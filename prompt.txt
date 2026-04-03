@@ -1,0 +1,11 @@
+read through the synopsis.txt to know the synopsis of our project and go through first-meeting.pdf
+to knwo more about what we are solving. we basically want to firstly model sead such that we can use 
+cfr and cfr+ to output the nash equilibrium and then we do the variant of it in which we do not know all the 
+attacker types but they have upper bound the no. of attackers and have to learn along the way.
+our goal is to minimize te regret. 
+first start with and help us to formalise the problem statement properly basically using proper equations
+ and everything that tells what are we trying to achieve. Use the notations and methods similar to regret.pdf
+ and write it  in the same fashion all the equations formally like a research paper. You have to write that in
+ the report files. There is  a format of writting that and you can access that from report template.txt.
+ Please follow instructions of report-template.txt thoroughly and write a well defined problem statement
+  formally exactly as done in regret.pdf
