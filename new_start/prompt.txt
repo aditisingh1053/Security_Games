@@ -1,0 +1,27 @@
+Now we want to create a presentation from this.
+We have attached a latex format to use use create all the slides using that
+We want to have our presentation divided into 3 sections
+ namely literature review
+which we did on our stackelberg security game model, different
+ papers we read a little bit about 
+them and why we chose to go with sequential stackelberg compared to 
+sequential whcih is CFR whcih is a much harder problem
+
+Then we move on to the intial problem how is it solved and the paarticualar
+ problem we pin pointed and are gonna solve
+I want you to lay down the problem setup the work done already on this problem
+
+Now we come down to how we are solving it firstly we go with the overall 
+idea of the proof that the regret will be sublinear in this case too
+and highlight the key components of the proof then write about the incremental
+ convex polytope algorithm(make sure to introduce and define all these concepts 
+ half spaces, which convex polytopes we are taking about exactly, the E set and 
+ everything beforehand)
+
+After going on with the proof write the algorithm which we propose using that and attach 
+a few graphs which we have generated here.
+
+Also make sure to use figures  
+("a picture is worth a thousand words") to explain the ideas wherever possible
+generate very good images to visualize polytopes if possible that would be really helpful
+Also make sure to have the main equations in the proof.

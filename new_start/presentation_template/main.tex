@@ -1,0 +1,152 @@
+% This template uses the base PolyU presentation style file with edits from Swaprava Nath to make it customized for IIT Bombay
+% The template is most suited for game theory presentations as the relevant packages in included. The example of each feature is explained with one example.
+% Feel free to replicate and use the template with appropriate credit attribution.
+
+\documentclass[10pt,aspectratio=169]{beamer}
+\usepackage[utf8]{inputenc}
+\usetheme[secheader]{Boadilla}
+\usepackage{poly}
+
+
+%%%%%%%% additional packages begin %%%%%%%
+
+\usepackage{pgf,tikz}
+\usetikzlibrary{circuits.ee.IEC,arrows}
+\usepackage{xgames}
+\usepackage[sc]{mathpazo}
+\usepackage[capitalise,noabbrev]{cleveref}
+\Crefname{property}{Property}{Properties}
+\Crefname{theorem}{Theorem}{Theorems}
+\Crefname{example}{Example}{Examples}
+\Crefname{table}{Table}{Tables}
+\Crefname{algorithm}{Algorithm}{Algorithms}
+
+\newcommand{\question}[1]{\begin{alertblock}{Question}{#1}\end{alertblock} }
+\newcommand{\answer}[1]{\begin{block}{Answer}{#1}\end{block} }
+\newcommand{\greenblock}[2]{\begin{exampleblock}{#1}{#2}\end{exampleblock} }
+\newcommand{\impterm}[1]{\textbf{\color{purple}{#1}}}
+\newcommand{\impcompterm}[1]{\textbf{\color{blue}{#1}}}
+\newcommand{\SN}[1]{{\color{red}{SN: }{#1}}}
+\newcommand{\argmax}{\arg\,\max}
+\newcommand{\argmin}{\arg\,\min}
+
+
+%%%%%%%% additional packages end %%%%%%%
+
+\title[Short title]{Here goes your brilliant long title}
+\subtitle{Week MCXVII}
+\author{Gigabitosaurus}
+\date{\footnotesize Slide preparation acknowledgments: Petaflopospus}
+
+
+\begin{document}
+
+\maketitle
+
+\section{Formal Representation of Games}
+
+\begin{frame}{Normal Form Games}
+\begin{itemize}
+    \item It is a representation technique for games -- particularly suitable for \impterm{static games}
+    \item In a {\em static game}, the players interact only once with each other
+\end{itemize}
+
+\pause
+\greenblock{Notation}{
+\begin{itemize}
+    \item $N=\{1, 2, 3, \ldots, n\}$, set of players
+    \item $S_i:$ set of strategies for player $i$, \quad $s_i \in S_i$
+    \item Set of strategy profiles $S=\times_{i \in N} S_i$
+    \item A strategy profile $s = (s_1, s_2, s_3, \ldots, s_n) \in S$
+    \item Strategy profile without player $i$: $s_{-i} = (s_1, s_2, ..., s_{i-1}, s_{i+1}, \ldots, s_n)$
+    \item $u_i: S \to \mathbb{R}$, utility function of player $i$
+\end{itemize}
+}
+\begin{itemize}
+    \item \impcompterm{Normal form} representation is a tuple $ \langle N, (S_i)_{i \in N}, (u_i)_{i \in N} \rangle$
+    \item If $S_i$ is finite $\forall i \in N$, this is called a finite game.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Example: Penalty Shootout Game}
+\begin{center}
+\begin{matrixgame}[player names={Shooter, Goalkeeper}, w=2, h=1]
+3 \payoffmatrix{-1, 1 & 1, -1 & 1, -1\\ 1, -1 & -1, 1 & 1, -1\\ 1, -1 & 1, -1 & -1, 1}
+4 \leftlabel{L, C, R}
+5 \toplabel{L, C, R}
+6 \bottomlabel{}
+7 \end{matrixgame}
+\pause
+\begin{itemize}
+    \item $N=\{1,2\}$, $1=\text{Shooter}, 2=\text{Goalkeeper}$
+    \item $S_1=S_2=\{L,C,R\}$
+    \item $u_1(L,L) = -1, u_1(L,C) = u_1(L,R) = 1$
+    \item $u_2(L,L) = 1, u_2(L,C) = u_2(L,R)=-1$
+    \item (loosely) $u_1(X,X) = -1 = -u_2(X,X), u_1(X,Y) = -u_2(X,Y) = 1$
+\end{itemize}
+\end{center}
+\end{frame}
+
+
+\section{Dominance}
+
+\begin{frame}{Domination in NFGs}
+    \begin{center}
+    \begin{matrixgame}[player names={Player 1, Player 2}, w=2, h=1]
+    3 \payoffmatrix{1, 0 & 1, 3 & 3, 2\\ -1, 6 & 0, 5 & 3, 3}
+    4 \leftlabel{U, D}
+    5 \toplabel{L, C, R}
+    6 \end{matrixgame}
+    \end{center}
+    \pause
+    \question{Will a {\bf rational} Player 2 ever play R?}
+\end{frame}
+
+
+
+\section{Nash Equilibrium}
+
+\begin{frame}{Nash Equilibrium (Nash 1951)}
+    
+    \greenblock{}{
+    \begin{center}
+        \bf No player gains by a unilateral deviation
+    \end{center}
+    }
+    \pause
+
+\begin{definition}[Nash Equilibrium]
+    A strategy profile $(s_i^{*}, s_{-i}^{*})$ is a pure strategy Nash equilibrium (PSNE) if $\forall i \in N$ and $\forall s_i \in S_i$
+    \[u_i(s_i^{*}, s_{-i}^{*}) \geqslant u_i(s_i, s_{-i}^{*}).\]
+\end{definition}
+
+\pause
+\begin{center}
+    \begin{matrixgame}[player names={Friend 1, Friend 2}, w=2, h=1]
+    3 \payoffmatrix{2, 1 & 0, 0\\ 0, 0 & 1, 2}
+    4 \leftlabel{F, C}
+    5 \toplabel{F, C}
+    6 \bottomlabel{Football or Cricket Game}
+    7 \end{matrixgame}
+\end{center}
+\end{frame}
+
+\begin{frame}{Best Response View}
+\begin{itemize}
+    \item A best response of a player i against the strategy profile $s_{-i}$ of other players is a strategy that gives the maximum utility i.e., 
+\[B_i(s_{-i})= \{s_i \in S_i:  u_i(s_i, s_{-i}) \geq u_i(s_i', s_{-i}), \forall s_i' \in S_i\}\]
+\item PSNE is a strategy profile ($s_i^{*}, s_{-i}^{*}$) s.t. 
+\[ s_i^{*} \in B_i(s_{-i}^{*}), \forall i \in N \]
+\item PSNE gives stability -- once there, no rational player unilaterally deviates
+\end{itemize}
+\pause
+\question{Relationship between SDSE, WDSE, PSNE?}
+\pause 
+\answer{SDSE $\implies$ WDSE $\implies$ PSNE}
+\end{frame}
+
+
+\backmatter
+
+\end{document}

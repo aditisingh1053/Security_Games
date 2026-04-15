@@ -1,11 +1,12 @@
 Theme: Security Games
-Classical Stackelberg Security Games assume that the defender commits to a strategy and that the attacker best responds. This breaks down in high-stakes military scenarios such as Suppression of Enemy Air Defences (SEAD), where both sides adapt simultaneously over multiple rounds under resource constraints and imperfect information.
-
-This project models the attacker (SEAD aircraft and decoys) versus defender (surface-to-air missile systems) interaction as a repeated, simultaneous-move imperfect-information game, where the state evolves through resource depletion across stages with options for escalation or ceasefire.
-
-We implement CFR and CFR+ on this SEAD game model, validate convergence, and study how equilibrium strategies evolve as resources deplete. We additionally treat the attacker’s decoy budget as a formal mechanism design variable, varying it to study phase transitions in strategic advantage.
-
-As an extension, we explore modifications to the CFR framework that account for risk-averse behaviour rather than optimising purely in expectation. We investigate whether weighting outcomes by worst-case scenarios better captures how real military commanders make decisions under existential resource constraints and how such equilibria differ from their risk-neutral counterparts.
+Classical Stackelberg Security Games assume that the defender commits to a strategy and that the attacker best responds. This breaks down in high-stakes military scenarios such as 
+Suppression of Enemy Air Defences (SEAD), where both sides adapt simultaneously over multiple rounds under resource constraints and imperfect information.
+This project models the attacker (SEAD aircraft and decoys) versus defender (surface-to-air missile systems) interaction as a repeated, simultaneous-move imperfect-information game,
+where the state evolves through resource depletion across stages with options for escalation or ceasefire.
+We implement CFR and CFR+ on this SEAD game model, validate convergence, and study how equilibrium strategies evolve as resources deplete.
+We additionally treat the attacker’s decoy budget as a formal mechanism design variable, varying it to study phase transitions in strategic advantage.
+As an extension, we explore modifications to the CFR framework that account for risk-averse behaviour rather than optimising purely in expectation.
+We investigate whether weighting outcomes by worst-case scenarios better captures how real military commanders make decisions under existential resource constraints and how such equilibria differ from their risk-neutral counterparts.
 
 The project is implementation and experiment-oriented. We compare CFR-based Nash equilibria with a Stackelberg baseline and empirically analyse robustness across varying resource configurations, with relevance to Indian and global defence contexts.
 
