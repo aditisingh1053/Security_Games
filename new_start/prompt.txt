@@ -1,18 +1,19 @@
 Now we want to create a presentation from this.
-We have attached a latex format to use use create all the slides using that
+We have attached a latex format in the directory presentation_template to use ,create all the slides using that
 We want to have our presentation divided into 3 sections
- namely literature review
+namely literature review
 which we did on our stackelberg security game model, different
  papers we read a little bit about 
 them and why we chose to go with sequential stackelberg compared to 
-sequential whcih is CFR whcih is a much harder problem
+simultaneous because form a defender's perspective we are worse off in sequential 
+so to have a worse case bound we are continuting to work on sequential (explain why as well thoda sa)
 
-Then we move on to the intial problem how is it solved and the paarticualar
+Then we move on to the intial problem(give some slides to define the problem formally) how is it solved and the paarticualar
  problem we pin pointed and are gonna solve
 I want you to lay down the problem setup the work done already on this problem
 
 Now we come down to how we are solving it firstly we go with the overall 
-idea of the proof that the regret will be sublinear in this case too
+idea of the proof that the regret wiAll be sublinear in this case too
 and highlight the key components of the proof then write about the incremental
  convex polytope algorithm(make sure to introduce and define all these concepts 
  half spaces, which convex polytopes we are taking about exactly, the E set and 
@@ -25,3 +26,15 @@ Also make sure to use figures
 ("a picture is worth a thousand words") to explain the ideas wherever possible
 generate very good images to visualize polytopes if possible that would be really helpful
 Also make sure to have the main equations in the proof.
+
+SO the flow should be 
+firstly explain the original problem statement .
+then tell about the literature review we did (mention why we didn't use simultaneous move game and move forward with this idea)
+then the exact problem description we are solving
+explain the sub linear regret we want to achieve
+proof of the whole thing(properly).
+then then the algo which we have used
+and finally the results.
+
+do note that the [proof is the main part of our research so give more priority to it]. also don't copy paste completely make it in a prentation format.
+

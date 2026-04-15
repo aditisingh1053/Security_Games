@@ -1,0 +1,915 @@
+================================================================================
+  PRESENTATION SPEAKING SCRIPT
+  No-Regret Learning in Stackelberg Security Games
+  with an Unknown, Bounded Set of Attacker Types
+  CS 6002 Project
+================================================================================
+
+GENERAL TIPS
+------------
+- Total slides: ~30 logical frames. Aim for ~45 sec to 90 sec per slide;
+  total talk should be ~20-25 minutes.
+- Each "[CLICK]" marker corresponds to a `\pause` in the slide and is the
+  point at which the next bullet/box appears. Time the click to your speech.
+- Boxes use the colors of the slide itself: dark green = primary,
+  blue = formal definitions/theorems, soft red = "watch out / our claim".
+- Pronunciations:
+    Stackelberg  = "STAH-kel-berg"
+    Balcan       = "BAL-kan"
+    Haghtalab    = "HAGH-ta-lab"
+    Procaccia    = "Pro-KAH-cha"
+    Cauchy       = "KOH-shee"
+    Hedge / Polynomial Weights = these are the names of online learning
+                                  algorithms.
+- A useful safety phrase if you go blank: "Let me move on to the next slide
+  and come back to this if there's time."
+
+
+================================================================================
+SLIDE 1  -- Title slide
+================================================================================
+SAY:
+  "Good morning everyone. We are Aditi, Ishita and Sabil from CS 6002.
+  Our project is on no-regret online learning in Stackelberg Security Games,
+  but in a setting where the defender does not know in advance which attacker
+  types they may face -- only that the number of distinct types is bounded.
+  Our base paper is Balcan, Blum, Haghtalab and Procaccia, EC 2015, which is
+  the standard reference for online learning in Stackelberg security games."
+
+DURATION: ~30 sec.
+
+
+================================================================================
+SLIDE 2  -- Outline
+================================================================================
+SAY:
+  "Here is what we'll cover. Three sections.
+   First, a quick literature review on Stackelberg security games and where
+   our problem sits. Second, the formal problem setup and the result of Balcan
+   et al. that we build on. Third -- the heart of our project -- our extension,
+   the proof of the regret bound, the algorithm we propose, and the experiments
+   we ran to validate it."
+
+DURATION: ~30 sec.
+
+
+================================================================================
+SECTION 1  --  LITERATURE REVIEW AND MOTIVATION
+================================================================================
+
+================================================================================
+SLIDE 3  -- Stackelberg Security Games (SSGs)
+================================================================================
+SAY:
+  "Let's start with what a Stackelberg Security Game actually is. There are
+   two players: a defender and an attacker. The defender has limited resources
+   to protect a set of n potential targets.
+
+   This is not just an abstract problem -- these games are deployed in
+   real-world security settings. The US Coast Guard, the Federal Air Marshals,
+   LAX airport patrols, and even wildlife anti-poaching programs use these
+   models. Tambe's 2012 book gives a comprehensive overview.
+
+   Conceptually, it's called Stackelberg because the defender commits first to
+   a randomized strategy, and the attacker observes this strategy and best-
+   responds to it."
+
+[CLICK -- 'The classical assumption' box appears]
+
+  "The classical assumption that makes the analysis simple is that there is
+   a single attacker with perfectly known utility function. Under that
+   assumption you can compute the optimal commitment with a linear or
+   mixed-integer program."
+
+[CLICK -- last bullet appears]
+
+  "But in reality the defender faces many possible attacker types -- different
+   poachers, different threat actors -- whose utility functions are not known
+   in advance. That's where things get interesting."
+
+DURATION: ~75 sec.
+
+
+================================================================================
+SLIDE 4  -- What the literature says about attacker uncertainty
+================================================================================
+SAY:
+  "There are several lines of work that try to handle this uncertainty.
+
+   First, robust optimization, by Pita and others in 2010, where you plan
+   against the worst-case payoffs. This gives safe but pessimistic strategies.
+
+   Second, Bayesian Stackelberg games -- Kiekintveld et al., Marecki et al. --
+   which assume you have a prior distribution over attacker types. The downside
+   is that you need to know that prior, which is usually not realistic.
+
+   Third, learning a single unknown attacker type, by Letchford et al. and
+   the 2014 paper by Blum, Haghtalab and Procaccia. They give query-efficient
+   learning algorithms. But they assume only ONE unknown type, not a sequence.
+
+   Finally, online learning against an adversarial sequence of attacker types,
+   which is the 2015 Balcan, Blum, Haghtalab, Procaccia paper, our base paper."
+
+[CLICK -- box appears]
+
+  "We chose Balcan et al. as our starting point for three reasons. One: it
+   doesn't need a prior. The adversary is allowed to pick any sequence from
+   a known set K. Two: they prove sublinear regret upper bounds AND a matching
+   linear-regret lower bound, so the picture is complete. And three -- this is
+   the punchline -- they explicitly leave open the question, what happens when
+   K itself is not known in advance? That's the question we attack."
+
+DURATION: ~90 sec.
+
+
+================================================================================
+SLIDE 5  -- Sequential vs Simultaneous Security Games
+================================================================================
+SAY:
+  "Before we go further, a quick word on a modeling choice we made.
+
+   There are two natural ways to model the timing of the game. The simultaneous
+   version on the left: the defender picks a coverage probability vector, the
+   attacker picks a target, both at the same time, neither sees the other.
+   In this model the loss function is linear in p, and standard online linear
+   optimization gives root-T-log-n regret almost for free.
+
+   On the right: the sequential, or Stackelberg, model. Here the defender
+   commits FIRST, the attacker observes the committed mixed strategy, and
+   then best-responds. This is what the base paper uses. The loss is no longer
+   linear -- in fact it is non-linear, non-convex, and even discontinuous in p,
+   because the attacker's best response can jump as p crosses a boundary.
+
+   You might ask, 'Why pick the harder model?'"
+
+[CLICK -- alert box appears]
+
+  "Because sequential is strictly harder for the defender. In the simultaneous
+   case the attacker has to guess, but in sequential the attacker can exploit
+   any exposed corner of our coverage vector. So a regret bound proved in the
+   sequential model is a worst-case bound that automatically also covers the
+   simultaneous case. From a defender's safety perspective, the sequential
+   model is the right place to live."
+
+DURATION: ~90 sec.
+
+
+================================================================================
+SLIDE 6  -- Where our project sits
+================================================================================
+SAY:
+  "Now, let me tell you exactly where our work fits. Balcan et al. give two
+   results. On the upper bound side, if K -- the set of attacker types -- is
+   KNOWN to the defender at the start of the game, and there are k types,
+   they give an online algorithm with regret of order root of T n-squared k
+   log(nk). Sublinear in T, polynomial in everything else.
+
+   On the lower bound side, they show that if you place no restriction on K --
+   if the set can have up to two-to-the-T-plus-one types -- then no online
+   algorithm can avoid linear-in-T regret."
+
+[CLICK -- 'Our question' alert]
+
+  "So there is a gap between 'fully known finite K' and 'no restriction at all'.
+   Our question is: what if K is unknown a priori, but its size is bounded by
+   a known constant K-max?"
+
+[CLICK -- last bullets]
+
+  "This is a genuinely open middle ground. We focus on the full-information
+   feedback setting -- where after each round the defender learns the identity
+   of the attacker -- so that we can isolate the issue of 'unknown K' from
+   the separate issue of bandit-style partial feedback."
+
+DURATION: ~90 sec.
+
+
+================================================================================
+SECTION 2  --  PROBLEM SETUP
+================================================================================
+
+================================================================================
+SLIDE 7  -- Game primitives (from Balcan et al., 2015)
+================================================================================
+SAY:
+  "Now the formal model. We follow the notation of Balcan et al. exactly so
+   you can map everything back to the paper.
+
+   Top box: targets are 1 through n. The defender has R resources. A schedule
+   is a subset of targets that one resource can defend simultaneously. A pure
+   strategy is a valid assignment of resources to schedules. A mixed strategy
+   is a distribution s over pure strategies. The matrix M is the indicator
+   matrix of which targets each pure strategy covers, so the induced
+   coverage probability vector p equals M times s. p_i is the probability that
+   target i is defended in the resulting random draw. Capital cal-P is the
+   convex polytope of all valid coverage vectors.
+
+   Bottom box -- defender utilities. We use two functions:
+     u_d^c (i)  is the defender's payoff if target i is attacked AND covered.
+     u_d^u (i)  is the defender's payoff if target i is attacked AND uncovered.
+   Both are bounded between minus 1 and plus 1.
+
+   When target i is attacked under coverage p, the defender's expected utility
+   is the convex combination of these two cases, weighted by the probability
+   that the target is or is not covered: u_d^c(i) p_i plus u_d^u(i) times
+   (1 minus p_i). This is linear in p for each fixed target i."
+
+DURATION: ~90 sec.
+
+
+================================================================================
+SLIDE 8  -- Strategy space P for n=2
+================================================================================
+SAY:
+  "Let me make the strategy space concrete with the simplest non-trivial case,
+   n equals 2. There are two targets and one resource which is allowed to be
+   idle. The coverage vector is (p_1, p_2) and the constraints are: p_1 and
+   p_2 are non-negative, and their sum is at most 1.
+
+   That gives us a 2-dimensional triangle, exactly the one that Balcan et al.
+   draw in Figure 1 of their paper.
+
+   The vertices have a clean interpretation:
+     - vertex (1, 0): always cover target 1.
+     - vertex (0, 1): always cover target 2.
+     - vertex (0, 0): the resource is idle, no target is defended.
+   Any point inside the triangle is a randomization between these three
+   pure strategies. cal-P is a convex polytope."
+
+DURATION: ~60 sec.
+
+
+================================================================================
+SLIDE 9  -- Attacker types and best response
+================================================================================
+SAY:
+  "Now the attacker side. An attacker TYPE alpha is just a pair of utility
+   functions u^c_alpha and u^u_alpha, again bounded in -1 to +1, with the same
+   convention: covered versus uncovered.
+
+   Given the defender's commitment p, type alpha computes its expected utility
+   for attacking each target i, and best-responds: it picks the target that
+   maximizes its own expected utility. We write this as b_alpha(p), the best-
+   response function.
+
+   The defender's per-round payoff is then u_d evaluated at the target that
+   the attacker actually chose, namely b_alpha(p)."
+
+[CLICK -- alert box appears]
+
+  "Now here is THE key technical difficulty of the entire setting. The
+   best-response operator b_alpha is piecewise constant in p. As p moves
+   continuously, the attacker's best target jumps discretely from one to
+   another. So the defender's loss is NOT linear, NOT convex, and NOT even
+   continuous in p. That breaks all standard online learning toolboxes,
+   and is why Balcan et al. need the polytope machinery we'll see in a moment."
+
+DURATION: ~90 sec.
+
+
+================================================================================
+SLIDE 10  -- Repeated game and regret
+================================================================================
+SAY:
+  "Putting things together. The horizon T is known. The adversary is OBLIVIOUS,
+   meaning it picks the entire sequence of attacker types a_1 through a_T
+   before the game starts. It does not adapt to what we play.
+
+   Each round: we commit p_t, the attacker of type a_t plays its best response,
+   the defender receives the payoff. Under full information feedback we then
+   observe a_t -- the identity of the attacker -- and the first time we see
+   any new type, we additionally receive its full utility function.
+
+   The benchmark we compare against is the best fixed coverage vector in
+   hindsight: the single p in cal-P that, looking back at the realized sequence
+   of attackers, would have given the highest cumulative payoff."
+
+[CLICK -- Expected regret box appears]
+
+  "And the expected regret is exactly what you'd expect: the cumulative payoff
+   of that best fixed strategy minus the expected cumulative payoff of our
+   online algorithm. The expectation is only over the algorithm's internal
+   randomness, not over the adversary, because the adversary is fixed."
+
+DURATION: ~90 sec.
+
+
+================================================================================
+SLIDE 11  -- Balcan, Blum, Haghtalab, Procaccia (2015) -- known K
+================================================================================
+SAY:
+  "Here is the result we are extending -- Theorem 5.1 of Balcan et al."
+
+[Box appears]
+
+  "If K is KNOWN at the start, with k attacker types, and feedback is full
+   information, there is an online algorithm achieving expected regret of
+   order root of T n-squared k log(nk). The key features:
+   sublinear in T -- so per-round regret tends to zero;
+   polynomial in n and in k.
+   This is what makes 'no-regret learning in Stackelberg security games'
+   feasible at all."
+
+[CLICK -- bullets appear]
+
+  "The proof technique is what we will inherit. They partition the strategy
+   space cal-P into finitely many best-response regions, enumerate the
+   epsilon-approximate extreme points of those regions, and run an online
+   learning subroutine over those extreme points as an expert set.
+
+   They also prove a matching lower bound: if K is unrestricted -- if it
+   could have up to two-to-the-T-plus-one types -- then linear regret is
+   forced. So SOME restriction on K is necessary."
+
+[CLICK -- alert appears]
+
+  "And our extension, in one sentence: K is unknown a priori, but bounded by
+   a known constant K-max. The first time a type appears, we get to observe
+   its full utility function -- consistent with the full-information setting."
+
+DURATION: ~90 sec.
+
+
+================================================================================
+SECTION 3  --  PROOF, ALGORITHM, AND RESULTS  (the heart of the talk)
+================================================================================
+
+================================================================================
+SLIDE 12  -- Primer: half-spaces and convex polytopes
+================================================================================
+SAY:
+  "Before we get into the proof, a quick primer on the geometric objects we
+   need. Anyone who's seen LP duality will be familiar.
+
+   A HALF-SPACE in R^n is the set of points satisfying a single linear
+   inequality, a-transpose-p less than or equal to b. It is the half of R^n
+   on one side of the hyperplane.
+
+   A CONVEX POLYTOPE is a bounded intersection of finitely many such
+   half-spaces.
+
+   Now the security-game-specific definitions. For each attacker type alpha
+   and each target i, we define cal-P-i-alpha as the set of coverage vectors
+   for which alpha's best response is exactly target i. This is a convex
+   polytope, because saying 'alpha attacks i' is exactly the conjunction of
+   the linear inequalities U_alpha(i, p) is at least U_alpha(j, p) for every
+   other target j.
+
+   And then for a 'response profile' sigma -- a function from a catalogue of
+   types C to N that says which target each type would attack -- the region
+   cal-P-sigma(C) is the intersection over all alpha in C of those polytopes.
+   It's again a convex polytope. These polytopes will be the building blocks
+   of the algorithm."
+
+DURATION: ~90 sec.
+
+
+================================================================================
+SLIDE 13  -- A concrete example for n=2: one best-response cut
+================================================================================
+SAY:
+  "Let me make this concrete in our 2-target example so the picture sticks.
+
+   On the left you see the triangle cal-P. We have ONE attacker type alpha_1.
+   The boundary of its best-response regions is the SINGLE line where
+   U_alpha_1 of target 1 equals U_alpha_1 of target 2. That line cuts the
+   triangle into two polygons.
+
+   On one side -- the green region in the picture -- alpha_1 prefers target 1.
+   On the other side -- the orange region -- alpha_1 prefers target 2. So
+   cal-P is split into 2 convex polytopes. That's how a single attacker
+   refines the strategy space."
+
+DURATION: ~60 sec.
+
+
+================================================================================
+SLIDE 14  -- Adding more types refines the partition
+================================================================================
+SAY:
+  "Now what happens if we add more attacker types. Top picture: catalogue of
+   2 types, alpha_1 and alpha_2. Each type contributes its own boundary line.
+   The first split has been REFINED -- the two original regions are each cut
+   further by the second line. We now get a finer partition into convex
+   polygons.
+
+   Bottom: with 3 types we have 3 lines, and the partition is even finer.
+   The general rule: adding type alpha introduces n-choose-2 boundary
+   inequalities -- one for each pair of targets. For n equal to 2 that is
+   exactly one line per type, which is what we see.
+
+   Two important observations on the right:
+
+   First, existing polytopes get SLICED, never lost. The partition only ever
+   gets finer when a new type arrives.
+
+   Second, and this is critical -- inside any single region cal-P-sigma(C),
+   the best response of every catalogued attacker is FIXED. So the defender's
+   payoff, as a function of p inside that region, is LINEAR. The non-linearity
+   only happens AT region boundaries, where the best response jumps. Inside
+   any region we're back in linear-algebra land."
+
+DURATION: ~100 sec.
+
+
+================================================================================
+SLIDE 15  -- The E(C) set of extreme points
+================================================================================
+SAY:
+  "OK, here is the key object that powers the entire analysis: the set
+   cal-E of epsilon-approximate extreme points of the partition.
+
+   The point of the previous slide was that the defender's payoff is linear
+   inside each polytope cal-P-sigma. A standard fact from linear programming
+   is that a linear function on a convex polytope attains its maximum at a
+   VERTEX. So if we want to find the best fixed coverage vector across the
+   whole strategy space, we know it can only happen at a vertex of one of
+   these regions.
+
+   So we define cal-E of C, with parameter epsilon, as the set of
+   epsilon-approximate vertices of all the regions cal-P-sigma. Think of it
+   as a finite set of candidate strategies, one per regional vertex.
+
+   Two key facts from the base paper:
+
+   First, the upper-most equation is Lemma 4.3. It says that the best element
+   of cal-E does almost as well as the best fixed strategy in all of cal-P,
+   up to an additive error of 2 epsilon T. So restricting our search to the
+   finite set cal-E only loses 2 epsilon T in regret -- a price we will absorb.
+
+   Second, the bottom equation is Lemma 4.4. It bounds the SIZE of cal-E.
+   For a catalogue of size |C|, the cardinality of cal-E is at most order of
+   (2 to the n plus C n squared) to the power n, times n to the power C.
+   Polynomial in C for any fixed n. That's why we can afford to run an
+   experts algorithm over cal-E."
+
+DURATION: ~110 sec.
+
+
+================================================================================
+SLIDE 16  -- E(C) grows as new types are discovered
+================================================================================
+SAY:
+  "Visually: as the catalogue of discovered types grows, cal-E grows with it.
+
+   Left panel: |C| equals 1, the partition has 2 regions, and there are 4
+   vertices marked in red. That is cal-E for one type.
+
+   Middle: |C| equals 2, the partition has more regions, more vertices --
+   cal-E now has 6 elements.
+
+   Right: |C| equals 3, the partition is finer still, and cal-E has 9
+   vertices.
+
+   Two things to note. First, |cal-E of C_i| is uniformly bounded by what we
+   call N-max -- the value of |cal-E| evaluated at the maximum allowed
+   catalogue size K-max. So even though cal-E is dynamic, its size never
+   exceeds N-max. Second, and this is what makes the algorithm work: at any
+   point in time, the analysis only uses the CURRENT cal-E, not future ones.
+   We do not need to anticipate which types will arrive."
+
+DURATION: ~80 sec.
+
+
+================================================================================
+SLIDE 17  -- Our main theorem
+================================================================================
+SAY:
+  "Now we are ready to state our main result."
+
+[Box]
+
+  "Let K be an unknown set of attacker types whose size is bounded by K-max.
+   Under full information feedback, against any oblivious adversarial
+   sequence of length T, our algorithm -- which we'll see in a moment, called
+   GROW-CATALOGUE -- achieves expected regret of order root of T times K-max
+   times the quantity n-squared plus K-max log n.
+
+   Three remarks on this bound.
+
+   First, it has the SAME functional form as Balcan et al. Theorem 5.1, with
+   their k literally replaced by our K-max. So we pay nothing extra in the
+   exponents -- just the gentle replacement of the known k with the worst-case
+   bound.
+
+   Second, when K-max is a constant, this becomes order n root T, which
+   matches the known-K rate up to logarithmic factors. So at constant K-max
+   the cost of NOT knowing K up front is essentially zero.
+
+   Third, the bound is instance-adaptive: if only K-prime distinct types
+   actually appear in the realized sequence, the bound automatically tightens
+   to root of T K-prime times the same parenthesized factor. So if the
+   adversary is mild, we pay less."
+
+DURATION: ~110 sec.
+
+
+================================================================================
+SLIDE 18  -- Proof idea in one picture
+================================================================================
+SAY:
+  "Here is the proof in one picture. Look at the time-line. The horizon
+   1 to T is split into FIVE intervals -- I'll call them epochs.
+
+   The red marks tau_1, tau_2, tau_3, tau_4 are the rounds at which a new
+   attacker type is OBSERVED for the first time. Between two consecutive
+   such rounds, the catalogue is fixed. Inside epoch i, the catalogue C_i
+   has exactly i types.
+
+   The proof is then five steps.
+
+   Step 1: split the horizon into epochs as just described.
+   Step 2: within each epoch, the catalogue is fixed, so we can run an
+   online learning subroutine on cal-E of C_i.
+   Step 3: apply Balcan et al.'s within-epoch analysis -- which combines a
+   regret bound for the subroutine with Lemma 4.3 -- to each epoch.
+   Step 4: sum over the at most K-max epochs using Cauchy--Schwarz.
+   Step 5: at most K-max rounds are 'discovery rounds' where we played
+   blind because the attacker was new. Each such round contributes at most
+   2 to the regret, so the discovery rounds contribute a 2 K-max additive
+   constant.
+
+   Five steps. Let me go through the analytic pieces in detail."
+
+DURATION: ~100 sec.
+
+
+================================================================================
+SLIDE 19  -- Proof -- within-epoch regret
+================================================================================
+SAY:
+  "Step one of the analytic part: the WITHIN-EPOCH regret.
+
+   The first box is what Balcan et al. call Proposition 1. It says: for any
+   fixed expert set cal-E_i, and any number of rounds L_i within an epoch,
+   there is an online learning algorithm whose expected regret is bounded by
+   c_1 times root of L_i times log of the size of cal-E_i. This is the
+   standard Hedge / Multiplicative Weights guarantee adapted to losses in
+   minus-1 plus-1.
+
+   Why does this matter? Because within an epoch, the catalogue is fixed,
+   and the loss is well-defined on each element of cal-E_i. So we can run
+   a black-box experts algorithm and get root-L_i regret against the BEST
+   element of cal-E_i for that epoch."
+
+DURATION: ~75 sec.
+
+
+================================================================================
+SLIDE 20  -- Proof -- still within-epoch (Lemma 4.3)
+================================================================================
+SAY:
+  "But we want to compete with p-star, the best fixed strategy in ALL of
+   cal-P, not just the best element of the finite set cal-E_i. That's where
+   Balcan et al.'s Lemma 4.3 comes in.
+
+   Inside epoch i, the sequence of attackers only uses types from C_i.
+   Lemma 4.3 then says: the best element of cal-E_i is almost as good as
+   the best p in the whole continuous polytope cal-P, up to an additive
+   error of 2 epsilon L_i.
+
+   So combining the two boxes, I have, on one hand, an algorithm that does
+   almost as well as the best in cal-E_i, and on the other hand the best
+   in cal-E_i is almost as good as the best in cal-P -- including p-star.
+   Chain these and you get a regret bound for the algorithm against
+   p-star, restricted to epoch i."
+
+DURATION: ~75 sec.
+
+
+================================================================================
+SLIDE 21  -- Proof -- combining the two within an epoch
+================================================================================
+SAY:
+  "Here is the chained inequality, written out. For every epoch i, the
+   expected utility of the algorithm restricted to that epoch is at least:
+   the cumulative utility of p-star restricted to that epoch,
+   minus a 2 epsilon L_i term -- the Lemma 4.3 approximation loss,
+   minus a c_1 root of L_i log of cal-E_i term -- the within-epoch regret
+   of the online learning subroutine.
+
+   Read it as: 'algorithm payoff is within (a small approximation gap) plus
+   (a small algorithmic regret) of the benchmark, on each epoch separately.'
+   This is the per-epoch building block."
+
+DURATION: ~60 sec.
+
+
+================================================================================
+SLIDE 22  -- Proof -- summing epochs with Cauchy--Schwarz
+================================================================================
+SAY:
+  "Now we sum the per-epoch inequality over all epochs. Three contributions
+   pop out.
+
+   First, two-K-max for the discovery rounds we agreed to absorb.
+   Second, two epsilon T for the total Lemma-4.3 approximation losses --
+   note that the epoch-wise 2 epsilon L_i terms summed to 2 epsilon T because
+   L_i sum to T.
+   Third, c_1 times root of log N-max -- which is the LOG of the maximum
+   cal-E size -- multiplied by the SUM over epochs of root L_i."
+
+[CLICK -- Cauchy-Schwarz line appears]
+
+  "Now apply Cauchy--Schwarz to that sum. The sum of root L_i over at most
+   K-prime epochs is at most root of K-prime times the sum of L_i, which is
+   in turn at most root of K-max T. That's the only place K-max enters
+   multiplicatively in the leading term."
+
+[CLICK -- final bound]
+
+  "Plug in epsilon equal to one over root T -- a fixed choice -- and use
+   the bound on log N-max from Lemma 4.4, which gives n-squared plus
+   K-max log n. The result is exactly our main theorem:
+   regret of order root of T K-max times the quantity n-squared plus
+   K-max log n. Q E D."
+
+DURATION: ~105 sec.
+
+
+================================================================================
+SLIDE 23  -- Regime in which the bound is meaningful
+================================================================================
+SAY:
+  "One useful sanity check: when does this bound ACTUALLY say something
+   meaningful, that is, when is it sublinear in T?
+
+   The bound is sublinear iff K-max times the parenthesized factor is
+   little-oh of T. Equivalently, K-max should be little-oh of the minimum of
+   two quantities: T over n-squared, and root of T over log n.
+
+   In words:
+     If K-max is constant -- order one -- the bound is order n root T,
+     which is great for any n up to root T.
+     If K-max scales as some polynomial in n, say n-to-the-c, the bound is
+     sublinear as long as T grows faster than n to the c-plus-2.
+     If K-max grows roughly as T over n-squared, the upper bound becomes
+     trivial -- and that's not a weakness of our analysis, it's matched by
+     the linear-regret lower bound of Balcan et al. on the unrestricted side.
+
+   So we cleanly cover the regime that the lower bound leaves open."
+
+DURATION: ~90 sec.
+
+
+================================================================================
+SLIDE 24  -- The GROW-CATALOGUE algorithm
+================================================================================
+SAY:
+  "OK -- with the analysis behind us, here is the algorithm itself.
+
+   We initialize an empty catalogue C, an empty expert set cal-E, and we set
+   the approximation parameter epsilon to one over root T.
+
+   For each round t from 1 to T:
+     If cal-E is still empty -- that is, we haven't seen any attacker yet --
+     play a default uniform coverage. Otherwise, sample p_t from the
+     current Hedge distribution q_t over cal-E.
+
+     Then observe the attacker a_t.
+
+     If a_t is a NEW type -- not in C -- this is a discovery round. We add
+     a_t and its utility function to C, recompute cal-E from scratch on the
+     enlarged catalogue, and restart Hedge on the new expert set.
+
+     Otherwise, this is a routine round. We compute the loss l_t at every
+     extreme point in cal-E, and update Hedge using an anytime learning rate
+     eta of t-local equals root of log cal-E over t-local. This anytime
+     schedule is what gives us the root-L_i per-epoch regret without having
+     to know the epoch length in advance.
+
+   We implement two variants of step 'recompute cal-E':
+     'Total recomputation' -- rebuild from scratch every time. Easier to
+     verify.
+     'Incremental' -- only update the new vertices and reuse the old Hedge
+     weights for the surviving extreme points. Same regret guarantee, just
+     faster wall-clock."
+
+DURATION: ~120 sec.
+
+
+================================================================================
+SLIDE 25  -- Experiment design
+================================================================================
+SAY:
+  "Now to validate the theorem empirically. We need an adversary that
+   actually exercises the catalogue-growing behaviour, but without being so
+   adversarial that the experiment becomes pathological.
+
+   We use what we call a 'staggered-uniform' adversary. We split the horizon
+   into K-max phases of equal length. In phase i, the attacker is drawn
+   uniformly at random from the FIRST i types alpha_1 through alpha_i.
+
+   So in phase 1 only alpha_1 attacks. In phase 2, both alpha_1 and alpha_2
+   are present and each appears with probability one-half. In phase i, all i
+   revealed types are equally likely.
+
+   Concretely: n equals 3, K-max equals 4, T equals 4000, and we average
+   over 40 random instances of the game's utility functions.
+
+   Two things to note about this design. First, OLD types keep arriving
+   after they've been revealed -- we don't forget alpha_1 once alpha_2
+   appears. That makes the benchmark p-star a genuine compromise across
+   types, not a single specialist. Second, the reveal rounds are at exactly
+   0, 1000, 2000, and 3000 -- so we have a clean signal of exactly when
+   the catalogue grows."
+
+DURATION: ~110 sec.
+
+
+================================================================================
+SLIDE 26  -- Result 1: per-round regret vs iteration
+================================================================================
+SAY:
+  "Here is the first experiment. The x-axis is the round t, the y-axis is
+   the average per-round regret in a sliding window of 75 rounds, averaged
+   over the 40 seeds.
+
+   The red dashed lines mark the four reveal rounds -- 0, 1000, 2000, 3000.
+
+   What I want you to notice is the SHAPE of the curve. At each reveal
+   round there is a clear SPIKE in the regret -- because at that very
+   round we have just seen a new type, our Hedge is briefly miscalibrated,
+   and we play badly. Then between reveals, the curve drops as Hedge
+   re-converges on the now-larger catalogue.
+
+   Two qualitative facts to highlight:
+
+   One -- the spike at reveal 1 is very tall, because we are starting from
+   an empty catalogue. By reveal 4, the spike is much smaller, because we
+   already know three of the four types and the partition only changes
+   marginally.
+
+   Two -- between reveals the curve is roughly flat or slightly falling,
+   confirming that Hedge does converge to the best expert in cal-E within
+   each epoch. This is exactly the behaviour the proof predicts."
+
+DURATION: ~110 sec.
+
+
+================================================================================
+SLIDE 27  -- Result 2: global average regret Regret(t) / t
+================================================================================
+SAY:
+  "Second experiment, same setup but a different y-axis. Now we plot the
+   GLOBAL average regret -- that is, cumulative regret divided by t -- as
+   a function of t.
+
+   This is the right metric to check the sublinear claim of the theorem.
+   The theorem says regret is order root of T times some constant. So
+   regret over t should look like one over root t -- a curve that decays
+   to zero.
+
+   And that is exactly what we see. From an initial peak around 0.35, the
+   global average regret drops sharply during the first epoch and then
+   continues to decay all the way to nearly zero by round 4000. The tiny
+   bumps you can see at rounds 1000, 2000, 3000 are the same reveals from
+   the previous slide -- they nudge the average up briefly but the effect
+   is small relative to the overall sublinear decay.
+
+   So both empirically and theoretically, we have a no-regret algorithm
+   for the unknown-K setting."
+
+DURATION: ~100 sec.
+
+
+================================================================================
+SLIDE 28  -- Take-aways
+================================================================================
+SAY:
+  "Three quick take-aways before I wrap up.
+
+   First: in repeated security games we deliberately analyze the SEQUENTIAL
+   Stackelberg model because it is strictly harder than the simultaneous
+   one for the defender. A bound there is a worst-case bound that covers
+   the easier setting too.
+
+   Second: when K is unknown but bounded by a known constant K-max, we
+   prove a regret bound of root of T K-max times n-squared plus K-max log n.
+   That is the same functional form as Balcan et al.'s Theorem 5.1 with
+   their k replaced by our K-max. The cost of not knowing K up front is
+   essentially absorbed into K-max.
+
+   Third: the bound is meaningful as long as K-max times that parenthesized
+   factor is much less than T -- and outside that regime the matching
+   linear-regret lower bound of Balcan et al. takes over. So our result
+   sits cleanly in the gap that the original paper leaves open.
+
+   Fourth, the experiments confirm everything. Sublinear regret, visible
+   spikes at discovery rounds, decay to zero between."
+
+[CLICK -- Future directions box]
+
+  "And what's NEXT, briefly. Three threads:
+   - Extending the result to PARTIAL-information feedback, where the
+     defender does not see the attacker's identity. That requires an
+     adaptive version of the barycentric spanner machinery from Section 6
+     of Balcan et al.
+   - Handling an ADAPTIVE adversary in the partial-info case -- this is
+     Balcan et al.'s explicit open problem.
+   - Tightening the logarithmic dependence on K-max using sleeping-experts
+     techniques."
+
+DURATION: ~120 sec.
+
+
+================================================================================
+SLIDE 29  -- References
+================================================================================
+SAY:
+  "Just listing the main references for completeness. The base paper is
+   Balcan, Blum, Haghtalab, Procaccia, EC 2015. Cesa-Bianchi and Lugosi
+   for the prediction-with-experts background. Tambe's book for the
+   real-world deployments. The other references are pointers for the
+   literature review section earlier."
+
+DURATION: ~30 sec.
+
+
+================================================================================
+SLIDE 30  -- Thank you / Questions
+================================================================================
+SAY:
+  "Thank you very much for listening. We're happy to take any questions."
+
+DURATION: ~10 sec.
+
+
+================================================================================
+LIKELY QUESTIONS AND ONE-LINE ANSWERS
+================================================================================
+
+Q1. "Why is sequential strictly harder than simultaneous from the
+     defender's perspective?"
+A1. Because in sequential Stackelberg the attacker observes the defender's
+    mixed strategy and best-responds optimally to it -- so any randomization
+    is exposed. In simultaneous, the attacker has to guess, which limits
+    what it can exploit. Hence the defender's worst-case loss is higher in
+    sequential. A bound proved there is automatically valid for the easier
+    simultaneous case.
+
+Q2. "What if K_max is not known either?"
+A2. Then we are in the regime of Balcan et al.'s lower bound: with no bound
+    at all on K, every online algorithm has linear-in-T regret. So K_max
+    being known is the minimal extra information we need. In practice, K_max
+    is set by domain knowledge -- 'no more than 5 distinct threat actors'
+    -- and the algorithm is robust to over-estimation: if we set K_max
+    larger than the actual K, the bound just degrades polynomially in K_max.
+
+Q3. "What is the role of the epsilon parameter?"
+A3. epsilon trades off the discretization error of cal-E (which is 2 epsilon T)
+    against the size of cal-E (which grows polynomially in 1/epsilon).
+    Setting epsilon equal to 1/root(T) balances the two and gives the
+    sublinear regret rate.
+
+Q4. "Why Cauchy-Schwarz at the end?"
+A4. We have a per-epoch regret of root(L_i log N_max) for each of K' epochs.
+    The sum of root(L_i) over at most K' epochs is, by Cauchy-Schwarz, at
+    most root(K' * sum of L_i) = root(K' T). That's how K_max enters the
+    final bound.
+
+Q5. "How does this compare to the original Balcan et al. bound?"
+A5. The functional form is identical: root(T n^2 K_max log(n K_max)) versus
+    their root(T n^2 k log(nk)). The only difference is that they have
+    the actual k whereas we have the upper bound K_max. When the realized
+    number of types K' is less than K_max, our bound is also instance-
+    adaptive in K' for the leading term.
+
+Q6. "Why does the per-round regret in your plot go negative or near-zero
+     between discovery rounds?"
+A6. Because Hedge converges quickly inside each epoch -- after about
+    50-100 rounds it has identified the best expert in the current
+    catalogue. The benchmark p* is a single FIXED strategy that has to
+    work across the whole sequence, so our adaptive play can match or
+    even beat it within a single epoch. The negative regret is not a
+    contradiction -- the theorem is an UPPER bound, not a lower bound.
+
+Q7. "What changes if you allow an adaptive adversary?"
+A7. In the full-information setting, even the adaptive case is handled by
+    the same proof -- Hedge's regret guarantee is robust to adaptive
+    adversaries. In the partial-information setting it is genuinely open;
+    that's one of our future directions.
+
+Q8. "Is the algorithm computationally efficient?"
+A8. Each Hedge update is order |cal-E|. Recomputing cal-E from scratch
+    when a new type is discovered is exponential in n in the worst case,
+    but for fixed n and K_max it is a constant. The incremental variant
+    avoids the recomputation by reusing weights for surviving vertices.
+
+Q9. "How does this scale to large n?"
+A9. The bound has an n^2 term, so it grows polynomially in n. The bottleneck
+    in practice is the size of cal-E, which is exponential in n in the
+    worst case. For large n one would need approximation schemes for
+    cal-E or different algorithmic ideas; our experiments use n = 3 where
+    everything is tractable.
+
+Q10. "What is the practical value of full-information feedback?"
+A10. It models settings where a successful attack is logged with the
+     attacker's identity -- e.g. cyber attacks where forensics reveal the
+     threat actor. The partial-information version, where you only see
+     which target was attacked, is the natural next step and is what
+     Section 6 of Balcan et al. handles for the known-K case.
+
+================================================================================
+END OF SCRIPT
+================================================================================
