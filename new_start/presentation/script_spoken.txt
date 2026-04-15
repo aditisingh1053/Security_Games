@@ -1,0 +1,129 @@
+PRESENTATION SPEAKING SCRIPT
+No-Regret Learning in Stackelberg Security Games with an Unknown, Bounded Set of Attacker Types
+Target duration: 20 minutes total.
+Read this aloud directly in class. No bullets, no dashes, just flowing speech.
+
+
+Slide 1. Title.
+Good morning. I am Aditi, and with me are Ishita and Sabil. Our project is on no regret online learning in Stackelberg security games, in a setting where the defender does not know in advance which attacker types they will face. Our base paper is Balcan, Blum, Haghtalab and Procaccia from EC 2015. Let me walk you through what we did.
+
+
+Slide 2. Outline.
+The talk has three parts. A short literature review on Stackelberg security games, then the formal setup and the known result that we build on, and then the main technical contribution of the project which is the proof of a sublinear regret bound in a regime that the base paper leaves open. I will spend most of the time on the proof because that is where the actual work is.
+
+
+Slide 3. Stackelberg security games.
+A Stackelberg security game has a defender protecting a set of n targets with limited resources, and an attacker who picks one target to attack. This is not just a theoretical model. It is actually deployed. The US Coast Guard, LAX airport patrols, the Federal Air Marshals service and wildlife anti poaching programs all use these games in real operation. The word Stackelberg means the defender commits first to a randomised strategy, and the attacker observes that commitment and best responds to it. The classical version of the problem assumes a single attacker with a perfectly known utility function, and then the best strategy can be computed by a linear program. But in practice the defender faces many attacker types with utility functions that are not known in advance, and that is where the interesting story begins.
+
+
+Slide 4. What the literature does about this.
+There are broadly four lines of work. Robust optimisation by Pita and others plans against
+the worst case payoff. Bayesian Stackelberg games by Kiekintveld and Marecki assume a prior
+over attacker types. Learning a single unknown type, by Letchford and by Blum, Haghtalab and 
+Procaccia, gives query efficient algorithms but assumes only one type rather than a sequence. 
+And the fourth line, which is our base paper, is Balcan, Blum, Haghtalab and Procaccia from 2015. 
+They allow an adversarially chosen sequence of attacker types from a known finite set, and they prove no regret bounds. We picked this as our starting point because it has clean sublinear bounds, a matching lower bound, and the authors explicitly leave open the case where the set of attacker types is itself not known.
+
+
+Slide 5. Sequential versus simultaneous.
+A quick word on modelling. There are two ways to think about the timing of each round. In the simultaneous version, the defender and the attacker act at the same time, the attacker does not see the coverage vector, and the loss is linear in the coverage. Off the shelf online learning gives you square root of T times log n regret almost for free in that case. In the sequential version, which is the real Stackelberg model, the defender commits first, the attacker observes, and then best responds. Here the loss is not linear, not convex, and not even continuous in the coverage vector, because the best response can jump discretely as the coverage crosses a boundary. We consciously chose the sequential model because it is strictly harder for the defender. The attacker can exploit any exposed corner of our randomisation, so a regret bound proved in the sequential setting is a worst case bound that automatically covers the simultaneous case as well.
+
+
+Slide 6. Where our project sits.
+Balcan and coauthors prove two things. First, if the attacker type set K is known in advance and has size k, there is an online algorithm with regret of the order of the square root of T times n squared times k times log of n times k. Second, if K is allowed to be completely unrestricted, no online algorithm can avoid linear in T regret. So there is a clean gap. On one side K is fully known, on the other side K has no bound at all. Our question sits right in the middle. What if K is unknown in advance but we know an upper bound K max on its size. We work in the full information feedback setting, where at the end of each round we observe the identity of the attacker. This lets us isolate the unknown K question from the separate question of partial feedback.
+
+
+Slide 7. Game primitives.
+Let me now state the formal model. We follow the exact notation of the base paper. The targets are indexed 1 through n. The defender has R resources and a collection of schedules, each schedule being a set of targets one resource can cover at once. A pure strategy is a valid assignment of resources to schedules, a mixed strategy is a distribution s over pure strategies, and this induces a coverage probability vector p, where p sub i is the probability that target i ends up defended. The set of valid coverage vectors is a convex polytope that we call capital P. Next, about payoffs, I want to define the two variables that we will use throughout. The defender has u-d-c of i, which is the payoff if target i is attacked and covered, and u-d-u of i, which is the payoff if target i is attacked and uncovered, both bounded in minus 1 to plus 1. When target i is attacked under coverage p, the defender's expected utility U-d of i comma p is u-d-c of i times p sub i plus u-d-u of i times one minus p sub i. For a fixed target this is linear in p, which we will use heavily later.
+
+
+Slide 8. Strategy space for n equal to 2.
+Let me make the strategy space concrete with the simplest non trivial case, n equal to 2 targets. We have one resource and we also allow it to stay idle. So p sub 1 and p sub 2 are non negative and their sum is at most 1. That gives us a 2 dimensional triangle, which is exactly the picture Balcan and coauthors draw in Figure 1 of their paper. The corners have clean interpretations. The vertex at 1 comma 0 means always cover target 1. The vertex 0 comma 1 means always cover target 2. And the vertex 0 comma 0 means the resource is sitting idle and no target is defended. Every interior point of the triangle is just a randomisation between these. The capital P is a convex polytope, the simplest non trivial one, and this is the object the entire theory lives on.
+
+
+Slide 9. Attacker types and best response.
+Now the attacker side. An attacker type alpha is specified by its own pair of utility functions u-alpha-c and u-alpha-u, again bounded in minus 1 to plus 1. Its expected utility from attacking target i under coverage p is u-alpha-c of i times p sub i plus u-alpha-u of i times one minus p sub i. Given the committed coverage p, the attacker of type alpha best responds by picking the target that maximises its own expected utility. We call this b sub alpha of p, the best response function. And then the defender's payoff is u-d evaluated at whatever target alpha actually chose, which is b sub alpha of p. Now here is the key difficulty of the whole setting. The best response function is piecewise constant in p. As p moves smoothly, the best target jumps discretely. So the defender's loss, as a function of p, is not linear, not convex, and not continuous. That is exactly why the standard online learning toolbox does not apply, and why the base paper needs the polytope machinery that we will see in a moment.
+
+
+Slide 10. The repeated game and regret.
+Putting the pieces together, the horizon T is known, and the adversary is oblivious, meaning it fixes the entire sequence a 1 up to a T of attacker types before the game starts. At each round we commit a coverage vector, the attacker at round t best responds, and we receive a payoff. Under full information feedback we observe the identity of the attacker at the end of the round, and the first time any new type appears we also see its full utility function. The benchmark we compare against is the best fixed coverage vector in hindsight, which is the single p star in capital P that would have given the highest total payoff over the realised sequence. The expected regret of our online algorithm is then the cumulative payoff of p star minus the expected cumulative payoff of our algorithm, where the expectation is only over the algorithm's internal randomness.
+
+
+Slide 11. The Balcan result we start from.
+Here is the theorem we are extending. If K is known in advance and has exactly k types, under full information feedback, Balcan, Blum, Haghtalab and Procaccia give an online algorithm whose expected regret is bounded by the order of the square root of T times n squared times k times log of n k. That is sublinear in T and polynomial in n and k. Their proof technique is the machinery we will reuse. They partition the coverage space P into finitely many best response regions, enumerate the epsilon approximate extreme points of those regions, and run a standard experts algorithm on those extreme points. They also prove a matching lower bound showing that if K is unrestricted, linear in T regret is unavoidable, so some restriction on K is necessary. Our extension is the mildest possible. The set K is unknown a priori, but we are given a constant K max with the promise that the size of K is at most K max, and the first time any type appears we observe its full utility function.
+
+
+Slide 12. Half spaces and convex polytopes.
+Now we get to the heart of the proof. A quick primer on the geometry first. A half space in R to the n is just a single linear inequality, the set of p satisfying a transpose p less than or equal to b. A convex polytope is a bounded intersection of finitely many such half spaces. Now the security game specific definitions. For each attacker type alpha and each target i, define P-i-alpha as the set of coverage vectors in capital P where alpha's best response is exactly target i. This is a convex polytope because the statement that alpha attacks i is just the conjunction of n minus 1 linear inequalities, U alpha of i, p at least U alpha of j, p for each other j. And for a response profile sigma that assigns each attacker in a catalogue C to a target, we define P sigma of C as the intersection over all alpha in C of the corresponding P-sigma-alpha-alpha polytopes. This is again a convex polytope. These regions P sigma of C will be the building blocks of the entire analysis.
+
+
+Slide 13. A concrete example for two targets.
+Let me make this picture concrete in the two target case. Take one attacker type alpha 1. The boundary of its best response regions is the single line where U of alpha 1 of target 1 equals U of alpha 1 of target 2. One line cuts the triangle into two pieces. On one side alpha 1 prefers target 1, on the other side alpha 1 prefers target 2. So with one attacker type, the capital P is split into two convex polytopes. That is the smallest non trivial example of our partition.
+
+
+Slide 14. Adding more types refines the partition.
+With two attacker types we have two lines, each contributing its own boundary, and the partition refines. The two original pieces are each sliced further by the second line. With three types we have three lines and it is finer still. The general rule is that each new attacker type adds n choose 2 lines to the picture, one for each pair of targets. For n equal to 2 that is one line per attacker. And here is the important observation. Inside any single region P sigma of C, the best response of every attacker in the catalogue is fixed by the definition of the region. So the defender's payoff, restricted to that region, is actually linear in p. The nasty non continuity only lives at the boundaries between regions. Inside any one region it is just linear algebra.
+
+
+Slide 15. The set cal E of extreme points.
+This leads to the key object of the proof, the set cal E of C. Because the defender's payoff is linear inside each region, and a linear function on a convex polytope attains its maximum at a vertex, the best fixed coverage vector over the whole P can only sit at a vertex of one of these regions. So we define cal E of C with parameter epsilon as the set of epsilon approximate vertices of all regions P sigma of C taken together. Think of it as a finite set of candidate best strategies, roughly one per regional vertex. There are two key facts from the base paper that we will use directly. The first one is Lemma 4.3. It says that for any attacker sequence of length T prime that only uses types in C, the best element of cal E is within 2 epsilon T prime of the best strategy in the entire P. So restricting the search to the finite cal E only costs 2 epsilon T prime in regret. The second one is Lemma 4.4. It bounds the size of cal E by the order of 2 to the n plus size of C times n squared, to the power n, times n to the power size of C. Polynomial in size of C for any fixed n, which is what makes running an experts algorithm over cal E actually feasible.
+
+
+Slide 16. Cal E grows as new types are discovered.
+Visually, as the catalogue grows, cal E grows with it. On the left with one attacker we have a few vertices, in the middle with two we get more, on the right with three even more. For the proof what matters is just that the size of cal E stays uniformly bounded by what we call N max, which is the value of cal E evaluated at the maximum catalogue size K max. So cal E never blows up past this ceiling, no matter how the discoveries play out.
+
+
+Slide 17. Our main theorem.
+Here is our main result. Let K be an unknown set of attacker types whose size is at most K max. Under full information feedback, against any oblivious adversarial sequence of length T, we prove that there is an online algorithm whose expected regret is at most the order of the square root of T times K max times the quantity n squared plus K max log n. This has the same functional form as the Balcan theorem with k literally replaced by our K max. When K max is a constant, the bound is of the order of n times square root of T, which matches the known K rate up to log factors. And the bound is instance adaptive. If only K prime distinct types actually show up in the realised sequence, the leading factor in the bound tightens automatically from K max to K prime.
+
+
+Slide 18. Proof idea in one picture.
+Here is the proof in one picture. Look at the time axis. The red marks tau 1 through tau 4 are the rounds at which each new attacker type is first observed. Between consecutive marks the catalogue is fixed. We call each such stretch an epoch. Inside epoch i the catalogue has exactly i types, so the algorithm runs a clean experts subroutine on a fixed cal E i. The proof will split the horizon into these epochs, apply the standard experts bound plus Lemma 4.3 inside each one, sum the per epoch regrets across at most K max epochs using Cauchy Schwarz, and absorb the K max discovery rounds as a small additive term. Let me walk through the pieces now.
+
+
+Slide 19. Within epoch experts regret.
+The first piece is the standard experts guarantee, which is Proposition 1 of the base paper. It says that for any fixed expert set cal E i and any L i rounds inside epoch i, there is an online learning algorithm whose expected regret on that epoch is at most a constant times the square root of L i times log of cal E i. Why can we use this? Because inside an epoch the catalogue is fixed, the loss is well defined on each element of cal E i, and we can run a black box experts algorithm and get square root of L i log cal E i regret against the best single element of cal E i for that epoch.
+
+
+Slide 20. Within epoch approximation by Lemma 4.3.
+But we do not want to compete against the best element of a finite set, we want to compete against p star, the best coverage vector in the entire capital P. That is exactly what Lemma 4.3 gives us. Inside epoch i all attackers are from the current catalogue C i, so we apply Lemma 4.3 to that catalogue and that sub sequence. It tells us that the best element of cal E i is within 2 epsilon L i of the best strategy over all of P, and since p star is in P, the same bound applies to p star restricted to epoch i.
+
+
+Slide 21. Per epoch combined bound.
+Chaining these two inequalities gives us, for every epoch i, that the expected utility of our algorithm on that epoch is at least the utility of p star restricted to that epoch, minus a 2 epsilon L i term from the Lemma 4.3 approximation, minus a constant times the square root of L i log cal E i from the experts subroutine regret. Read it as algorithm is within a small approximation loss plus a small experts regret of the benchmark, on each epoch separately. This is the per epoch building block.
+
+
+Slide 22. Summing epochs and Cauchy Schwarz.
+Now sum the per epoch inequality over all at most K max epochs. The discovery rounds contribute at most 2 K max because the loss is bounded by 2 at each of them. The approximation losses sum to 2 epsilon T because the L i sum to T. And the experts regret terms give us a constant times the square root of log N max multiplied by the sum over epochs of the square root of L i. Now Cauchy Schwarz on that last sum. The sum over at most K prime epochs of square root of L i is at most the square root of K prime times the total length T, which is at most the square root of K max times T. That is the single place where K max enters multiplicatively in the leading term. Plugging epsilon equal to one over square root of T, and using Lemma 4.4 which says log N max is of the order of n squared plus K max log n, we get exactly what we claimed, expected regret at most the order of the square root of T times K max times the quantity n squared plus K max log n. And that closes the proof.
+
+
+Slide 23. Regime where the bound is meaningful.
+A quick sanity check on when this bound actually says something. It is sublinear in T exactly when K max times the bracket n squared plus K max log n is little o of T. If K max is a constant, the bound is of the order of n times square root of T for any n up to square root of T, which is the nicest case. If K max grows polynomially in n, say n to some power c, the bound stays sublinear as long as T grows faster than n to the c plus 2. And if K max is larger than roughly T over n squared the upper bound becomes trivial, but Balcan's linear lower bound kicks in there anyway. So we cover precisely the gap between known K and unrestricted K.
+
+
+Slide 24. The Grow Catalogue algorithm.
+Here is the actual algorithm. We call it Grow Catalogue. We start with an empty catalogue C and an empty expert set cal E and we set epsilon to one over square root of T. At every round, if cal E is still empty we play a default uniform coverage, otherwise we sample from the current Hedge distribution over cal E. Then we observe the attacker. If it is a new type not yet in the catalogue, we add it along with its utility, we recompute cal E of C epsilon from scratch, and we restart the Hedge subroutine on the new expert set. If it is a type we already know, we compute the loss at every element of cal E and update Hedge with an anytime learning rate, eta at t local equal to the square root of log cal E over t local. That anytime rate is exactly what lets the within epoch regret bound hold without knowing the epoch length in advance. In the actual implementation we wrote two versions of the recompute step. A total version that rebuilds cal E from scratch, and an incremental version that reuses Hedge weights for surviving vertices. Both give identical regret. Only the wall clock differs.
+
+
+Slide 25. Experiment setup.
+Now to the experiments. We want to actually validate the theorem empirically. For the adversary we use what we call a staggered uniform adversary. We split the horizon into K max phases of equal length. In phase i the attacker is drawn uniformly at random from the first i types, alpha 1 up to alpha i. So phase 1 only has alpha 1. Phase 2 has alpha 1 and alpha 2 with probability one half each. In phase i each of the i already revealed types appears with probability one over i. Our concrete settings are n equal to 3, K max equal to 4, T equal to 4000, and we average over 40 random games. Two small things to note. Old types keep showing up after they have been revealed, so the benchmark p star has to be a genuine compromise across all four types. And the four discovery rounds happen at exactly 0, 1000, 2000 and 3000, which gives us a very clean signal of when the catalogue grew.
+
+
+Slide 26. First result, per round regret.
+Here is the first plot. On the x axis is the round index, on the y axis is a rolling window average of the per round regret, averaged over the forty seeds. The red dashed lines mark the four discovery rounds. The shape is exactly what the proof predicts. At each discovery round we see a spike in per round regret, because at that very moment our Hedge is holding onto an expert set from the previous epoch and now has to deal with a brand new attacker. Between discoveries the curve decays as Hedge re converges inside the new epoch. Each new epoch contributes its own square root of L i log cal E i term to the sum, which is the spike followed by decay. And the spikes shrink over time, because by the fourth reveal we already know three of the four types, so the partition changes only marginally.
+
+
+Slide 27. Second result, global average regret.
+Same experiment, different y axis. Now we plot the global average regret, meaning cumulative regret divided by t, as a function of t. This is the natural way to check the sublinear claim, because the theorem says cumulative regret grows like square root of T, so divided by t it should decay like one over square root of t. And that is exactly what we observe. From an initial peak around 0.35 the curve drops sharply and then keeps decaying all the way to nearly zero by round 4000. The tiny bumps at 1000, 2000 and 3000 are the same spikes from the previous slide, smoothed out by the cumulative average. The sublinear behaviour is there, cleanly matching the theorem.
+
+
+Slide 28. Take aways and future work.
+Let me wrap up. In repeated security games we deliberately analyse the sequential Stackelberg model because it is harder for the defender, and a bound there automatically covers the simultaneous case. When the set of attacker types K is unknown but bounded by a known constant K max, we prove a regret of the order of the square root of T times K max times n squared plus K max log n. This is the same functional form as Balcan's theorem with k replaced by K max. The bound is meaningful as long as K max times that bracket is much less than T, and outside that regime Balcan's own linear lower bound takes over. For future work, the most interesting direction is the partial information bandit version, which needs an adaptive barycentric spanner construction. And the adaptive adversary under partial information is still an open problem, even in the base paper.
+
+
+Slide 29. References.
+These are the main references. The base paper is of course Balcan, Blum, Haghtalab and Procaccia, EC 2015. Cesa Bianchi and Lugosi for the experts and online learning background. Tambe's book for the real world deployments. And the rest is the literature review from earlier in the talk.
+
+
+Slide 30. Thank you.
+Thank you for listening. We are happy to take any questions.
