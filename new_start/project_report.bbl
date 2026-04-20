@@ -1,4 +1,4 @@
-\begin{thebibliography}{15}
+\begin{thebibliography}{16}
 \providecommand{\natexlab}[1]{#1}
 \providecommand{\url}[1]{\texttt{#1}}
 \expandafter\ifx\csname urlstyle\endcsname\relax
@@ -6,25 +6,31 @@
   \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
 
 \bibitem[Balcan et~al.(2015)Balcan, Blum, Haghtalab, and Procaccia]{balcan2015}
-Maria-Florina Balcan, Avrim Blum, Nika Haghtalab, and Ariel~D. Procaccia.
+M.-F. Balcan, A.~Blum, N.~Haghtalab, and A.~D. Procaccia.
 \newblock Commitment without regrets: online learning in {S}tackelberg security
   games.
 \newblock In \emph{Proceedings of the 16th {ACM} Conference on Economics and
   Computation ({EC})}, pages 61--78, 2015.
 
 \bibitem[Blum et~al.(2014)Blum, Haghtalab, and Procaccia]{blum2014b}
-Avrim Blum, Nika Haghtalab, and Ariel~D. Procaccia.
+A.~Blum, N.~Haghtalab, and A.~D. Procaccia.
 \newblock Learning optimal commitment to overcome insecurity.
 \newblock In \emph{Advances in Neural Information Processing Systems
   ({NeurIPS})}, 2014.
 
 \bibitem[Cesa-Bianchi and Lugosi(2006)]{cesa2006}
-Nicol{\`o} Cesa-Bianchi and G{\'a}bor Lugosi.
+N.~Cesa-Bianchi and G.~Lugosi.
 \newblock \emph{Prediction, Learning, and Games}.
 \newblock Cambridge University Press, 2006.
 
+\bibitem[Conitzer and Sandholm(2006)]{conitzer2006}
+V.~Conitzer and T.~Sandholm.
+\newblock Computing the optimal strategy to commit to.
+\newblock In \emph{Proceedings of the 7th {ACM} Conference on Electronic
+  Commerce ({EC})}, pages 82--90, 2006.
+
 \bibitem[Freund and Schapire(1997)]{freund1997}
-Yoav Freund and Robert~E. Schapire.
+Y.~Freund and R.~E. Schapire.
 \newblock A decision-theoretic generalization of on-line learning and an
   application to boosting.
 \newblock \emph{Journal of Computer and System Sciences}, 55\penalty0
@@ -32,27 +38,27 @@ Yoav Freund and Robert~E. Schapire.
 
 \bibitem[Gaillard et~al.(2019)Gaillard, Gerchinovitz, Huard, and
   Stoltz]{gaillard2019}
-Pierre Gaillard, Remi Gerchinovitz, Malo Huard, and Gilles Stoltz.
+P.~Gaillard, R.~Gerchinovitz, M.~Huard, and G.~Stoltz.
 \newblock Dying experts: efficient algorithms with optimal regret bounds.
 \newblock In \emph{Advances in Neural Information Processing Systems
   ({NeurIPS})}, 2019.
 
 \bibitem[Haghtalab et~al.(2022)Haghtalab, Lykouris, Nietert, and
   Wei]{haghtalab2022}
-Nika Haghtalab, Thodoris Lykouris, Sloan Nietert, and Alexander Wei.
+N.~Haghtalab, T.~Lykouris, S.~Nietert, and A.~Wei.
 \newblock Learning in {S}tackelberg games with non-myopic agents.
 \newblock In \emph{Proceedings of the 23rd {ACM} Conference on Economics and
   Computation ({EC})}, 2022.
 
 \bibitem[Harris et~al.(2024)Harris, Wu, and Balcan]{harris2024side}
-Keegan Harris, Zhiwei~Steven Wu, and Maria-Florina Balcan.
+K.~Harris, Z.~S. Wu, and M.-F. Balcan.
 \newblock Regret minimization in {S}tackelberg games with side information.
 \newblock In \emph{Advances in Neural Information Processing Systems
   ({NeurIPS})}, 2024.
 
 \bibitem[Kiekintveld et~al.(2011)Kiekintveld, Marecki, and
   Tambe]{kiekintveld2011}
-Christopher Kiekintveld, Janusz Marecki, and Milind Tambe.
+C.~Kiekintveld, J.~Marecki, and M.~Tambe.
 \newblock Approximation methods for infinite {B}ayesian {S}tackelberg games:
   modeling distributional payoff uncertainty.
 \newblock In \emph{Proceedings of the 10th International Conference on
@@ -60,46 +66,45 @@ Christopher Kiekintveld, Janusz Marecki, and Milind Tambe.
 
 \bibitem[Letchford et~al.(2009)Letchford, Conitzer, and
   Munagala]{letchford2009}
-Joshua Letchford, Vincent Conitzer, and Kamesh Munagala.
+J.~Letchford, V.~Conitzer, and K.~Munagala.
 \newblock Learning and approximating the optimal strategy to commit to.
 \newblock In \emph{Proceedings of the 2nd International Symposium on
   Algorithmic Game Theory ({SAGT})}, pages 250--262, 2009.
 
 \bibitem[Littlestone and Warmuth(1994)]{littlestone1994}
-Nick Littlestone and Manfred~K. Warmuth.
+N.~Littlestone and M.~K. Warmuth.
 \newblock The weighted majority algorithm.
 \newblock \emph{Information and Computation}, 108\penalty0 (2):\penalty0
   212--261, 1994.
 
 \bibitem[Marecki et~al.(2012)Marecki, Tesauro, and Segal]{marecki2012}
-Janusz Marecki, Gerald Tesauro, and Richard Segal.
+J.~Marecki, G.~Tesauro, and R.~Segal.
 \newblock Playing repeated {S}tackelberg games with unknown opponents.
 \newblock In \emph{Proceedings of the 11th International Conference on
   Autonomous Agents and Multi-Agent Systems ({AAMAS})}, pages 821--828, 2012.
 
 \bibitem[Mourtada and Maillard(2017)]{mourtada2017}
-Jaouad Mourtada and Odalric-Ambrym Maillard.
+J.~Mourtada and O.-A. Maillard.
 \newblock Efficient tracking of a growing number of experts.
 \newblock In \emph{Proceedings of the 28th International Conference on
   Algorithmic Learning Theory ({ALT})}, 2017.
 
 \bibitem[Pita et~al.(2010)Pita, Jain, Tambe, Ord{\'o}{\~n}ez, and
   Kraus]{pita2010}
-James Pita, Manish Jain, Milind Tambe, Fernando Ord{\'o}{\~n}ez, and Sarit
-  Kraus.
+J.~Pita, M.~Jain, M.~Tambe, F.~Ord{\'o}{\~n}ez, and S.~Kraus.
 \newblock Robust solutions to {S}tackelberg games: addressing bounded
   rationality and limited observations in human cognition.
 \newblock \emph{Artificial Intelligence}, 174\penalty0 (15):\penalty0
   1142--1171, 2010.
 
 \bibitem[Tambe(2012)]{tambe2012}
-Milind Tambe.
+M.~Tambe.
 \newblock \emph{Security and Game Theory: Algorithms, Deployed Systems, Lessons
   Learned}.
 \newblock Cambridge University Press, 2012.
 
 \bibitem[Yang et~al.(2014)Yang, Ford, Tambe, and Lemieux]{yang2014}
-Rong Yang, Benjamin Ford, Milind Tambe, and Andrew Lemieux.
+R.~Yang, B.~Ford, M.~Tambe, and A.~Lemieux.
 \newblock Adaptive resource allocation for wildlife protection against illegal
   poachers.
 \newblock In \emph{Proceedings of the 13th International Conference on

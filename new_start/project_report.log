@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023/Debian) (preloaded format=pdflatex 2026.4.15)  16 APR 2026 01:09
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023/Debian) (preloaded format=pdflatex 2026.4.15)  21 APR 2026 01:56
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -264,15 +264,6 @@ Package bm Info: No bold for \U/msa/m/n, using \pmb.
 Package bm Info: No bold for \U/msb/m/n, using \pmb.
 LaTeX Font Info:    Redeclaring math alphabet \mathbf on input line 149.
 )
-(/usr/share/texlive/texmf-dist/tex/latex/enumitem/enumitem.sty
-Package: enumitem 2019/06/20 v3.9 Customized lists
-\labelindent=\skip61
-\enit@outerparindent=\dimen170
-\enit@toks=\toks34
-\enit@inbox=\box55
-\enit@count@id=\count283
-\enitdp@description=\count284
-)
 (/usr/share/texlive/texmf-dist/tex/latex/graphics/graphicx.sty
 Package: graphicx 2021/09/16 v1.2d Enhanced LaTeX Graphics (DPC,SPQR)
 
@@ -290,28 +281,28 @@ Package graphics Info: Driver file: pdftex.def on input line 107.
 (/usr/share/texlive/texmf-dist/tex/latex/graphics-def/pdftex.def
 File: pdftex.def 2022/09/22 v1.2b Graphics/color driver for pdftex
 ))
-\Gin@req@height=\dimen171
-\Gin@req@width=\dimen172
+\Gin@req@height=\dimen170
+\Gin@req@width=\dimen171
 )
 (/usr/share/texlive/texmf-dist/tex/latex/booktabs/booktabs.sty
 Package: booktabs 2020/01/12 v1.61803398 Publication quality tables
-\heavyrulewidth=\dimen173
-\lightrulewidth=\dimen174
-\cmidrulewidth=\dimen175
-\belowrulesep=\dimen176
-\belowbottomsep=\dimen177
-\aboverulesep=\dimen178
-\abovetopsep=\dimen179
-\cmidrulesep=\dimen180
-\cmidrulekern=\dimen181
-\defaultaddspace=\dimen182
-\@cmidla=\count285
-\@cmidlb=\count286
-\@aboverulesep=\dimen183
-\@belowrulesep=\dimen184
-\@thisruleclass=\count287
-\@lastruleclass=\count288
-\@thisrulewidth=\dimen185
+\heavyrulewidth=\dimen172
+\lightrulewidth=\dimen173
+\cmidrulewidth=\dimen174
+\belowrulesep=\dimen175
+\belowbottomsep=\dimen176
+\aboverulesep=\dimen177
+\abovetopsep=\dimen178
+\cmidrulesep=\dimen179
+\cmidrulekern=\dimen180
+\defaultaddspace=\dimen181
+\@cmidla=\count283
+\@cmidlb=\count284
+\@aboverulesep=\dimen182
+\@belowrulesep=\dimen183
+\@thisruleclass=\count285
+\@lastruleclass=\count286
+\@thisrulewidth=\dimen184
 )
 (/usr/share/texlive/texmf-dist/tex/latex/algorithms/algorithm.sty
 Package: algorithm 2009/08/24 v0.1 Document Style `algorithm' - floating enviro
@@ -319,17 +310,17 @@ nment
 
 (/usr/share/texlive/texmf-dist/tex/latex/float/float.sty
 Package: float 2001/11/08 v1.3d Float enhancements (AL)
-\c@float@type=\count289
-\float@exts=\toks35
-\float@box=\box56
-\@float@everytoks=\toks36
-\@floatcapt=\box57
+\c@float@type=\count287
+\float@exts=\toks34
+\float@box=\box55
+\@float@everytoks=\toks35
+\@floatcapt=\box56
 )
 (/usr/share/texlive/texmf-dist/tex/latex/base/ifthen.sty
 Package: ifthen 2022/04/13 v1.1d Standard LaTeX ifthen package (DPC)
 )
-\@float@every@algorithm=\toks37
-\c@algorithm=\count290
+\@float@every@algorithm=\toks36
+\c@algorithm=\count288
 )
 (/usr/share/texlive/texmf-dist/tex/latex/algorithmicx/algpseudocode.sty
 Package: algpseudocode 
@@ -338,19 +329,28 @@ Package: algpseudocode
 Package: algorithmicx 2005/04/27 v1.2 Algorithmicx
 
 Document Style algorithmicx 1.2 - a greatly improved `algorithmic' style
-\c@ALG@line=\count291
-\c@ALG@rem=\count292
-\c@ALG@nested=\count293
-\ALG@tlm=\skip62
-\ALG@thistlm=\skip63
-\c@ALG@Lnr=\count294
-\c@ALG@blocknr=\count295
-\c@ALG@storecount=\count296
-\c@ALG@tmpcounter=\count297
-\ALG@tmplength=\skip64
+\c@ALG@line=\count289
+\c@ALG@rem=\count290
+\c@ALG@nested=\count291
+\ALG@tlm=\skip61
+\ALG@thistlm=\skip62
+\c@ALG@Lnr=\count292
+\c@ALG@blocknr=\count293
+\c@ALG@storecount=\count294
+\c@ALG@tmpcounter=\count295
+\ALG@tmplength=\skip63
 )
 Document Style - pseudocode environments for use with the `algorithmicx' style
-) (/usr/share/texlive/texmf-dist/tex/latex/xcolor/xcolor.sty
+) (/usr/share/texlive/texmf-dist/tex/latex/enumitem/enumitem.sty
+Package: enumitem 2019/06/20 v3.9 Customized lists
+\labelindent=\skip64
+\enit@outerparindent=\dimen185
+\enit@toks=\toks37
+\enit@inbox=\box57
+\enit@count@id=\count296
+\enitdp@description=\count297
+)
+(/usr/share/texlive/texmf-dist/tex/latex/xcolor/xcolor.sty
 Package: xcolor 2023/11/15 v3.01 LaTeX color extensions (UK)
 
 (/usr/share/texlive/texmf-dist/tex/latex/graphics-cfg/color.cfg
@@ -530,7 +530,21 @@ LaTeX Info: Redefining \cite on input line 694.
 \c@NAT@ctr=\count309
 )
 \c@theorem=\count310
-LaTeX Font Info:    Trying to load font information for T1+lmr on input line 67
+
+(/usr/share/texlive/texmf-dist/tex/latex/fancyhdr/fancyhdr.sty
+Package: fancyhdr 2022/11/09 v4.1 Extensive control of page headers and footers
+
+\f@nch@headwidth=\skip68
+\f@nch@O@elh=\skip69
+\f@nch@O@erh=\skip70
+\f@nch@O@olh=\skip71
+\f@nch@O@orh=\skip72
+\f@nch@O@elf=\skip73
+\f@nch@O@erf=\skip74
+\f@nch@O@olf=\skip75
+\f@nch@O@orf=\skip76
+)
+LaTeX Font Info:    Trying to load font information for T1+lmr on input line 78
 .
 
 (/usr/share/texmf/tex/latex/lm/t1lmr.fd
@@ -544,24 +558,24 @@ File: l3backend-pdftex.def 2024-01-04 L3 backend support: PDF output (pdfTeX)
 (./project_report.aux)
 \openout1 = `project_report.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 67.
-LaTeX Font Info:    ... okay on input line 67.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 67.
-LaTeX Font Info:    ... okay on input line 67.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 67.
-LaTeX Font Info:    ... okay on input line 67.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 67.
-LaTeX Font Info:    ... okay on input line 67.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 67.
-LaTeX Font Info:    ... okay on input line 67.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 67.
-LaTeX Font Info:    ... okay on input line 67.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 67.
-LaTeX Font Info:    ... okay on input line 67.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 67.
-LaTeX Font Info:    ... okay on input line 67.
-LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 67.
-LaTeX Font Info:    ... okay on input line 67.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 78.
+LaTeX Font Info:    ... okay on input line 78.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 78.
+LaTeX Font Info:    ... okay on input line 78.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 78.
+LaTeX Font Info:    ... okay on input line 78.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 78.
+LaTeX Font Info:    ... okay on input line 78.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 78.
+LaTeX Font Info:    ... okay on input line 78.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 78.
+LaTeX Font Info:    ... okay on input line 78.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 78.
+LaTeX Font Info:    ... okay on input line 78.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 78.
+LaTeX Font Info:    ... okay on input line 78.
+LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 78.
+LaTeX Font Info:    ... okay on input line 78.
 
 *geometry* driver: auto-detecting
 *geometry* detected driver: pdftex
@@ -571,14 +585,14 @@ LaTeX Font Info:    ... okay on input line 67.
 * layout: <same size as paper>
 * layoutoffset:(h,v)=(0.0pt,0.0pt)
 * modes: 
-* h-part:(L,W,R)=(54.2025pt, 505.89pt, 54.2025pt)
+* h-part:(L,W,R)=(50.58878pt, 513.11745pt, 50.58878pt)
 * v-part:(T,H,B)=(61.42993pt, 661.27007pt, 72.26999pt)
 * \paperwidth=614.295pt
 * \paperheight=794.96999pt
-* \textwidth=505.89pt
+* \textwidth=513.11745pt
 * \textheight=661.27007pt
-* \oddsidemargin=-18.06749pt
-* \evensidemargin=-18.06749pt
+* \oddsidemargin=-21.68121pt
+* \evensidemargin=-21.68121pt
 * \topmargin=-47.84006pt
 * \headheight=12.0pt
 * \headsep=25.0pt
@@ -597,19 +611,19 @@ LaTeX Font Info:    ... okay on input line 67.
 * \@reversemarginfalse
 * (1in=72.27pt=25.4mm, 1cm=28.453pt)
 
-LaTeX Info: Redefining \microtypecontext on input line 67.
-Package microtype Info: Applying patch `item' on input line 67.
-Package microtype Info: Applying patch `toc' on input line 67.
-Package microtype Info: Applying patch `eqnum' on input line 67.
-Package microtype Info: Applying patch `footnote' on input line 67.
-Package microtype Info: Applying patch `verbatim' on input line 67.
+LaTeX Info: Redefining \microtypecontext on input line 78.
+Package microtype Info: Applying patch `item' on input line 78.
+Package microtype Info: Applying patch `toc' on input line 78.
+Package microtype Info: Applying patch `eqnum' on input line 78.
+Package microtype Info: Applying patch `footnote' on input line 78.
+Package microtype Info: Applying patch `verbatim' on input line 78.
 Package microtype Info: Generating PDF output.
 Package microtype Info: Character protrusion enabled (level 2).
 Package microtype Info: Using default protrusion set `alltext'.
 Package microtype Info: Automatic font expansion enabled (level 2),
 (microtype)             stretch: 20, shrink: 20, step: 1, non-selected.
 Package microtype Info: Using default expansion set `alltext-nott'.
-LaTeX Info: Redefining \showhyphens on input line 67.
+LaTeX Info: Redefining \showhyphens on input line 78.
 Package microtype Info: No adjustment of tracking.
 Package microtype Info: No adjustment of interword spacing.
 Package microtype Info: No adjustment of character kerning.
@@ -639,43 +653,43 @@ Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 4
 File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Liv
 e
 ))
-Package hyperref Info: Link coloring OFF on input line 67.
+Package hyperref Info: Link coloring OFF on input line 78.
 
 (./project_report.out) (./project_report.out)
 \@outlinefile=\write3
 \openout3 = `project_report.out'.
 
 LaTeX Font Info:    Trying to load font information for OT1+lmr on input line 1
-02.
+09.
 
 (/usr/share/texmf/tex/latex/lm/ot1lmr.fd
 File: ot1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
 LaTeX Font Info:    Trying to load font information for OML+lmm on input line 1
-02.
+09.
 
 (/usr/share/texmf/tex/latex/lm/omllmm.fd
 File: omllmm.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
 LaTeX Font Info:    Trying to load font information for OMS+lmsy on input line 
-102.
+109.
 
 (/usr/share/texmf/tex/latex/lm/omslmsy.fd
 File: omslmsy.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
 LaTeX Font Info:    Trying to load font information for OMX+lmex on input line 
-102.
+109.
 
 (/usr/share/texmf/tex/latex/lm/omxlmex.fd
 File: omxlmex.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <10> on input line 102.
+(Font)              <10> on input line 109.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <7> on input line 102.
+(Font)              <7> on input line 109.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <5> on input line 102.
-LaTeX Font Info:    Trying to load font information for U+msa on input line 102
+(Font)              <5> on input line 109.
+LaTeX Font Info:    Trying to load font information for U+msa on input line 109
 .
 
 (/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsa.fd
@@ -684,7 +698,7 @@ File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 (/usr/share/texlive/texmf-dist/tex/latex/microtype/mt-msa.cfg
 File: mt-msa.cfg 2006/02/04 v1.1 microtype config. file: AMS symbols (a) (RS)
 )
-LaTeX Font Info:    Trying to load font information for U+msb on input line 102
+LaTeX Font Info:    Trying to load font information for U+msb on input line 109
 .
 
 (/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsb.fd
@@ -694,123 +708,134 @@ File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 File: mt-msb.cfg 2005/06/01 v1.0 microtype config. file: AMS symbols (b) (RS)
 )
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <8> on input line 102.
+(Font)              <9> on input line 109.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <6> on input line 102.
+(Font)              <6> on input line 109.
+LaTeX Font Info:    External font `lmex10' loaded for size
+(Font)              <8> on input line 109.
 Package microtype Info: Character `029' is missing
 (microtype)             in font `T1/lmr/m/sc/8'.
 (microtype)             Ignoring protrusion settings for this character.
-LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <9> on input line 109.
+LaTeX Font Info:    Trying to load font information for TS1+lmr on input line 1
+62.
+
+(/usr/share/texmf/tex/latex/lm/ts1lmr.fd
+File: ts1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
+)
 Package microtype Info: Character `029' is missing
 (microtype)             in font `T1/lmr/m/sc/9'.
 (microtype)             Ignoring protrusion settings for this character.
-
-Underfull \hbox (badness 10000) in paragraph at lines 155--160
-[]\T1/lmr/m/it/9 (+20) Regret bound. \T1/lmr/m/n/9 (+20) We prove (The-o-rem []
-7[])
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 155--160
-\T1/lmr/m/n/9 (+20) that \T1/lmr/m/sc/9 (+20) Grow-Catalogue \T1/lmr/m/n/9 (+20
-) has ex-pected re-gret
- []
+ [1{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}{/usr/share/texmf/fonts/e
+nc/dvips/lm/lm-ec.enc}{/usr/share/texmf/fonts/enc/dvips/lm/lm-mathit.enc}{/usr/
+share/texmf/fonts/enc/dvips/lm/lm-rm.enc}{/usr/share/texmf/fonts/enc/dvips/lm/l
+m-mathex.enc}{/usr/share/texmf/fonts/enc/dvips/lm/lm-mathsy.enc}
 
 
-Underfull \hbox (badness 4217) in paragraph at lines 155--160
-\OML/lmm/m/it/9 O\OT1/lmr/m/n/9 (+20) ([])$\T1/lmr/m/n/9 (+20) . This matches [
-]Bal-
- []
+{/usr/share/texmf/fonts/enc/dvips/lm/lm-ts1.enc}]
+[2]
 
-[1{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}{/usr/share/texmf/fonts/en
-c/dvips/lm/lm-ec.enc}{/usr/share/texmf/fonts/enc/dvips/lm/lm-mathit.enc}{/usr/s
-hare/texmf/fonts/enc/dvips/lm/lm-rm.enc}{/usr/share/texmf/fonts/enc/dvips/lm/lm
--mathex.enc}{/usr/share/texmf/fonts/enc/dvips/lm/lm-mathsy.enc}
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `math shift' on input line 327.
 
 
-] [2]
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `\epsilon' on input line 327.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `math shift' on input line 327.
+
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <10.95> on input line 336.
+(Font)              <10.95> on input line 383.
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `math shift' on input line 383.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `math shift' on input line 336.
-
-
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `math shift' on input line 336.
-
-
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `math shift' on input line 336.
-
-
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `subscript' on input line 336.
-
-
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\max' on input line 336.
-
-
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `math shift' on input line 336.
+(hyperref)                removing `math shift' on input line 383.
 
 
 LaTeX Font Warning: Font shape `T1/lmr/bx/sc' undefined
-(Font)              using `T1/lmr/bx/n' instead on input line 375.
+(Font)              using `T1/lmr/bx/n' instead on input line 420.
 
 Package hyperref Info: bookmark level for unknown algorithm defaults to 0 on in
-put line 385.
+put line 447.
 [3]
-Underfull \hbox (badness 1728) in paragraph at lines 556--558
- []\T1/lmr/bx/n/9 (+20) Step 9: Cauchy--Schwarz.[] \T1/lmr/m/n/9 (+20) Ap-ply-i
-ng the Cauchy--
+Underfull \hbox (badness 5133) in paragraph at lines 501--504
+\T1/lmr/m/it/9 (+20) tion \T1/lmr/m/n/9 (+20) ([]7[]) \T1/lmr/m/it/9 (+20) is s
+ub-lin-ear in $\OML/lmm/m/it/9 T$ \T1/lmr/m/it/9 (+20) if and only if $\OML/lmm
+/m/it/9 K[] \OMS/lmsy/m/n/9 ^^A
  []
+
+
+Underfull \hbox (badness 5908) in paragraph at lines 501--504
+\OT1/lmr/m/n/9 (+20) (\OML/lmm/m/it/9 n[] \OT1/lmr/m/n/9 (+20) + \OML/lmm/m/it/
+9 K[] [] n\OT1/lmr/m/n/9 (+20) ) = \OML/lmm/m/it/9 o\OT1/lmr/m/n/9 (+20) (\OML/
+lmm/m/it/9 T\OT1/lmr/m/n/9 (+20) )$\T1/lmr/m/it/9 (+20) ; equiv-a-lently, $\OML
+/lmm/m/it/9 K[] \OT1/lmr/m/n/9 (+20) =
+ []
+
+
+Underfull \hbox (badness 3884) in paragraph at lines 508--510
+[]\T1/lmr/bx/n/9 (+20) Corollary 9 \T1/lmr/m/n/9 (+20) (In-stance-adap-tive bou
+nd)\T1/lmr/bx/n/9 (+20) . []\T1/lmr/m/it/9 (+20) Let $\OML/lmm/m/it/9 K[] \OT1/
+lmr/m/n/9 (+20) =
+ []
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `\new@ifnextchar' on input line 521.
 
 [4]
-Underfull \hbox (badness 1668) in paragraph at lines 609--613
-[]\T1/lmr/bx/n/9 (+20) Corollary 9 \T1/lmr/m/n/9 (+20) (In-stance-adap-tiv-ity)
-\T1/lmr/bx/n/9 (+20) . []\T1/lmr/m/it/9 (+20) Let $\OML/lmm/m/it/9 K[] \OMS/lms
-y/m/n/9 ^^T \OML/lmm/m/it/9 K[]$
+Underfull \hbox (badness 7308) in paragraph at lines 697--702
+\T1/lmr/m/n/9 (+20) for an ab-so-lute con-stant $\OML/lmm/m/it/9 c[]$\T1/lmr/m/
+n/9 (+20) . Since the lead-ing
  []
 
 
-Underfull \hbox (badness 1983) in paragraph at lines 609--613
-\T1/lmr/m/it/9 (+20) be the num-ber of dis-tinct at-tacker types ac-tu-ally ob-
-
+Underfull \hbox (badness 1946) in paragraph at lines 697--702
+[]$ \T1/lmr/m/n/9 (+20) term dom-i-nates the ad-di-tive
  []
 
-<figures/presentation/avg_regret_per_iter.pdf, id=308, 686.565pt x 361.35pt>
+[5]
+<figures/presentation/avg_regret_per_iter.pdf, id=311, 686.565pt x 361.35pt>
 File: figures/presentation/avg_regret_per_iter.pdf Graphic file (type pdf)
 <use figures/presentation/avg_regret_per_iter.pdf>
 Package pdftex.def Info: figures/presentation/avg_regret_per_iter.pdf  used on 
-input line 661.
-(pdftex.def)             Requested size: 237.26126pt x 124.86989pt.
-<figures/presentation/global_avg_regret.pdf, id=309, 686.565pt x 361.35pt>
-File: figures/presentation/global_avg_regret.pdf Graphic file (type pdf)
-<use figures/presentation/global_avg_regret.pdf>
-Package pdftex.def Info: figures/presentation/global_avg_regret.pdf  used on in
-put line 674.
-(pdftex.def)             Requested size: 237.26126pt x 124.86989pt.
-[5 <./figures/presentation/avg_regret_per_iter.pdf>]
+input line 749.
+(pdftex.def)             Requested size: 240.80269pt x 126.73354pt.
+
+Underfull \hbox (badness 1571) in paragraph at lines 755--755
+[]\T1/lmr/m/n/9 (+20) Figure 1: []Rolling-window per-round re-gret of \T1/lmr/m
+/sc/9 (+20) Grow-
+ []
+
+<figures/presentation/regret_vs_T_scaling.pdf, id=312, 650.43pt x 397.485pt>
+File: figures/presentation/regret_vs_T_scaling.pdf Graphic file (type pdf)
+<use figures/presentation/regret_vs_T_scaling.pdf>
+Package pdftex.def Info: figures/presentation/regret_vs_T_scaling.pdf  used on 
+input line 761.
+(pdftex.def)             Requested size: 240.80269pt x 147.15811pt.
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
 Package microtype Info: Character `029' is missing
 (microtype)             in font `T1/lmr/m/sc/7'.
 (microtype)             Ignoring protrusion settings for this character.
-LaTeX Font Info:    Trying to load font information for T1+lmtt on input line 7
-61.
-
-(/usr/share/texmf/tex/latex/lm/t1lmtt.fd
+ [6 <./figures/presentation/avg_regret_per_iter.pdf> <./figures/presentation/re
+gret_vs_T_scaling.pdf>]
+LaTeX Font Info:    Trying to load font information for T1+lmtt on input line 8
+50.
+ (/usr/share/texmf/tex/latex/lm/t1lmtt.fd
 File: t1lmtt.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
 Package microtype Info: Loading generic protrusion settings for font family
 (microtype)             `lmtt' (encoding: T1).
 (microtype)             For optimal results, create family-specific settings.
 (microtype)             See the microtype manual for details.
- (./project_report.bbl [6 <./figures/presentation/global_avg_regret.pdf>]) [7
-
-] [8
+ (./project_report.bbl)
+[7] [8
 
 ] (./project_report.aux)
  ***********
@@ -821,17 +846,20 @@ L3 programming layer <2024-01-22>
 
 LaTeX Font Warning: Some font shapes were not available, defaults substituted.
 
+
+LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
+
 Package rerunfilecheck Info: File `project_report.out' has not changed.
-(rerunfilecheck)             Checksum: 18620ECA087C8F6C96C29D8E1FAF9E4E;1520.
+(rerunfilecheck)             Checksum: 04F5A79AB76CA61F56C6E36BF6210323;2572.
  ) 
 Here is how much of TeX's memory you used:
- 17474 strings out of 476106
- 285204 string characters out of 5793933
- 1956975 words of memory out of 5000000
- 38750 multiletter control sequences out of 15000+600000
- 689326 words of font info for 288 fonts, out of 8000000 for 9000
+ 17716 strings out of 476106
+ 289211 string characters out of 5793933
+ 1958975 words of memory out of 5000000
+ 38998 multiletter control sequences out of 15000+600000
+ 689356 words of font info for 284 fonts, out of 8000000 for 9000
  59 hyphenation exceptions out of 8191
- 75i,12n,79p,1011b,589s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 75i,14n,79p,1011b,612s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </usr/share/texmf/fonts/type1/public/lm/lmbx10.pfb></usr/share/texmf/fonts/ty
 pe1/public/lm/lmbx12.pfb></usr/share/texmf/fonts/type1/public/lm/lmbx6.pfb></us
 r/share/texmf/fonts/type1/public/lm/lmbx8.pfb></usr/share/texmf/fonts/type1/pub
@@ -840,22 +868,23 @@ e/texmf/fonts/type1/public/lm/lmex10.pfb></usr/share/texmf/fonts/type1/public/l
 m/lmmi10.pfb></usr/share/texmf/fonts/type1/public/lm/lmmi5.pfb></usr/share/texm
 f/fonts/type1/public/lm/lmmi6.pfb></usr/share/texmf/fonts/type1/public/lm/lmmi7
 .pfb></usr/share/texmf/fonts/type1/public/lm/lmmi8.pfb></usr/share/texmf/fonts/
-type1/public/lm/lmmi9.pfb></usr/share/texmf/fonts/type1/public/lm/lmr5.pfb></us
-r/share/texmf/fonts/type1/public/lm/lmr6.pfb></usr/share/texmf/fonts/type1/publ
-ic/lm/lmr7.pfb></usr/share/texmf/fonts/type1/public/lm/lmr8.pfb></usr/share/tex
-mf/fonts/type1/public/lm/lmr9.pfb></usr/share/texmf/fonts/type1/public/lm/lmri7
-.pfb></usr/share/texmf/fonts/type1/public/lm/lmri8.pfb></usr/share/texmf/fonts/
-type1/public/lm/lmri9.pfb></usr/share/texmf/fonts/type1/public/lm/lmsy5.pfb></u
-sr/share/texmf/fonts/type1/public/lm/lmsy6.pfb></usr/share/texmf/fonts/type1/pu
-blic/lm/lmsy7.pfb></usr/share/texmf/fonts/type1/public/lm/lmsy8.pfb></usr/share
-/texmf/fonts/type1/public/lm/lmsy9.pfb></usr/share/texmf/fonts/type1/public/lm/
-lmtt9.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/symbols/ms
-bm10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/symbols/msb
-m7.pfb>
-Output written on project_report.pdf (8 pages, 731880 bytes).
+type1/public/lm/lmmi9.pfb></usr/share/texmf/fonts/type1/public/lm/lmr10.pfb></u
+sr/share/texmf/fonts/type1/public/lm/lmr5.pfb></usr/share/texmf/fonts/type1/pub
+lic/lm/lmr6.pfb></usr/share/texmf/fonts/type1/public/lm/lmr7.pfb></usr/share/te
+xmf/fonts/type1/public/lm/lmr8.pfb></usr/share/texmf/fonts/type1/public/lm/lmr9
+.pfb></usr/share/texmf/fonts/type1/public/lm/lmri7.pfb></usr/share/texmf/fonts/
+type1/public/lm/lmri8.pfb></usr/share/texmf/fonts/type1/public/lm/lmri9.pfb></u
+sr/share/texmf/fonts/type1/public/lm/lmsy10.pfb></usr/share/texmf/fonts/type1/p
+ublic/lm/lmsy5.pfb></usr/share/texmf/fonts/type1/public/lm/lmsy6.pfb></usr/shar
+e/texmf/fonts/type1/public/lm/lmsy7.pfb></usr/share/texmf/fonts/type1/public/lm
+/lmsy8.pfb></usr/share/texmf/fonts/type1/public/lm/lmsy9.pfb></usr/share/texmf/
+fonts/type1/public/lm/lmtt9.pfb></usr/share/texlive/texmf-dist/fonts/type1/publ
+ic/amsfonts/symbols/msbm10.pfb></usr/share/texlive/texmf-dist/fonts/type1/publi
+c/amsfonts/symbols/msbm7.pfb>
+Output written on project_report.pdf (8 pages, 688369 bytes).
 PDF statistics:
- 661 PDF objects out of 1000 (max. 8388607)
- 478 compressed objects within 5 object streams
- 121 named destinations out of 1000 (max. 500000)
- 68203 words of extra memory for PDF output out of 74296 (max. 10000000)
+ 667 PDF objects out of 1000 (max. 8388607)
+ 472 compressed objects within 5 object streams
+ 116 named destinations out of 1000 (max. 500000)
+ 70299 words of extra memory for PDF output out of 74296 (max. 10000000)
 

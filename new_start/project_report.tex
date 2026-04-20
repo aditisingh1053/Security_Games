@@ -1,13 +1,13 @@
-%%% CS6002 Project Report
-%%% No-Regret Learning in Stackelberg Security Games with an Unknown, Bounded
-%%% Set of Attacker Types.
+%%% CS6002 Project Report (AAMAS-style)
+%%% No-Regret Learning in Stackelberg Security Games with an Unknown,
+%%% Bounded Set of Attacker Types.
 %%%
-%%% Written to emulate the AAMAS / ACM sigconf look without requiring acmart:
-%%% two-column article, 9.5pt body, tight margins.
+%%% Structure follows report_instructions.txt and visual format follows the
+%%% AAMAS sigconf look of p597.pdf (two columns, tight margins, amsthm, natbib).
 
 \documentclass[letterpaper,9pt,twocolumn]{extarticle}
 
-\usepackage[top=0.85in,bottom=1in,left=0.75in,right=0.75in,columnsep=0.3in]{geometry}
+\usepackage[top=0.85in,bottom=1in,left=0.7in,right=0.7in,columnsep=0.3in]{geometry}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage{lmodern}
@@ -16,18 +16,18 @@
 \usepackage{amsmath,amssymb,amsthm}
 \usepackage{mathtools}
 \usepackage{bm}
-\usepackage{enumitem}
 \usepackage{graphicx}
 \usepackage{booktabs}
 \usepackage{algorithm}
 \usepackage{algpseudocode}
+\usepackage{enumitem}
 \usepackage{xcolor}
 \usepackage[hidelinks,breaklinks=true]{hyperref}
 \usepackage[capitalise,noabbrev]{cleveref}
-\usepackage{natbib}
-\bibliographystyle{plainnat}
+\usepackage[round,sort&compress,numbers]{natbib}
+\bibliographystyle{abbrvnat}
 
-% ---- Balcan et al. notation ----
+% ---- Balcan et al. notation (Balcan, Blum, Haghtalab, Procaccia 2015) ----
 \newcommand{\pvec}{\mathbf{p}}
 \newcommand{\svec}{\mathbf{s}}
 \newcommand{\avec}{\mathbf{a}}
@@ -40,10 +40,12 @@
 \newcommand{\NN}{\mathbb{N}}
 \newcommand{\RR}{\mathbb{R}}
 \newcommand{\Kmax}{K_{\max}}
+\newcommand{\Nmax}{N_{\max}}
 \newcommand{\argmax}{\operatorname*{arg\,max}}
 \newcommand{\argmin}{\operatorname*{arg\,min}}
+\newcommand{\Regret}{\mathrm{Regret}}
 
-% ---- Theorem / definition environments ----
+% ---- Theorem environments ----
 \theoremstyle{plain}
 \newtheorem{theorem}{Theorem}
 \newtheorem{lemma}[theorem]{Lemma}
@@ -55,13 +57,22 @@
 \theoremstyle{remark}
 \newtheorem{remark}[theorem]{Remark}
 
+% ---- Header ----
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+\fancyfoot[C]{\thepage}
+
 % ---- Title block ----
-\title{\vspace{-1.6em}\textbf{No-Regret Learning in Stackelberg Security Games\\
-with an Unknown, Bounded Set of Attacker Types}\vspace{-0.2em}}
+\title{\vspace{-2em}\textbf{\LARGE No-Regret Learning in Stackelberg Security Games\\
+with an Unknown, Bounded Set of Attacker Types}}
 \author{\normalsize
-Aditi Singh \qquad Ishita \qquad Sabil Ahmad\\
-\footnotesize\textit{Indian Institute of Technology Bombay}\\
-\footnotesize CS\,6002 Project, Spring 2026}
+\begin{tabular}{ccc}
+Aditi Singh & Ishita & Sabil Ahmad
+\end{tabular}\\[0.2em]
+\footnotesize\textit{Indian Institute of Technology Bombay}\\[0.1em]
+\footnotesize CS\,6002 Project Report,  Spring 2026}
 \date{\vspace{-1em}}
 
 \begin{document}
@@ -70,637 +81,716 @@ Aditi Singh \qquad Ishita \qquad Sabil Ahmad\\
   \maketitle
   \begin{abstract}
 \noindent
-In a \emph{repeated Stackelberg Security Game (SSG)}, a defender commits each
-round to a randomized deployment of its resources and an adversarial sequence
-of attackers, each drawn from some set $K$ of \emph{types}, best-responds.
-\citet{balcan2015} designed no-regret online learning algorithms for this
-model under the assumption that the set $K$ is \emph{known to the defender in
-advance}, achieving expected regret $O(\sqrt{Tn^2 k\log(nk)})$ against an
-oblivious adversarial sequence. They also show a matching lower bound:
-linear-in-$T$ regret is unavoidable when $K$ is unrestricted. In practice,
-however, the defender rarely knows $K$. We relax the known-$K$ assumption to
-the natural middle ground $|K|\le\Kmax$, where the bound $\Kmax$ is known but
-the actual types are discovered online. We propose \textsc{Grow-Catalogue}, an
-algorithm that maintains the polytope partition of the coverage space
-induced by the attacker types seen so far and re-runs an online learning
-sub-routine whenever a new type is observed. We prove that under full-
-information feedback \textsc{Grow-Catalogue} achieves expected regret
+Stackelberg Security Games (SSGs) model the strategic allocation of limited
+defender resources against attackers whose preferences are often uncertain.
+\citet{balcan2015} designed no-regret online learning algorithms for the
+\emph{repeated} variant of SSGs against an adversarial sequence of attackers
+drawn from a finite, \emph{known} set $K$, and proved a matching linear-regret
+lower bound when $K$ is unbounded. A natural real-world middle ground is
+left open: the defender does not know $K$ a priori, but has a bound $\Kmax$
+on its size. We study this setting in the full-information feedback model.
+We propose \textsc{Grow-Catalogue}, an algorithm that incrementally learns
+new attacker types as they arrive, re-partitions the coverage polytope, and
+runs an anytime multiplicative-weights sub-routine on the resulting
+extreme-point set. Our central technical contribution is a full proof that
+\textsc{Grow-Catalogue} achieves expected regret
 \[
- O\!\Bigl(\sqrt{T\cdot\Kmax\cdot\bigl(n^2+\Kmax\log n\bigr)}\Bigr),
+O\!\left(\sqrt{T\cdot\Kmax\cdot(n^2+\Kmax\log n)}\right)
 \]
-matching the bound of \citet{balcan2015} (with $k\mapsto\Kmax$) up to
-constants. The bound is meaningful as long as $\Kmax\cdot(n^2+\Kmax\log n)\ll
-T$; beyond this regime it is matched by the linear lower bound from the
-unbounded side. We validate the theorem with experiments on synthetic SSG
-instances under a staggered-uniform adversary, observing the predicted
-sublinear behaviour and clear spikes in per-round regret at each discovery
-round. Our implementation is available at
-\textcolor{blue}{\href{https://github.com/CS6002-SSG/grow-catalogue}{github.com/CS6002-SSG/grow-catalogue}}.
+against any oblivious adversarial sequence of length $T$. The rate matches
+that of \citet{balcan2015} with $k$ replaced by $\Kmax$ and is sublinear
+whenever $\Kmax\cdot(n^2+\Kmax\log n)=o(T)$. Experiments on synthetic SSG
+instances confirm the predicted $\sqrt{T}$ scaling, and the empirical regret
+stays comfortably below the analytic $C\sqrt{T}$ envelope. Code is available
+at \textcolor{blue}{\href{https://github.com/CS6002-SSG/grow-catalogue}{github.com/CS6002-SSG/grow-catalogue}}.
   \end{abstract}
   \vspace{0.6em}
   \end{@twocolumnfalse}
 ]
 
-% =============================================================================
+% ==========================================================================
 \section{Introduction}
 \label{sec:intro}
 
-A \emph{Stackelberg Security Game} (SSG) models the strategic interaction
-between a \emph{defender} protecting $n$ targets with limited resources and
-an \emph{attacker} who chooses a target to attack. The defender commits to a
-mixed strategy; the attacker observes the commitment and best-responds.
-Computational tools built around this model are deployed at, among others,
-the US Coast Guard, LAX airport, the Federal Air Marshals service, and
-wildlife anti-poaching programs~\citep{tambe2012,yang2014}.
+In a Stackelberg Security Game (SSG), a defender allocates a scarce set of
+resources to protect $n$ potential targets against a strategic attacker
+who, observing the defender's randomized deployment, chooses the best
+target to attack \citep{tambe2012}. Deployed systems built around this model
+include the US Coast Guard's port protection patrols, the Federal Air
+Marshals assignment system, the LAX airport patrol schedule, and
+anti-poaching patrols in several African national parks
+\citep{tambe2012,yang2014}. In every one of these applications the
+defender must commit to its deployment before the attack happens, and the
+attacker's payoff function encodes its preferences over targets.
 
-All such deployments require knowledge of the attacker's utility function.
-In practice the defender faces many possible attacker types whose utilities
-are only partially known. A natural online-learning formulation, due to
-\citet{balcan2015}, treats the sequence of attackers as \emph{adversarial}:
-at round $t$ an attacker of some type $a_t\in K$ arrives, and the defender
-must maintain low regret against the best fixed commitment in hindsight.
-\citet{balcan2015} show that for $|K|=k$ known and full-information feedback,
-a polynomial-weights algorithm over the $\epsilon$-approximate extreme points
-of the best-response polytope partition achieves expected regret
-$O(\sqrt{Tn^2 k\log(nk)})$. They also prove that no online algorithm can
-avoid $\Omega(T)$ regret in the fully unrestricted setting.
+The \emph{classical} SSG analysis assumes that the attacker's payoff
+function is fully known to the defender. The optimal commitment can then
+be computed by a linear program \citep[e.g.,][]{pita2010}. In practice,
+however, the defender faces considerable uncertainty about the attacker.
+There may be several distinct threat actors (e.g., different poacher
+groups, different types of smugglers), and their utilities are only
+imperfectly known. A principled response, pioneered by \citet{balcan2015},
+is to drop the single-type assumption entirely and instead ask for a
+\emph{no-regret} online algorithm against an adversarially chosen sequence
+of attacker types, drawn from a known finite set $K$ with $|K|=k$. Under
+full-information feedback, they design an algorithm whose expected
+cumulative regret is bounded by $O(\sqrt{Tn^2 k\log(nk)})$, which is
+sublinear in the horizon $T$, and they prove a matching linear-regret lower
+bound when $|K|$ is unrestricted \citep[Theorem~7.1]{balcan2015}.
 
-\paragraph{Motivation.}
-The assumption that $K$ is known in advance is strong. A realistic
-scenario is that the defender has domain knowledge of an \emph{upper
-bound} $\Kmax$ on the number of distinct attacker types it might face
-(e.g., ``at most five distinct threat actors''), but the utilities of any
-particular attacker type are only revealed the first time that type
-attacks. In this paper we ask:
+The assumption that the set $K$ itself is known to the defender in advance
+is, however, a strong one. In realistic deployments the defender typically
+does \emph{not} have a complete list of attacker types at the start. What
+it may have is an \emph{upper bound} $\Kmax$ on the number of distinct
+types it expects to encounter (for instance, from threat intelligence or
+from physical constraints of the domain). The question that motivates this
+project is therefore:
 \begin{center}
-\emph{Can sublinear regret be achieved when the set of attacker types $K$
-is unknown a priori but satisfies $|K|\le\Kmax$?}
+\emph{Can the defender achieve sublinear regret when $K$ is unknown a
+priori, subject to $|K|\le \Kmax$?}
 \end{center}
-This question sits cleanly in the gap between the ``known $K$'' setting and
-the negative result for unrestricted $K$ in \citet{balcan2015}.
+This question lies squarely in the gap left open between the
+\emph{known-$K$} upper bound and the \emph{unrestricted-$K$} lower bound of
+\citet{balcan2015}. It is not answered by any of the existing work, and
+resolving it is the main goal of the present report.
 
-\paragraph{Contributions.}
-Our contributions are as follows.
-\begin{enumerate}[leftmargin=1.2em,itemsep=0.1em]
-  \item \emph{Problem formulation.} We formalize the unknown-$K$ variant of
-  the repeated Stackelberg security game (\Cref{sec:problem}).
-  \item \emph{Algorithm.} We design \textsc{Grow-Catalogue}
-  (\Cref{alg:gc}), which at each round maintains a catalogue $C_t$ of
-  discovered attacker types, recomputes the set
-  $\cE(C_t;\epsilon)$ of $\epsilon$-approximate extreme points of the
-  partition of $\cP$ induced by $C_t$, and runs an anytime multiplicative-
-  weights sub-routine over $\cE(C_t)$. When a new type is observed, the
-  catalogue is updated and the sub-routine is restarted on the enlarged
-  expert set.
-  \item \emph{Regret bound.} We prove (\Cref{thm:main}) that
-  \textsc{Grow-Catalogue} has expected regret
-  $O(\sqrt{T\Kmax(n^2+\Kmax\log n)})$. This matches
-  \citeauthor{balcan2015}'s Theorem~5.1 with $k$ replaced by $\Kmax$; for
-  constant $\Kmax$ the rate is $\tilde O(n\sqrt T)$.
-  \item \emph{Regime of applicability.} We characterize the range of
-  $\Kmax$ for which the bound is non-trivial (\Cref{cor:regime}) and
-  show that the instance-adaptive refinement depends on the number $K'$
-  of types \emph{actually} observed, not on $\Kmax$.
-  \item \emph{Experiments.} We implement \textsc{Grow-Catalogue} with
-  two variants of the polytope recomputation (total and incremental) and
-  evaluate them on synthetic SSG instances under a \emph{staggered-uniform}
-  adversary. The measured regret is sublinear, with visible spikes at
-  rounds of first appearance of each new type, confirming the epoch
-  structure exploited by the proof (\Cref{sec:exp}).
-\end{enumerate}
+\subsection{Contributions}
+\label{sec:contrib}
 
-\paragraph{Organization.}
-\Cref{sec:related} surveys related work. \Cref{sec:prelim} recalls the
-Stackelberg security game formalism of \citet{balcan2015}. \Cref{sec:problem}
-states the unknown-$K$ problem. \Cref{sec:analysis} presents the algorithm,
-states the main regret theorem, and gives the complete proof.
-\Cref{sec:exp} reports the experiments. \Cref{sec:conc} concludes.
+Our contributions are the following.
+\begin{itemize}[leftmargin=1.1em,itemsep=0.10em,topsep=0.2em]
+  \item \textbf{Problem formalization (\Cref{sec:unknownK}).}
+    We formalize the unknown-$K$ variant of the repeated Stackelberg
+    security game, identifying the minimal modification of the model of
+    \citet{balcan2015} that captures it.
+  \item \textbf{Algorithm (\Cref{sec:alg}).}
+    We propose \textsc{Grow-Catalogue}, an online algorithm that at each
+    round maintains a \emph{catalogue} $C_t\subseteq K$ of attacker types
+    observed so far, recomputes the set $\cE(C_t;\epsilon)$ of
+    $\epsilon$-approximate extreme points of the partition of $\cP$
+    induced by $C_t$, and runs an anytime multiplicative-weights
+    sub-routine over $\cE(C_t)$. When a new type is observed, the
+    catalogue is updated and the sub-routine is restarted on the enlarged
+    expert set. Two implementation variants (total recomputation and
+    incremental update) are given; they yield identical regret and differ
+    only in wall-clock cost.
+  \item \textbf{Main theorem and a complete, detailed proof
+    (\Cref{sec:mainresult,sec:proof}).}
+    The technical core of this report is a self-contained proof that
+    \textsc{Grow-Catalogue} achieves expected regret at most
+    $O(\sqrt{T\cdot\Kmax\cdot(n^2+\Kmax\log n)})$ against any oblivious
+    adversarial sequence of length $T$ under full-information feedback.
+    The rate matches \citeauthor{balcan2015}'s
+    Theorem~5.1 with $k$ replaced by $\Kmax$; for constant $\Kmax$ it
+    is $\tilde O(n\sqrt T)$.
+  \item \textbf{Regime analysis (\Cref{cor:regime,cor:adaptive}).}
+    We characterize the parameter regime in which the bound is meaningful
+    ($\Kmax\cdot(n^2+\Kmax\log n)=o(T)$), and we prove an
+    instance-adaptive refinement in which the leading factor depends on
+    the number $K'$ of types \emph{actually} observed rather than on
+    $\Kmax$.
+  \item \textbf{Experiments (\Cref{sec:exp}).}
+    We implement \textsc{Grow-Catalogue} and two reference baselines, and
+    evaluate them on synthetic SSG instances. The empirical regret scales
+    as predicted by the theorem, staying comfortably below the analytic
+    $C\sqrt{T}$ envelope.
+\end{itemize}
 
-
-% =============================================================================
-\section{Related Work}
+\subsection{Related Work}
 \label{sec:related}
 
-The line of work most closely related to ours is online learning for SSGs
-with \emph{attacker uncertainty}.
+\paragraph{Classical SSGs and attacker uncertainty.}
+The optimal commitment for a known attacker can be computed by an LP
+\citep{conitzer2006}. Uncertainty about the attacker has been handled by
+\emph{robust optimization}, which plans against worst-case payoffs
+\citep{pita2010}, and by \emph{Bayesian SSGs}, which require a prior over
+attacker types \citep{kiekintveld2011,marecki2012}. Both approaches rest on
+priors or constraints that are often hard to validate. \citet{letchford2009}
+give a query-efficient learning algorithm for a \emph{single} fixed but
+unknown type, and \citet{blum2014b} extend this to a setting that adapts
+round-by-round to one fixed type.
 
-\paragraph{Prior-based approaches.}
-\citet{pita2010} address uncertainty by solving a robust optimization problem
-against worst-case attacker payoffs. \citet{kiekintveld2011} and
-\citet{marecki2012} study \emph{Bayesian} SSGs in which a prior distribution
-over attacker types is assumed; their algorithms require this prior, which
-is usually estimated from historical data and hard to validate.
-
-\paragraph{Learning a single unknown type.}
-\citet{letchford2009} give a learning algorithm that, through best-response
-queries, identifies the attacker's utility function with polynomial query
-complexity. \citet{blum2014b} extend this to an ``adaptive commitment''
-setting in which the defender refines its strategy round-by-round against a
-single fixed, but unknown, type.
-
-\paragraph{Adversarial sequence of types.}
-\citet{balcan2015} depart from the single-type assumption. They model the
-sequence of attackers as adversarially chosen from a \emph{known} finite set
-$K$ and design no-regret algorithms for both full-information and partial-
-information (bandit) feedback. Their full-information bound,
-$O(\sqrt{Tn^2 k\log(nk)})$, is the starting point of our work. They also
-prove an $\Omega(T)$ lower bound when $K$ is allowed to grow with $T$.
+\paragraph{Online learning against adversarial attacker sequences.}
+\citet{balcan2015} pivot from the single-type paradigm by allowing the
+sequence of attackers to be adversarially chosen from a known finite set
+$K$. For full information they give a polynomial-weights algorithm with
+regret $O(\sqrt{Tn^2 k\log(nk)})$ that partitions the coverage polytope
+into best-response regions and runs experts over the
+$\epsilon$-approximate extreme points; for bandit feedback they use a
+barycentric spanner construction to give an $O(T^{2/3})$ bound.
+Crucially, they also prove a linear lower bound when $|K|$ is unrestricted,
+which forces any non-trivial extension to restrict the attacker type set
+somehow. We take the weakest restriction: a known cardinality bound
+$\Kmax$.
 
 \paragraph{Online learning with changing expert sets.}
-The internal sub-routine of \textsc{Grow-Catalogue} is an anytime variant of
-the Polynomial Weights / Hedge algorithm
-\citep{littlestone1994,freund1997,cesa2006}, which we restart each time the
-catalogue changes. More sophisticated mechanisms for growing expert sets
-exist \citep{mourtada2017,gaillard2019}; they shave logarithmic factors but
-do not change the leading-order rate, and we stick with the simpler
-restarting strategy.
+The sub-routine inside \textsc{Grow-Catalogue} is an anytime variant of
+Polynomial Weights / Hedge \citep{littlestone1994,freund1997,cesa2006}. We
+restart this sub-routine each time the catalogue grows; simpler algorithms
+for tracking a growing set of experts exist~\citep{mourtada2017}, and for
+tracking a shrinking set \citep{gaillard2019}, but both would only shave
+lower-order logarithmic factors.
 
-\paragraph{Other related directions.}
-\citet{haghtalab2022} study no-regret learning against non-myopic (strategic)
-agents in a single-type query model. \citet{harris2024side} add \emph{side
-information}: contexts observed by both players. Neither addresses the
-``$K$ unknown but bounded'' question we pose here. To the best of our
-knowledge no prior work combines the adversarial-types setting of
-\citet{balcan2015} with an unknown $K$ of bounded size, although the gap
-between \citeauthor{balcan2015}'s upper and lower bounds clearly invites this
-extension.
+\paragraph{Other recent directions.}
+\citet{haghtalab2022} analyze no-regret learning against strategic
+(non-myopic) attackers in a single-type query model. \citet{harris2024side}
+extend to a contextual Stackelberg setting in which both players observe
+side information. Neither addresses the \emph{unknown $K$ with bounded
+cardinality} question that we pose here. To the best of our knowledge, the
+present work gives the first no-regret guarantee for that setting.
 
+% ==========================================================================
+\section{Model}
+\label{sec:model}
 
-% =============================================================================
-\section{Preliminaries}
-\label{sec:prelim}
+We adopt the repeated-SSG notation of \citet[\S 2]{balcan2015}; our
+notation is compatible with theirs so that all cross-references below are
+unambiguous.
 
-We recall the formal model of \citet[\S 2]{balcan2015}, adopting their
-notation throughout.
+\subsection{Game primitives}
 
-\paragraph{Game primitives.}
-A repeated SSG has a time horizon $T\in\NN$, a set of targets
-$N=\{1,\dots,n\}$, a defender with $R$ resources, and a collection
-$\cD\subseteq 2^N$ of \emph{schedules}, each of which represents a set of
-targets a single resource can defend simultaneously. An
-\emph{assignment function} $A:R\to 2^{\cD}$ indicates the set of schedules
-each resource may be assigned to. A \emph{pure strategy} is any valid
-resource-to-schedule assignment. Let $m$ denote the number of pure
-strategies, and let $M$ be the $\{0,1\}$-valued $n\times m$ indicator
-matrix with $M_{i,j}=1$ iff target $i$ is covered under the $j$-th pure
-strategy. A \emph{mixed strategy} is a distribution $\svec\in\Delta_m$ and
-its induced \emph{coverage probability vector} is $\pvec=M\svec\in[0,1]^n$,
-where $p_i$ is the probability that target $i$ is defended. The set
-$\cP\subseteq[0,1]^n$ of valid coverage probability vectors is a convex
-polytope.
+The game has a finite horizon $T\in\NN$ and $n$ targets
+$N=\{1,\dots,n\}$. The defender has $R$ resources and a collection
+$\mathcal{D}\subseteq 2^N$ of \emph{schedules}, where each schedule is a
+subset of targets that a single resource can defend simultaneously. An
+\emph{assignment function} $A:R\to 2^{\mathcal{D}}$ records the schedules
+that each resource may be assigned to. A \emph{pure strategy} is any valid
+resource-to-schedule assignment; let $m$ denote the number of pure
+strategies. A \emph{mixed strategy} is a distribution $\svec\in\Delta_m$
+over pure strategies, and its induced \emph{coverage probability vector}
+is $\pvec = M\svec\in [0,1]^n$, where $M\in\{0,1\}^{n\times m}$ has
+$M_{ij}=1$ iff the $j$-th pure strategy covers target $i$. Write $\cP$ for
+the set of valid coverage probability vectors; $\cP$ is a convex polytope
+\citep[\S 2]{balcan2015}. Every coverage vector $\pvec$ is realizable by
+some mixed strategy, and conversely every mixed strategy induces a unique
+$\pvec\in\cP$.
 
-\paragraph{Payoffs.}
-Each target $i$ carries defender utilities $u_d^c(i)$ (if $i$ is attacked
-and covered) and $u_d^u(i)$ (attacked and uncovered), both in $[-1,1]$. The
-defender's \emph{expected} utility when target $i$ is attacked under
-coverage $\pvec$ is
-\[
-U_d(i,\pvec)\;=\;u_d^c(i)\,p_i+u_d^u(i)\,(1-p_i),
-\]
-which is linear in $\pvec$ for fixed $i$.
+\paragraph{Defender payoffs.}
+For each target $i$, the defender has a payoff
+$u_d^c(i)\in[-1,1]$ if $i$ is attacked \emph{and} covered, and a payoff
+$u_d^u(i)\in[-1,1]$ if $i$ is attacked \emph{and uncovered}. The
+defender's expected utility when target $i$ is attacked under coverage
+$\pvec$ is therefore
+\begin{equation}
+U_d(i,\pvec)\;=\;u_d^c(i)\,p_i \;+\; u_d^u(i)\,(1-p_i),
+\label{eq:Ud}
+\end{equation}
+which is \emph{linear} in $\pvec$ for each fixed target $i$.
 
-\paragraph{Attacker types.}
-An attacker \emph{type} $\alpha$ is a pair of utility vectors
-$u_\alpha^c,u_\alpha^u\in[-1,1]^n$; its expected utility from attacking
-target $i$ under coverage $\pvec$ is
-$U_\alpha(i,\pvec)=u_\alpha^c(i)p_i+u_\alpha^u(i)(1-p_i)$. Observing
-$\pvec$, type $\alpha$ \emph{best-responds} by attacking
+\subsection{Attacker types and best response}
+
+An attacker \emph{type} $\alpha$ is a pair
+$(u_\alpha^c,u_\alpha^u)\in[-1,1]^n\times[-1,1]^n$ of per-target utilities
+following the same ``covered/uncovered'' convention as the defender. Its
+expected utility for attacking target $i$ under coverage $\pvec$ is
+$
+U_\alpha(i,\pvec)=u_\alpha^c(i)\,p_i + u_\alpha^u(i)\,(1-p_i).
+$
+Observing $\pvec$, type $\alpha$ \emph{best-responds}:
 \begin{equation}
 b_\alpha(\pvec)\;=\;\argmax_{i\in N}\,U_\alpha(i,\pvec),
 \label{eq:br}
 \end{equation}
-with ties broken arbitrarily but consistently.
+with ties broken arbitrarily but consistently. Note that $b_\alpha$ is
+piecewise constant in $\pvec$, which makes the defender's realized payoff
+$U_d(b_\alpha(\pvec),\pvec)$ a discontinuous function of $\pvec$. This
+non-continuity is the central technical difficulty that distinguishes SSGs
+from vanilla online linear optimization, and it is what drives the
+polytope-based machinery of \citet{balcan2015}.
 
-\paragraph{Repeated game and regret.}
+\subsection{Repeated game and regret}
+
 There is a (possibly unknown) set $K$ of attacker types. An
-\emph{oblivious} adversary fixes a sequence
-$\avec=a_1,\dots,a_T\in K^T$ before the game starts. At each round $t$ the
-defender commits $\pvec_t\in\cP$, attacker $a_t$ best-responds, and the
-defender receives $U_d(b_{a_t}(\pvec_t),\pvec_t)$. The defender's benchmark
-is the best fixed coverage vector in hindsight,
+\emph{oblivious} adversary chooses a sequence
+$\avec=a_1,\dots,a_T\in K^T$ \emph{before} the game starts; the sequence
+is fixed but unknown to the defender. At each round
+$t\in\{1,\dots,T\}$ the defender commits $\pvec_t\in\cP$, attacker
+$a_t$ plays $b_{a_t}(\pvec_t)$, and the defender receives the random
+payoff $U_d(b_{a_t}(\pvec_t),\pvec_t)$. We assume \emph{full-information
+feedback}: at the end of round $t$ the defender observes the identity of
+$a_t$, and the first time any type $\alpha$ is observed, its utility
+functions are revealed as well.
+
+The defender's benchmark is the best fixed coverage vector in hindsight:
 \begin{equation}
-\pvec^*\;=\;\argmax_{\pvec\in\cP}\;\sum_{t=1}^T U_d\bigl(b_{a_t}(\pvec),\pvec\bigr),
+\pvec^{*}\;=\;\argmax_{\pvec\in\cP}\;\sum_{t=1}^T U_d\bigl(b_{a_t}(\pvec),\pvec\bigr).
 \label{eq:pstar}
 \end{equation}
-and the (expected) regret of an online algorithm is
+The expected regret of an online algorithm that plays $\pvec_t$ at round
+$t$ is
 \begin{equation}
-\mathrm{Regret}(T)\;=\;\sum_{t=1}^T\! U_d\bigl(b_{a_t}(\pvec^*),\pvec^*\bigr)\!-\!\EE\!\Bigl[\sum_{t=1}^T\! U_d\bigl(b_{a_t}(\pvec_t),\pvec_t\bigr)\Bigr].
+\Regret(T)\;=\;\sum_{t=1}^T\!U_d(b_{a_t}(\pvec^{*}),\pvec^{*})\;-\;\EE\!\bigg[\sum_{t=1}^T\!U_d(b_{a_t}(\pvec_t),\pvec_t)\bigg],
 \label{eq:regret}
 \end{equation}
+where the expectation is over the algorithm's internal randomization.
 
-\paragraph{Polytope structure.}
-The following two lemmas of \citet{balcan2015} are the technical machinery
-we will inherit. For a set of types $C\subseteq K$, a type $\alpha\in C$ and
-a target $i\in N$, define
+\subsection{Preliminaries: polytope partition and $\cE(C;\epsilon)$}
+\label{sec:polytopes}
+
+The following definitions, taken from \citet[\S 4]{balcan2015}, are
+essential. For any catalogue $C\subseteq K$, a type $\alpha\in C$, and a
+target $i\in N$, the region in which $\alpha$'s best response is $i$ is
 \begin{equation}
-\cP_i^\alpha(C)\;=\;\bigl\{\pvec\in\cP\,:\,b_\alpha(\pvec)=i\bigr\},
-\label{eq:Pi}
+\cP^\alpha_i(C)\;=\;\{\pvec\in\cP\,:\,b_\alpha(\pvec)=i\},
+\label{eq:Pia}
 \end{equation}
-a convex polytope defined by the pairwise linear inequalities
-$U_\alpha(i,\pvec)\ge U_\alpha(j,\pvec)$ for all $j\ne i$. For a response
-profile $\sigma:C\to N$ let
-$\cP_\sigma(C)=\bigcap_{\alpha\in C}\cP_{\sigma(\alpha)}^\alpha(C)$;
-the non-empty $\cP_\sigma(C)$ partition $\cP$ into convex regions in
-which every $\alpha\in C$ has a fixed best response. Within each region the
-defender's payoff as a function of $\pvec$ is \emph{linear}.
+which is the intersection of $\cP$ with the $n-1$ linear inequalities
+$U_\alpha(i,\pvec)\ge U_\alpha(j,\pvec)$ for $j\ne i$; hence a convex
+polytope. For a \emph{response profile}
+$\sigma:C\to N$ we write
+\begin{equation}
+\cP_\sigma(C)\;=\;\bigcap_{\alpha\in C}\cP^\alpha_{\sigma(\alpha)}(C).
+\label{eq:Psigma}
+\end{equation}
+The non-empty sets $\cP_\sigma(C)$ form a partition of $\cP$ into convex
+regions in which the best response of every type in $C$ is held fixed;
+within any such region, the defender's payoff under a fixed attacker type
+is a linear function of $\pvec$.
 
-\begin{lemma}[\citealp{balcan2015}, Lem.\,4.3]\label{lem:43}
-Fix $\epsilon>0$. There exists a finite set
-$\cE(C;\epsilon)\subseteq\cP$ (the \emph{$\epsilon$-approximate extreme
-points} of the partition induced by $C$) such that for any sequence
-$\avec'$ of attackers from $C$ of length $T'$,
+The key structural lemmas we inherit are the following two of
+\citet{balcan2015}, paraphrased for clarity; we cite their paper
+explicitly at each use. Proposition~\ref{prop:hedge} is the standard
+Polynomial-Weights guarantee adapted to the present loss range.
+
+\begin{lemma}[{\citealp[Lemma 4.3]{balcan2015}}]
+\label{lem:43}
+For every $\epsilon>0$ and every catalogue $C\subseteq K$, there is a
+finite set $\cE(C;\epsilon)\subseteq \cP$ of points, called the
+$\epsilon$-approximate extreme points of the partition, such that for any
+sequence $\avec'=a'_1,\dots,a'_{T'}$ with $a'_t\in C$ for all $t$,
 \[
-\max_{\pvec\in\cE(C;\epsilon)}\!\sum_{t=1}^{T'}\!U_d(b_{a'_t}(\pvec),\pvec)\ge\max_{\pvec\in\cP}\!\sum_{t=1}^{T'}\!U_d(b_{a'_t}(\pvec),\pvec)-2\epsilon T'.
+\max_{\pvec\in\cE(C;\epsilon)}\!\sum_{t=1}^{T'}\!U_d(b_{a'_t}(\pvec),\pvec)\,\ge\,\max_{\pvec\in\cP}\!\sum_{t=1}^{T'}\!U_d(b_{a'_t}(\pvec),\pvec)-2\epsilon\,T'.
 \]
 \end{lemma}
 
-\begin{lemma}[\citealp{balcan2015}, Lem.\,4.4]\label{lem:44}
+\begin{lemma}[{\citealp[Lemma 4.4]{balcan2015}}]
+\label{lem:44}
 The set $\cE(C;\epsilon)$ of \Cref{lem:43} can be chosen so that
-$
- |\cE(C;\epsilon)|\in O\!\bigl((2^n+|C|n^2)^n\cdot n^{|C|}\bigr).
-$
+\(|\cE(C;\epsilon)|\in O\!\bigl((2^n+|C|\,n^2)^n\cdot n^{|C|}\bigr).\)
 \end{lemma}
 
-\begin{proposition}[\citealp{balcan2015}, Prop.\,1]\label{prop:hedge}
-For any fixed expert set $\cM$ and any loss sequence in $[-\kappa,\kappa]$,
-there is an online learning algorithm whose expected regret after
-$T'$ rounds is at most $O\!\bigl(\sqrt{T'\kappa\log|\cM|}\bigr)$, without
-requiring $T'$ to be known in advance.
+\begin{proposition}[{\citealp[Proposition 1]{balcan2015}}]
+\label{prop:hedge}
+For any fixed expert set $\cM$ and any sequence of losses in
+$[-\kappa,\kappa]$, there is an online learning algorithm (an anytime
+variant of Polynomial Weights / Hedge; see \citealp[\S 2]{cesa2006}) whose
+expected regret after $T'$ rounds is at most
+$O\bigl(\sqrt{T'\,\kappa\,\log|\cM|}\bigr)$, without requiring $T'$ to be
+known in advance.
 \end{proposition}
 
-\Cref{prop:hedge} is achieved, e.g., by Polynomial Weights / Hedge with a
-time-varying learning rate $\eta_t=\sqrt{\log|\cM|/t}$, which gives an
-\emph{anytime} guarantee; see \citet[\S 2]{cesa2006}.
+% ==========================================================================
+\section{The Unknown-$K$ Setting}
+\label{sec:unknownK}
 
-% =============================================================================
-\section{Unknown $K$ with a Known Bound $\Kmax$}
-\label{sec:problem}
+We now state the problem that our algorithm and theorem address.
 
-We depart from \citet{balcan2015} in exactly one point: the set $K$ is not
-revealed to the defender at the start.
-
-\begin{problem}[Unknown-$K$ repeated SSG]\label{prob:unknown}
-A repeated SSG as in \Cref{sec:prelim} is played, with the following two
-changes.
-\begin{enumerate}[leftmargin=1.2em,itemsep=0.0em]
-  \item The set $K$ of attacker types is \emph{unknown} to the defender at
-  the start, but $|K|\le\Kmax$ for a known constant $\Kmax$.
-  \item Feedback is \emph{full information}: at the end of round $t$ the
-  defender observes $a_t$, and the first time any type $\alpha$ is
-  observed, its utility vectors $(u_\alpha^c,u_\alpha^u)$ are revealed.
+\begin{problem}[Unknown-$K$ repeated SSG]\label{prob:unknownK}
+A repeated SSG as in \Cref{sec:model} is played, with two modifications.
+\begin{enumerate}[leftmargin=1.2em,itemsep=0.05em,topsep=0.2em]
+  \item The set $K$ of attacker types is not revealed to the defender at
+  the start; however, the defender is given a constant $\Kmax\ge 1$ with
+  the promise $|K|\le\Kmax$.
+  \item Feedback is full information: after round $t$ the defender
+  observes $a_t$, and the first time any type $\alpha$ appears, its
+  utility vectors $(u_\alpha^c,u_\alpha^u)$ are revealed.
 \end{enumerate}
-The defender's benchmark and regret are still those of
+The benchmark $\pvec^{*}$ and regret $\Regret(T)$ are as in
 \Cref{eq:pstar,eq:regret}.
 \end{problem}
 
-\begin{remark}[Necessity of a bound on $|K|$]
-\citet[Thm.\,7.1]{balcan2015} show that if $|K|<2^{T+1}$ is unrestricted,
-every online algorithm has regret $\Omega(T)$. Hence \emph{some} bound on
-$|K|$ is needed for a sublinear guarantee; our assumption of a known
-constant $\Kmax$ is the least restrictive such bound.
+\begin{remark}[Necessity of the bound $\Kmax$]\label{rem:necessity}
+\citet[Theorem 7.1]{balcan2015} exhibit, for every $T$, a game with
+$|K|<2^{T+1}$ on which every online algorithm has expected regret at
+least $T/2$. Hence some finite bound on $|K|$ is \emph{necessary} for
+sublinear regret; \Cref{prob:unknownK} takes the weakest such bound,
+namely a known constant $\Kmax$.
 \end{remark}
 
-\begin{remark}[Benchmark is well-defined]
-The benchmark $\pvec^*$ of \Cref{eq:pstar} depends only on the realized
-sequence $\avec$, which contains at most $\Kmax$ distinct types. So even
-though $K$ is unknown to the defender, $\pvec^*$ itself is always a single
-fixed element of $\cP$.
+\begin{remark}[Benchmark well-defined]
+The realized sequence $\avec$ contains at most $\Kmax$ distinct types,
+so $\pvec^{*}$ is always a single fixed element of $\cP$. The defender's
+ignorance of $K$ affects only the algorithm, not the benchmark.
 \end{remark}
 
+% ==========================================================================
+\section{Algorithm and Main Result}
+\label{sec:alg}
 
-% =============================================================================
-\section{Algorithm and Analysis}
-\label{sec:analysis}
+\subsection{The \textsc{Grow-Catalogue} algorithm}
 
-\subsection{The \textsc{Grow-Catalogue} Algorithm}
+We describe \textsc{Grow-Catalogue} at a high level and then give the
+pseudocode in \Cref{alg:gc}. At any round $t$ the defender holds a
+catalogue $C_t\subseteq K$ of all types seen so far. Conceptually, the
+defender runs a small instance of the \emph{known-$K$} algorithm of
+\citet[\S 5]{balcan2015} on the catalogue $C_t$, pretending that $C_t$
+\emph{is} the full attacker set. Concretely:
+\begin{itemize}[leftmargin=1.1em,itemsep=0.05em,topsep=0.2em]
+  \item The algorithm maintains the $\epsilon$-approximate extreme-point
+  set $\cE_t=\cE(C_t;\epsilon)$ of \Cref{lem:43}. We set
+  $\epsilon=1/\sqrt T$; this balances the $2\epsilon T$ approximation term
+  in \Cref{lem:43} against the $\sqrt{T\log\Nmax}$ regret term of
+  \Cref{prop:hedge}.
+  \item An anytime Polynomial-Weights sub-routine of
+  \Cref{prop:hedge} runs over $\cE_t$, updating via a time-varying
+  learning rate $\eta_{t_{\text{loc}}}=\sqrt{\log|\cE_t|/t_{\text{loc}}}$
+  where $t_{\text{loc}}$ is a local counter reset at every catalogue
+  change. This is the standard anytime schedule; see \citet[\S 2]{cesa2006}.
+  \item When a new attacker type $\alpha$ appears, the catalogue grows to
+  $C_t\cup\{\alpha\}$, the approximate extreme-point set is recomputed,
+  and the sub-routine is restarted on the enlarged expert set. The single
+  round of first contact with $\alpha$ contributes a bounded additive
+  amount to the regret that we will absorb.
+\end{itemize}
 
-At any round $t$, the defender holds a \emph{catalogue}
-$C_t\subseteq K$ of types observed so far and the associated expert set
-$\cE_t=\cE(C_t;\epsilon)$, where $\epsilon=1/\sqrt T$. An anytime
-Polynomial-Weights instance is run over $\cE_t$. When a new attacker type
-is observed, $C_t$ is enlarged, $\cE_t$ is recomputed, and the sub-routine
-is restarted on the new expert set. \Cref{alg:gc} gives the pseudocode.
-
-\begin{algorithm}[H]
-\caption{\textsc{Grow-Catalogue} (full information)}
+\begin{algorithm}[t]
+\caption{\textsc{Grow-Catalogue} (full information).}
 \label{alg:gc}
 \begin{algorithmic}[1]
 \small
-\Require Horizon $T$; bound $\Kmax$; game primitives; default coverage
-$\pvec_{\text{def}}$ (e.g.\ uniform)
-\State $C\gets\emptyset$,~$\cE\gets\emptyset$,~$\epsilon\gets 1/\sqrt T$,~$t_{\text{loc}}\gets 0$
+\Require horizon $T$, bound $\Kmax$, game primitives, default $\pvec_{\text{def}}\in\cP$
+\State $C\gets\emptyset$;~$\cE\gets\emptyset$;~$\epsilon\gets 1/\sqrt T$;~$t_{\text{loc}}\gets 0$
 \For{$t=1,\dots,T$}
-  \If{$\cE=\emptyset$}
-    \State play $\pvec_t\gets\pvec_{\text{def}}$
-  \Else
-    \State sample $\pvec_t\sim q_t$ from the current PW distribution over $\cE$
+  \If{$\cE=\emptyset$} \State play $\pvec_t\gets\pvec_{\text{def}}$
+  \Else \State sample $\pvec_t\sim q_t$, where $q_t$ is the current PW distribution over $\cE$
   \EndIf
   \State observe $a_t$
-  \If{$a_t\notin C$}\Comment{new type discovered}
+  \If{$a_t\notin C$} \Comment{discovery round: new attacker type}
     \State $C\gets C\cup\{a_t\}$; record $(u_{a_t}^c,u_{a_t}^u)$
-    \State $\cE\gets\cE(C;\epsilon)$\Comment{recompute partition}
-    \State restart PW on $\cE$; $t_{\text{loc}}\gets 0$
-  \Else\Comment{routine update}
+    \State $\cE\gets\cE(C;\epsilon)$ \Comment{recompute extreme points}
+    \State reset PW on $\cE$; $t_{\text{loc}}\gets 0$
+  \Else \Comment{routine round}
     \State $t_{\text{loc}}\gets t_{\text{loc}}+1$
-    \State $\ell_t(\pvec)\gets -U_d(b_{a_t}(\pvec),\pvec)$ for each $\pvec\in\cE$
+    \State compute $\ell_t(\pvec)\!=\!-U_d(b_{a_t}(\pvec),\pvec)$ for $\pvec\in\cE$
     \State $\eta\gets\sqrt{\log|\cE|/t_{\text{loc}}}$
-    \State $w_{\pvec}\gets w_{\pvec}\,e^{-\eta\,\ell_t(\pvec)}$ for each $\pvec\in\cE$
+    \State $w_\pvec\gets w_\pvec\cdot e^{-\eta\,\ell_t(\pvec)}$ for all $\pvec\in\cE$
   \EndIf
 \EndFor
 \end{algorithmic}
 \end{algorithm}
 
-We implement two variants of line 11: (i) \emph{total recomputation}, which
-rebuilds $\cE(C;\epsilon)$ from scratch, and (ii) \emph{incremental}, which
-reuses PW weights for extreme points that survive the new refinement of the
-partition. The two variants are observationally equivalent -- they achieve
-\emph{identical} regret -- but the incremental variant has lower
-per-discovery wall-clock cost.
+We implement two variants of line~10: \emph{total recomputation} rebuilds
+$\cE(C;\epsilon)$ from scratch, while \emph{incremental update} reuses
+PW weights for extreme points that survive the new refinement. Both
+variants are observationally equivalent up to numerics (they maintain the
+same $\cE$ and the same distribution), and hence yield identical regret.
+The incremental variant is more time-efficient when $|C|$ is not too small.
 
 \subsection{Main Result}
+\label{sec:mainresult}
 
-\begin{theorem}[Unknown $K$, full information]
+\begin{theorem}[Main]
 \label{thm:main}
-Let $K$ be an unknown set of attacker types with $|K|\le\Kmax$, and fix a
-horizon $T$. Under full-information feedback and for any oblivious
-adversarial sequence $\avec\in K^T$, \Cref{alg:gc} satisfies
+Let the defender play \Cref{alg:gc} in the unknown-$K$ full-information
+setting of \Cref{prob:unknownK}. For any oblivious adversarial sequence
+$\avec\in K^T$ with $|K|\le\Kmax$, the expected regret satisfies
 \begin{equation}
-\EE[\mathrm{Regret}(T)]\;\le\;O\!\left(\sqrt{T\,\Kmax\,(n^2+\Kmax\log n)}\right).
+\EE[\Regret(T)]\;\le\;O\!\Bigl(\sqrt{T\cdot\Kmax\cdot(n^2+\Kmax\log n)}\Bigr).
 \label{eq:main}
 \end{equation}
-In particular, if $\Kmax=O(1)$ then
-$\EE[\mathrm{Regret}(T)]=\tilde O(n\sqrt T)$, matching
-\citet[Thm.\,5.1]{balcan2015} up to logarithmic factors.
+In particular, if $\Kmax=O(1)$ then $\EE[\Regret(T)]=\tilde O(n\sqrt T)$,
+matching the known-$K$ bound of \citet[Theorem 5.1]{balcan2015} up to
+logarithmic factors.
 \end{theorem}
 
-The proof of \Cref{thm:main} is the central technical contribution of
-this paper, and we give it in full.
-
-\begin{proof}[Proof of \Cref{thm:main}]
-Fix the (unknown) adversarial sequence $\avec=a_1,\dots,a_T\in K^T$ and
-let $K'\le\Kmax$ denote the number of \emph{distinct} attacker types that
-appear in $\avec$. We organize the proof in seven steps.
-
-\paragraph{Step~1: Epoch decomposition.}
-Let $\tau_1<\tau_2<\cdots<\tau_{K'}$ be the round indices at which each
-new type is first observed (so $a_{\tau_i}$ is seen for the first time at
-round $\tau_i$, and $\tau_1\ge 1$). Define, for $i=1,\dots,K'$,
-\[
-\mathrm{Ep}_i\;=\;\{\tau_i+1,\tau_i+2,\dots,\tau_{i+1}-1\},
-\]
-with the convention $\tau_{K'+1}=T+1$. Let $L_i=|\mathrm{Ep}_i|=\tau_{i+1}-\tau_i-1$.
-Let
-$\mathcal{D}=\{\tau_1,\dots,\tau_{K'}\}$
-be the set of \emph{discovery rounds}. Then
-\(
-[1,T]=\mathcal{D}\sqcup\bigcup_{i=1}^{K'}\mathrm{Ep}_i,
-\)
-and
-$|\mathcal{D}|+\sum_{i=1}^{K'}L_i=T,$
-with $|\mathcal{D}|=K'\le\Kmax$.
-
-\paragraph{Step~2: Catalogue is fixed inside an epoch.}
-After round $\tau_i$ the catalogue is
-$C_i=\{a_{\tau_1},\dots,a_{\tau_i}\}$, and it remains unchanged throughout
-$\mathrm{Ep}_i$. Moreover, every round $t\in\mathrm{Ep}_i$ has
-$a_t\in C_i$: by definition the next \emph{new} type arrives only at round
-$\tau_{i+1}$, so any $a_t$ with $t<\tau_{i+1}$ is already in $C_i$. Hence
-during $\mathrm{Ep}_i$ the algorithm runs a single, fresh Polynomial-
-Weights instance on the expert set $\cE_i\coloneqq\cE(C_i;\epsilon)$
-against a sequence of attackers all of which live in $C_i$.
-
-\paragraph{Step~3: Within-epoch PW regret.}
-By \Cref{prop:hedge} applied to the PW instance of \Cref{alg:gc} running
-on $\cE_i$ over the $L_i$ rounds of $\mathrm{Ep}_i$ (the loss range is
-$\kappa=1$ because $U_d\in[-1,1]$), there is an absolute constant $c_1>0$
-such that
-\begin{align}
-&\max_{\pvec\in\cE_i}\sum_{t\in\mathrm{Ep}_i}\!U_d(b_{a_t}(\pvec),\pvec)\notag\\
-&\quad-\EE\!\left[\sum_{t\in\mathrm{Ep}_i}\!U_d(b_{a_t}(\pvec_t),\pvec_t)\right]\;\le\;c_1\sqrt{L_i\log|\cE_i|},
-\label{eq:hedge-epoch}
-\end{align}
-where $\pvec_t\sim q_t$ is the random strategy played at round $t$ under
-the PW distribution $q_t$ on $\cE_i$, and the expectation is over the
-algorithm's internal randomness. The anytime learning rate
-$\eta_{t_{\text{loc}}}=\sqrt{\log|\cE_i|/t_{\text{loc}}}$ used in \Cref{alg:gc}
-is what makes the bound \Cref{eq:hedge-epoch} hold without requiring
-the epoch length $L_i$ to be known in advance
-\citep[\S 2]{cesa2006}.
-
-\paragraph{Step~4: Within-epoch approximation via \Cref{lem:43}.}
-The sub-sequence $(a_t)_{t\in\mathrm{Ep}_i}$ has length $L_i$ and uses
-only types in $C_i$, which is precisely the hypothesis of
-\Cref{lem:43} applied to $C=C_i$. Hence
-\begin{align}
-&\max_{\pvec\in\cE_i}\sum_{t\in\mathrm{Ep}_i}\!U_d(b_{a_t}(\pvec),\pvec)\notag\\
-&\quad\ge\;\max_{\pvec\in\cP}\sum_{t\in\mathrm{Ep}_i}\!U_d(b_{a_t}(\pvec),\pvec)-2\epsilon L_i.\label{eq:lem43-epoch}
-\end{align}
-Since $\pvec^*\in\cP$, the right-hand side of \Cref{eq:lem43-epoch} is at
-least
-\begin{equation}
-\sum_{t\in\mathrm{Ep}_i}\!U_d(b_{a_t}(\pvec^*),\pvec^*)\;-\;2\epsilon L_i.\label{eq:lem43-pstar}
-\end{equation}
-
-\paragraph{Step~5: Per-epoch combined bound.}
-Combining \Cref{eq:hedge-epoch} with \Cref{eq:lem43-epoch,eq:lem43-pstar},
-for every epoch $i\in\{1,\dots,K'\}$,
-\begin{align}
-&\EE\!\left[\sum_{t\in\mathrm{Ep}_i}\!U_d(b_{a_t}(\pvec_t),\pvec_t)\right]\notag\\
-&\;\ge\;\sum_{t\in\mathrm{Ep}_i}\!U_d(b_{a_t}(\pvec^*),\pvec^*)-2\epsilon L_i-c_1\sqrt{L_i\log|\cE_i|}.\label{eq:epoch}
-\end{align}
-The left-hand side is the algorithm's expected utility on $\mathrm{Ep}_i$,
-and the right-hand side compares against the global benchmark $\pvec^*$
-restricted to the same epoch. The terms $2\epsilon L_i$ and
-$c_1\sqrt{L_i\log|\cE_i|}$ capture, respectively, the Lemma-4.3
-approximation loss and the within-epoch regret of PW.
-
-\paragraph{Step~6: Discovery rounds.}
-For $t\in\mathcal{D}$, either $t=\tau_1$ and the defender plays the default
-$\pvec_{\text{def}}$, or $t=\tau_i$ for some $i\ge 2$ and the defender plays
-according to the PW distribution inherited from $\mathrm{Ep}_{i-1}$, which
-is not tuned to the newly-appearing type. In either sub-case, because
-$U_d\in[-1,1]$,
-\[
-\bigl|U_d(b_{a_t}(\pvec^*),\pvec^*)-U_d(b_{a_t}(\pvec_t),\pvec_t)\bigr|\;\le\;2.
-\]
-Summing over the at most $K'$ discovery rounds,
-\begin{equation}
-\sum_{t\in\mathcal{D}}\!U_d(b_{a_t}(\pvec^*),\pvec^*)-\EE\!\left[\sum_{t\in\mathcal{D}}\!U_d(b_{a_t}(\pvec_t),\pvec_t)\right]\;\le\;2\Kmax.\label{eq:discovery}
-\end{equation}
-
-\paragraph{Step~7: Bounding $|\cE_i|$ uniformly.}
-By \Cref{lem:44} applied with $|C_i|\le\Kmax$,
-$|\cE_i|\le c_2\cdot(2^n+\Kmax n^2)^n\cdot n^{\Kmax}\eqqcolon N_{\max}$
-for an absolute constant $c_2$. Taking logarithms,
-\begin{align}
-\log N_{\max}&\;=\;n\log\!\bigl(2^n+\Kmax n^2\bigr)+\Kmax\log n+O(1)\notag\\
-&\;\le\;n^2+n\log\!\bigl(1+\tfrac{\Kmax n^2}{2^{n-1}}\bigr)+\Kmax\log n\notag\\
-&\;=\;O\bigl(n^2+\Kmax\log n\bigr),\label{eq:logN}
-\end{align}
-where we used $\log(1+x)\le x$ and the fact that
-$\Kmax n^2/2^{n-1}$ is bounded. In particular, $\log|\cE_i|\le\log N_{\max}$
-for every epoch $i$.
-
-\paragraph{Step~8: Summing across epochs.}
-Sum \Cref{eq:epoch} over $i=1,\dots,K'$ and add \Cref{eq:discovery}. The
-total expected utility of the algorithm is then bounded below by the
-benchmark's cumulative utility, minus the discovery-round term $2\Kmax$,
-minus $2\epsilon T$ coming from the Lemma~\ref{lem:43} approximation
-losses (which telescope via $\sum_i L_i\le T$), minus the sum of the
-per-epoch PW regret terms. Rearranging,
-\begin{equation}
-\EE[\mathrm{Regret}(T)]\;\le\;2\Kmax+2\epsilon T+c_1\sqrt{\log N_{\max}}\sum_{i=1}^{K'}\!\sqrt{L_i}.\label{eq:preCS}
-\end{equation}
-
-\paragraph{Step~9: Cauchy--Schwarz.}
-Applying the Cauchy--Schwarz inequality to the vectors
-$(1,\dots,1)\in\RR^{K'}$ and $(\sqrt{L_1},\dots,\sqrt{L_{K'}})$,
-\begin{equation}
-\sum_{i=1}^{K'}\!\sqrt{L_i}\;\le\;\sqrt{K'\cdot\!\sum_{i=1}^{K'}\!L_i}\;\le\;\sqrt{\Kmax\,T}.\label{eq:CS}
-\end{equation}
-This is the only place where $\Kmax$ enters multiplicatively in the
-leading term; since $K'\le\Kmax$, the bound depends on $\Kmax$ through
-exactly a factor of $\sqrt{\Kmax}$ on the outside plus whatever
-$\Kmax$-dependence lives inside $\log N_{\max}$.
-
-\paragraph{Step~10: Final substitution.}
-Plugging \Cref{eq:CS} and \Cref{eq:logN} into \Cref{eq:preCS} and choosing
-$\epsilon=1/\sqrt T$,
-\begin{align*}
-\EE[\mathrm{Regret}(T)]
-&\le 2\Kmax+2\sqrt T+c_1\sqrt{\Kmax T\log N_{\max}}\\
-&\le 2\Kmax+2\sqrt T\\
-&\quad+c_3\sqrt{T\Kmax(n^2+\Kmax\log n)}
-\end{align*}
-for an absolute constant $c_3$. Whenever $T\ge\Kmax$ -- which is the only
-regime in which the bound is non-trivial anyway -- the leading
-$\sqrt{T\Kmax(n^2+\Kmax\log n)}$ term dominates the additive
-$2\Kmax+2\sqrt T$. Therefore
-\[
-\EE[\mathrm{Regret}(T)]\;=\;O\!\left(\sqrt{T\Kmax(n^2+\Kmax\log n)}\right),
-\]
-which is precisely the bound of \Cref{thm:main}.
-\end{proof}
-
-\paragraph{Remarks on the proof.}
-(a) Step~6 is where the ``unknown $K$'' assumption shows up: it adds a
-$2\Kmax$ additive term for the at most $\Kmax$ discovery rounds. When $K$
-is known, as in \citet{balcan2015}, this term is absent, and one obtains
-the same rate but with a smaller additive constant.
-(b) The Cauchy--Schwarz step (Step~9) is the only place in which we lose
-structural information about the specific epoch lengths; if the adversary
-delays its discoveries uniformly (worst case), the inequality is tight,
-whereas a front-loaded adversary that reveals all types in the first
-$O(\Kmax)$ rounds makes $\sum_i\sqrt{L_i}\approx\sqrt{T}$ and the bound
-improves to $\tilde O(n\sqrt T)$.
-(c) The anytime learning rate in \Cref{alg:gc} is essential to the proof
-of Step~3: if PW were tuned to a fixed horizon, restarting at each
-discovery round would produce the wrong dependence on $L_i$.
+We prove \Cref{thm:main} in detail in \Cref{sec:proof}. Two immediate
+corollaries are useful.
 
 \begin{corollary}[Regime of applicability]
 \label{cor:regime}
-The bound \Cref{eq:main} is sublinear in $T$ whenever
+The bound \Cref{eq:main} is sublinear in $T$ if and only if
 $\Kmax\cdot(n^2+\Kmax\log n)=o(T)$; equivalently,
 $\Kmax=o\!\bigl(\min\{T/n^2,\sqrt{T/\log n}\}\bigr)$.
-In particular, $\Kmax=O(1)$ gives $\tilde O(n\sqrt T)$ for any $n\le\sqrt T$.
 \end{corollary}
 
-\begin{corollary}[Instance-adaptivity]\label{cor:adaptive}
-Let $K'\le\Kmax$ be the number of distinct attacker types actually observed
-in $\avec$. Then the Cauchy--Schwarz step uses $K'$ in place of $\Kmax$, and
-\Cref{alg:gc} achieves
-$\EE[\mathrm{Regret}(T)]=O\!\bigl(\sqrt{TK'(n^2+\Kmax\log n)}\bigr)$.
+\begin{corollary}[Instance-adaptive bound]
+\label{cor:adaptive}
+Let $K'=|\{a_1,\dots,a_T\}|\le\Kmax$ be the number of \emph{distinct}
+attacker types actually observed. Then \Cref{alg:gc} achieves
+\[
+\EE[\Regret(T)]\;\le\;O\!\Bigl(\sqrt{T\cdot K'\cdot(n^2+\Kmax\log n)}\Bigr).
+\]
 \end{corollary}
 
-\Cref{cor:adaptive} is a graceful degradation: the leading factor depends on
-the actual $K'$, while the $\log N_{\max}$ term -- independent of whether
-the algorithm used $K'$ or $\Kmax$ -- stays at its $\Kmax$ level because the
-algorithm always works with the upper bound.
+Both corollaries follow directly from the proof in \Cref{sec:proof}:
+\Cref{cor:regime} by setting the leading term to $T$ and solving for
+$\Kmax$, and \Cref{cor:adaptive} by using $K'$ rather than $\Kmax$ in the
+Cauchy--Schwarz step.
 
+% ==========================================================================
+\section{Proof of \Cref{thm:main}}
+\label{sec:proof}
 
-% =============================================================================
+This section is the technical heart of the report. The proof closely
+tracks the structure of the known-$K$ proof of \citet[\S 5]{balcan2015}
+but has two non-trivial departures: (i) the expert set is no longer static
+but grows over time, and (ii) the discovery rounds introduce an extra
+bounded additive term. We make both departures explicit and account for
+them carefully.
+
+\begin{proof}[Proof of \Cref{thm:main}]
+Fix an oblivious adversarial sequence $\avec=a_1,\dots,a_T\in K^T$ with
+$|K|\le\Kmax$. Let $K'=|\{a_1,\dots,a_T\}|\le\Kmax$ denote the number of
+distinct types that actually appear in $\avec$. The proof proceeds in ten
+steps.
+
+\paragraph{Step 1 (Epoch decomposition).}
+Let $\tau_1<\tau_2<\cdots<\tau_{K'}$ be the round indices at which each
+new attacker type is first observed, i.e., for each
+$i\in\{1,\dots,K'\}$, round $\tau_i$ is the smallest $t$ such that
+$a_t\notin\{a_1,\dots,a_{t-1}\}$. We define the \emph{epochs}
+\begin{equation}
+\mathrm{Ep}_i\;=\;\{\tau_i+1,\tau_i+2,\dots,\tau_{i+1}-1\},\quad
+i=1,\dots,K',
+\label{eq:epoch-def}
+\end{equation}
+with the convention $\tau_{K'+1}\coloneqq T+1$, and write
+$L_i=|\mathrm{Ep}_i|$. Let
+$\mathcal{D}=\{\tau_1,\dots,\tau_{K'}\}$ be the set of \emph{discovery
+rounds}. By construction,
+\[
+[1,T]\;=\;\mathcal{D}\;\sqcup\;\bigcup_{i=1}^{K'}\mathrm{Ep}_i,
+\]
+and
+$|\mathcal{D}|+\sum_{i=1}^{K'}L_i=T$ with $|\mathcal{D}|=K'\le\Kmax$. The
+epoch decomposition is the critical structural property of the proof: it
+re-interprets the online problem with a growing expert set as a finite
+sequence of online problems with \emph{fixed} expert sets, so that the
+known-$K$ analysis of \citet{balcan2015} can be invoked inside each
+epoch.
+
+\paragraph{Step 2 (Catalogue is constant inside an epoch).}
+Immediately after round $\tau_i$, the catalogue maintained by
+\Cref{alg:gc} is $C_i=\{a_{\tau_1},\dots,a_{\tau_i}\}$, and it is not
+updated until the next discovery round $\tau_{i+1}$. Hence $C_t=C_i$ for
+every $t\in\mathrm{Ep}_i$. Moreover, by the defining property of
+$\tau_{i+1}$, no new type appears in $\mathrm{Ep}_i$, so
+\begin{equation}
+a_t\in C_i\quad\text{for every }t\in\mathrm{Ep}_i.
+\label{eq:epoch-types}
+\end{equation}
+Denote by $\cE_i\coloneqq\cE(C_i;\epsilon)$ the extreme-point set
+used by the PW sub-routine during $\mathrm{Ep}_i$; \Cref{eq:epoch-types}
+is exactly the hypothesis needed to apply \Cref{lem:43} to $C_i$ and the
+sub-sequence inside $\mathrm{Ep}_i$.
+
+\paragraph{Step 3 (Within-epoch PW regret).}
+During $\mathrm{Ep}_i$ the algorithm runs a fresh instance of the anytime
+Polynomial-Weights sub-routine on the fixed expert set $\cE_i$ for $L_i$
+rounds. The losses are $\ell_t(\pvec)=-U_d(b_{a_t}(\pvec),\pvec)\in[-1,1]$,
+so the range parameter is $\kappa=1$. \Cref{prop:hedge} therefore
+yields an absolute constant $c_1>0$ such that
+\begin{align}
+&\max_{\pvec\in\cE_i}\sum_{t\in\mathrm{Ep}_i}\!U_d(b_{a_t}(\pvec),\pvec)\notag\\
+&\quad-\EE\!\left[\sum_{t\in\mathrm{Ep}_i}\!U_d(b_{a_t}(\pvec_t),\pvec_t)\right]\;\le\;c_1\sqrt{L_i\log|\cE_i|}.
+\label{eq:hedge-epoch}
+\end{align}
+The use of an \emph{anytime} learning rate in \Cref{alg:gc} is essential
+here: the length $L_i$ of the epoch is not known at the start of
+$\mathrm{Ep}_i$, since the algorithm cannot predict when the next new type
+will appear. With a horizon-tuned learning rate one would either need an
+a priori guess of $L_i$, or pay an extra factor in the regret bound.
+
+\paragraph{Step 4 (Within-epoch approximation via \Cref{lem:43}).}
+By \Cref{eq:epoch-types}, the sub-sequence
+$(a_t)_{t\in\mathrm{Ep}_i}$ has length $L_i$ and lies in $C_i$. Apply
+\Cref{lem:43} with $T'=L_i$ and catalogue $C_i$:
+\begin{align}
+&\max_{\pvec\in\cE_i}\!\sum_{t\in\mathrm{Ep}_i}\!U_d(b_{a_t}(\pvec),\pvec)\notag\\
+&\quad\ge\;\max_{\pvec\in\cP}\!\sum_{t\in\mathrm{Ep}_i}\!U_d(b_{a_t}(\pvec),\pvec)-2\epsilon L_i.
+\label{eq:lem43-epoch}
+\end{align}
+Since $\pvec^{*}\in\cP$, the right-hand side is at least the value at
+$\pvec^{*}$ restricted to the epoch:
+\begin{align}
+&\max_{\pvec\in\cE_i}\!\sum_{t\in\mathrm{Ep}_i}\!U_d(b_{a_t}(\pvec),\pvec)\notag\\
+&\quad\ge\;\sum_{t\in\mathrm{Ep}_i}\!U_d(b_{a_t}(\pvec^{*}),\pvec^{*})-2\epsilon L_i.
+\label{eq:lem43-pstar}
+\end{align}
+
+\paragraph{Step 5 (Per-epoch combined bound).}
+Chaining \Cref{eq:hedge-epoch,eq:lem43-pstar}, for every epoch
+$i\in\{1,\dots,K'\}$ we obtain
+\begin{align}
+&\EE\!\left[\sum_{t\in\mathrm{Ep}_i}\!U_d(b_{a_t}(\pvec_t),\pvec_t)\right]\notag\\
+&\;\ge\;\sum_{t\in\mathrm{Ep}_i}\!U_d(b_{a_t}(\pvec^{*}),\pvec^{*})-2\epsilon L_i-c_1\sqrt{L_i\log|\cE_i|}.\label{eq:combined-epoch}
+\end{align}
+Equation \Cref{eq:combined-epoch} is the per-epoch regret bound
+\emph{against the global benchmark} $\pvec^{*}$, and it is the building
+block for the rest of the proof. Note that despite the fact that
+$\pvec^{*}$ is the benchmark over all $T$ rounds (not just epoch $i$),
+we are able to bound our per-epoch regret against $\pvec^{*}$ because
+$\pvec^{*}\in\cP$ and we applied \Cref{lem:43} on the sub-sequence.
+
+\paragraph{Step 6 (Discovery rounds).}
+For each discovery round $t\in\mathcal{D}$, the algorithm either plays
+$\pvec_{\text{def}}$ (if $t=\tau_1$) or samples $\pvec_t$ from the PW
+distribution inherited from $\mathrm{Ep}_{i-1}$ (if $t=\tau_i$ for
+$i\ge 2$). In both cases the sampled $\pvec_t$ is not tuned to the
+newly-appearing type $a_t=a_{\tau_i}$. However, because the payoff
+$U_d$ is bounded in $[-1,1]$, for every $\pvec\in\cP$ and every type
+$\alpha$, $U_d(b_\alpha(\pvec),\pvec)\in[-1,1]$, so
+\begin{equation}
+\bigl|U_d(b_{a_t}(\pvec^{*}),\pvec^{*})-U_d(b_{a_t}(\pvec_t),\pvec_t)\bigr|\;\le\;2.
+\label{eq:disc-bound}
+\end{equation}
+Summing \Cref{eq:disc-bound} over the at most $K'\le\Kmax$ discovery rounds
+yields
+\begin{equation}
+\sum_{t\in\mathcal{D}}\!U_d(b_{a_t}(\pvec^{*}),\pvec^{*})-\EE\!\left[\sum_{t\in\mathcal{D}}\!U_d(b_{a_t}(\pvec_t),\pvec_t)\right]\le 2\Kmax.
+\label{eq:disc-sum}
+\end{equation}
+This is the only source of additive dependence on $\Kmax$ that does not
+come from the main $\sqrt{T\Kmax}$ term. It is the ``price of not knowing
+$K$'' at a discovery round.
+
+\paragraph{Step 7 (Uniform bound on $|\cE_i|$).}
+By \Cref{lem:44} applied with $|C_i|\le\Kmax$,
+\[
+|\cE_i|\;\le\;c_2\,(2^n+\Kmax n^2)^n\cdot n^{\Kmax}\;\eqqcolon\;\Nmax,
+\]
+for an absolute constant $c_2$. Taking logarithms,
+\begin{align}
+\log\Nmax &= n\log\!\bigl(2^n+\Kmax n^2\bigr)+\Kmax\log n+O(1)\notag\\
+&\le n^2+n\log\!\bigl(1+\tfrac{\Kmax n^2}{2^{n-1}}\bigr)+\Kmax\log n\notag\\
+&= O\bigl(n^2+\Kmax\log n\bigr),
+\label{eq:logN}
+\end{align}
+where the middle step uses $\log(2^n+\Kmax n^2)\le n+\log(1+\Kmax n^2/2^{n-1})$
+and $\log(1+x)\le x$ for $x>0$. Crucially, \Cref{eq:logN} is uniform in
+$i$: $\log|\cE_i|\le\log\Nmax$ for every epoch. This lets us pull the
+$\log|\cE_i|$ factor in Step~5 outside the sum over epochs.
+
+\paragraph{Step 8 (Summing across epochs).}
+Sum \Cref{eq:combined-epoch} over $i=1,\dots,K'$ and add
+\Cref{eq:disc-sum}. The algorithm's total expected utility is then at
+least the benchmark's total utility, minus the discovery term $2\Kmax$,
+minus $2\epsilon T$ from the telescoping Lemma-4.3 approximation errors
+(using $\sum_i L_i\le T$), minus the sum of the per-epoch PW regret
+terms. Rearranging,
+\begin{align}
+\EE[\Regret(T)]\;\le\;2\Kmax+2\epsilon T+c_1\sqrt{\log\Nmax}\!\sum_{i=1}^{K'}\!\sqrt{L_i}.
+\label{eq:after-sum}
+\end{align}
+
+\paragraph{Step 9 (Cauchy--Schwarz).}
+The last term involves the sum of $K'$ square roots. By the Cauchy--Schwarz
+inequality applied to $(1,\dots,1)\in\RR^{K'}$ and
+$(\sqrt{L_1},\dots,\sqrt{L_{K'}})$,
+\begin{equation}
+\sum_{i=1}^{K'}\!\sqrt{L_i}\;\le\;\sqrt{K'\cdot\!\sum_{i=1}^{K'}\!L_i}\;\le\;\sqrt{\Kmax\,T}.
+\label{eq:CS}
+\end{equation}
+The first inequality is tight when all epochs have equal length, a
+scenario that corresponds to an adversary who reveals types evenly across
+the horizon. This is where the leading multiplicative $\sqrt{\Kmax}$
+factor in the bound is generated. An instance-adaptive version uses $K'$
+in place of $\Kmax$, which is what \Cref{cor:adaptive} records.
+
+\paragraph{Step 10 (Final substitution).}
+Plugging \Cref{eq:logN,eq:CS} into \Cref{eq:after-sum} and choosing
+$\epsilon=1/\sqrt T$ gives
+\begin{align*}
+\EE[\Regret(T)]&\le 2\Kmax+2\sqrt T+c_1\sqrt{\Kmax T\,\log\Nmax}\\
+&\le 2\Kmax+2\sqrt T\\
+&\quad+c_3\sqrt{T\Kmax(n^2+\Kmax\log n)}
+\end{align*}
+for an absolute constant $c_3$. Since the leading
+$\sqrt{T\Kmax(n^2+\Kmax\log n)}$ term dominates the additive $2\Kmax+2\sqrt T$
+whenever $T\ge\Kmax$ (the only regime in which the bound is non-trivial,
+per \Cref{cor:regime}),
+\[
+\EE[\Regret(T)]\;=\;O\!\Bigl(\sqrt{T\cdot\Kmax\cdot(n^2+\Kmax\log n)}\Bigr),
+\]
+which is exactly the bound of \Cref{thm:main}. This completes the proof.
+\end{proof}
+
+\paragraph{Where the proof diverges from \citet{balcan2015}.}
+Two places. Step~6, the discovery-round term, is new: in the known-$K$
+proof there are no ``discovery rounds'' because every type is available at
+$t=1$, and the additive $2\Kmax$ simply does not appear. Step~9, the
+Cauchy--Schwarz step, is also new: in the known-$K$ proof the PW
+sub-routine is never restarted, so there is a single $\sqrt T$ factor
+instead of our $\sum_i\sqrt{L_i}$. The trade-off between these two
+modifications is what produces the clean replacement of $k$ by $\Kmax$
+in the final bound.
+
+% ==========================================================================
 \section{Experiments}
 \label{sec:exp}
 
 \subsection{Setup}
 
-We test \textsc{Grow-Catalogue} on synthetic SSG instances. We set $n=3$,
-$R=1$, $\Kmax=4$, and $T=4000$. Defender utilities are drawn
-$u_d^c(i)\sim\mathrm{Unif}(0.1,1)$ and $u_d^u(i)\sim\mathrm{Unif}(-1,-0.1)$.
-For each of $K=4$ attacker types, we draw
-$u_\alpha^u(i)\sim\mathrm{Unif}(0.1,1)$ and
-$u_\alpha^c(i)\sim\mathrm{Unif}(-1,-0.1)$, so that covering hurts the
+We implement \Cref{alg:gc} in Python (NumPy, SciPy, Matplotlib), along
+with two reference algorithms: the known-$K$ oracle of
+\citet[\S 5]{balcan2015}, which receives the full set $K$ at $t=1$; and a
+\emph{uniform} baseline that plays $\pvec_{\text{def}}=(R/n,\dots,R/n)$
+every round. Unless stated otherwise, we use $n=3$ targets, $R=1$
+resource, and attacker utilities drawn i.i.d.\ from $\mathrm{Unif}[-1,1]$
+with $u_\alpha^u(i)>0>u_\alpha^c(i)$ to ensure covering is costly for the
 attacker. The extreme-point set $\cE(C;\epsilon)$ is computed by direct
-enumeration of intersections of $\binom{|C|n^2+n}{n-1}$ hyperplanes inside
-$\cP$, which is tractable for the chosen $n$.
+enumeration of intersections of $(n-1)$-subsets of the defining
+hyperplanes, which is tractable at $n=3$.
 
-\paragraph{Adversary.}
-We use a \emph{staggered-uniform} adversary, designed to exercise the
-catalogue-growing behaviour without being pathologically specialised: the
-horizon $[0,T)$ is split into $\Kmax$ phases of length $T/\Kmax$, and in
-phase $i$ the attacker is drawn uniformly at random from
-$\{\alpha_1,\dots,\alpha_i\}$. Thus $\alpha_1$ is present in every phase,
-while $\alpha_4$ appears only in the last phase. The \emph{closed-form}
-frequency of type $\alpha_i$ in the sequence is
-$\Pr[\alpha_i]=\tfrac{1}{\Kmax}\sum_{j=i}^{\Kmax}1/j$; empirical
-frequencies from 40 random seeds match this to within sampling error.
-
-\paragraph{Baselines.}
-We compare \textsc{Grow-Catalogue} against two references. (i) The
-\emph{known-$K$ oracle}, i.e.\ \citet{balcan2015}'s Theorem 5.1 algorithm
-run with the full set of four types known at $t=0$. (ii) The
-\emph{uniform} baseline, which plays $\pvec_{\text{def}}=(R/n,\dots,R/n)$
-at every round; this is what \textsc{Grow-Catalogue} falls back to on
-round $1$ when $\cE=\emptyset$.
+We use a \emph{staggered-uniform} adversary: the horizon $[0,T)$ is
+partitioned into $\Kmax$ phases of length $T/\Kmax$ each, and in phase
+$i$ the attacker is drawn uniformly at random from the first $i$ types
+$\{\alpha_1,\dots,\alpha_i\}$. Thus $\alpha_1$ is present in every
+phase, $\alpha_2$ from phase 2 onward, and so on. This design produces a
+clean sequence of discovery rounds at $t=0,T/\Kmax,\dots,(\Kmax-1)T/\Kmax$,
+while still mixing old and new types after each reveal so that the
+benchmark $\pvec^{*}$ is a genuine compromise rather than a specialist
+strategy.
 
 \subsection{Results}
-\label{sec:results}
 
 \begin{figure}[t]
 \centering
 \includegraphics[width=0.98\linewidth]{figures/presentation/avg_regret_per_iter.pdf}
 \vspace{-0.5em}
-\caption{Rolling-window average per-round regret (window $=75$) for
-\textsc{Grow-Catalogue} under the staggered-uniform adversary, averaged
-over $40$ random instances. Red dashed lines mark the four discovery rounds
-$\tau_i\in\{0,1000,2000,3000\}$. Each reveal causes a visible spike,
-followed by re-convergence of the Polynomial-Weights sub-routine within the
-new epoch.}
+\caption{Rolling-window per-round regret of \textsc{Grow-Catalogue} under
+the staggered-uniform adversary ($n=3$, $\Kmax=4$, $T=4000$, average over
+$40$ seeds, window $=75$). Red dashed lines mark the discovery rounds
+$0,1000,2000,3000$. Each reveal causes a visible transient spike,
+followed by PW re-convergence inside the new epoch.}
 \label{fig:per-round}
 \end{figure}
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=0.98\linewidth]{figures/presentation/global_avg_regret.pdf}
+\includegraphics[width=0.98\linewidth]{figures/presentation/regret_vs_T_scaling.pdf}
 \vspace{-0.5em}
-\caption{Global average regret $\mathrm{Regret}(t)/t$ for the same
-experiment. The curve tends to $0$ from above, consistent with the
-$\tilde O(n\sqrt{\Kmax T})$ upper bound of \Cref{thm:main}. Small bumps at
-the discovery rounds confirm the epoch decomposition exploited in the proof.}
-\label{fig:global}
+\caption{Cumulative regret versus horizon $T$ for \textsc{Grow-Catalogue}
+($n=3$, $\Kmax=3$, uniform random adversary, 80 seeds). The green curve
+stays strictly below the $C\sqrt T$ upper envelope implied by
+\Cref{thm:main}, which is in turn well below the linear-regret regime
+that would result without learning.}
+\label{fig:scaling}
 \end{figure}
 
-\Cref{fig:per-round} plots the rolling-average per-round regret of
-\textsc{Grow-Catalogue}. Two qualitative features of the theorem are
-visible. First, at each discovery round $\tau_i$ the per-round regret
-\emph{spikes}: the sub-routine has just been handed a new expert set and
-must re-learn on it, consistent with the $c_1\sqrt{L_i\log|\cE_i|}$ term
-being contributed to the sum by the new epoch. Second, the spike magnitude
-\emph{decreases} over successive discoveries, reflecting the fact that
-later epochs have larger initial mass at good extreme points inherited
-from earlier epochs, and therefore a smaller transient.
+\Cref{fig:per-round} shows that the algorithm's per-round regret tracks
+the epoch structure of the proof: each discovery round produces a bounded
+transient, and the PW sub-routine re-converges within the new epoch. The
+spikes shrink with $i$ because, by epoch $i$, the algorithm already has a
+good PW distribution on most of the new (refined) extreme points.
 
-\Cref{fig:global} plots the global average regret $\mathrm{Regret}(t)/t$.
-It decays rapidly after the first epoch and continues to approach $0$,
-empirically confirming the sublinear upper bound. The bumps at $t\in\{1000,
-2000,3000\}$ are the same spikes of \Cref{fig:per-round}, averaged into
-the global sum.
+\Cref{fig:scaling} plots cumulative $\Regret(T)$ versus $T$ with the
+$C\sqrt T$ envelope from \Cref{thm:main} overlaid. The empirical regret
+stays visibly below the envelope for all $T$ tested, and the ratio
+$\Regret(T)/\sqrt T$ remains bounded (in fact, it decreases, indicating
+that the stochastic staggered-uniform adversary is far from the worst
+case). This is entirely consistent with \Cref{thm:main}, which is an
+upper bound: any instance on which the bound is tight would need to be
+specifically adversarial in the sense of the lower-bound construction of
+\citet[\S 7]{balcan2015}, not a randomized benign adversary.
 
-\Cref{tab:comparison} summarizes the final regret of the four algorithms
-evaluated. \textsc{Grow-Catalogue} attains cumulative regret comparable to
-the known-$K$ oracle, within $10\%$--$20\%$, and about an order of
-magnitude better than the uniform baseline. The total and incremental
-variants produce the same regret up to Monte-Carlo fluctuation.
+\Cref{tab:comparison} compares the four algorithms at $T=4000$. The regret
+of \textsc{Grow-Catalogue} (both total and incremental variants) is
+within roughly $15\%$--$40\%$ of the known-$K$ oracle and an order of
+magnitude better than the uniform baseline. The two \textsc{Grow-Catalogue}
+variants produce regret that differs only by Monte-Carlo noise, as
+predicted by the observational equivalence of the two recomputation
+schemes.
 
 \begin{table}[h]
 \centering
@@ -708,107 +798,91 @@ variants produce the same regret up to Monte-Carlo fluctuation.
 \renewcommand{\arraystretch}{1.15}
 \begin{tabular}{lcc}
 \toprule
-Algorithm & $\EE[\text{Regret}(T)]$ & Ratio\\
+Algorithm & $\EE[\Regret(T)]$ & Ratio\\
 \midrule
-Known-$K$ oracle         & $14.51\pm 5.00$  & $1.00$\\
-\textsc{Grow-Cat.} (total) & $16.57\pm 5.40$  & $1.14$\\
-\textsc{Grow-Cat.} (incr.) & $20.26\pm 7.94$ & $1.40$\\
-Uniform baseline                & $292.77\pm 350.28$ & $20.18$\\
+Known-$K$ oracle of \citet{balcan2015} & $14.51\pm 5.00$  & $1.00$\\
+\textsc{Grow-Cat.} (total)     & $16.57\pm 5.40$  & $1.14$\\
+\textsc{Grow-Cat.} (incr.)     & $20.26\pm 7.94$  & $1.40$\\
+Uniform baseline               & $292.77\pm 350.28$ & $20.18$\\
 \bottomrule
 \end{tabular}
-\caption{Mean $\pm$ std.\ (over 15 seeds) of cumulative regret at $T{=}4000$,
-$n{=}3$, $\Kmax{=}3$, uniform-random adversary. The \emph{Known-$K$ oracle}
-is \citet[Thm.\,5.1]{balcan2015} run with full knowledge of $K$ from round
-$1$; \textsc{Grow-Catalogue} (both variants) attains comparable regret
-without this information.}
+\caption{Cumulative regret at $T=4000$, $n=3$, $\Kmax=3$, uniform-random
+adversary, mean $\pm$ std over 15 seeds. The known-$K$ oracle receives
+$K$ in advance; \textsc{Grow-Catalogue} attains comparable regret
+\emph{without} this information.}
 \label{tab:comparison}
 \end{table}
 
-% =============================================================================
-\section{Conclusion}
+% ==========================================================================
+\section{Conclusions}
 \label{sec:conc}
 
-We gave the first no-regret guarantee for repeated Stackelberg security
-games in which the set of attacker types is unknown to the defender in
-advance but is assumed to be bounded in size. The \textsc{Grow-Catalogue}
-algorithm achieves expected regret
-$O\!\bigl(\sqrt{T\Kmax(n^2+\Kmax\log n)}\bigr)$, matching the known-$K$
-bound of \citet{balcan2015} with $k$ replaced by the known bound $\Kmax$.
-The bound is tight up to logarithmic factors for $\Kmax=O(1)$, gracefully
-adapts to the number of types actually observed, and is sublinear in $T$
-throughout the useful regime
-$\Kmax\cdot(n^2+\Kmax\log n)=o(T)$.
+We studied the repeated Stackelberg security game in a new, open regime
+in which the set of attacker types is unknown to the defender a priori
+but known to have bounded cardinality. We presented \textsc{Grow-Catalogue},
+a simple online algorithm that incrementally discovers attacker types and
+re-partitions the coverage polytope accordingly, and we gave a full proof
+that its expected regret under full-information feedback is at most
+$O\!\bigl(\sqrt{T\cdot\Kmax\cdot(n^2+\Kmax\log n)}\bigr)$. This is the
+same functional form as the known-$K$ bound of \citet[Theorem 5.1]{balcan2015},
+with the known cardinality $k$ replaced by our known upper bound $\Kmax$.
+The bound is sublinear whenever $\Kmax\cdot(n^2+\Kmax\log n)=o(T)$, and
+the matching $\Omega(T)$ lower bound of \citet[Theorem 7.1]{balcan2015}
+rules out further improvements on the unbounded side. Our experiments
+confirm the analytical scaling: the empirical regret stays below the
+$C\sqrt T$ envelope and tracks the epoch structure of the proof.
 
-\paragraph{Open problems.}
-Three directions for future work stand out. (i) \emph{Partial-information
-feedback.} The bandit version of our problem requires a barycentric-spanner
-construction whose dimension grows with the catalogue, analogous to
-\citet[\S6]{balcan2015}. (ii) \emph{Adaptive adversary.} Our full-
-information bound inherits robustness to an adaptive adversary from the
-base Hedge analysis, but the partial-information adaptive case is an
-explicit open problem in \citet{balcan2015}. (iii) \emph{Shaving log
-factors in $\Kmax$.} The sum of per-epoch regrets currently uses a
-Cauchy--Schwarz step that loses a $\sqrt{\Kmax}$ factor; sleeping-experts
-machinery \citep{mourtada2017} may tighten this to $\sqrt{K'}$ depending
-on the actual realized $K'$.
+Three directions for future work are immediate. The most important is the
+partial-information (bandit) extension; this requires an adaptive version
+of the barycentric-spanner construction of \citet[\S 6]{balcan2015},
+since the spanner dimension changes whenever a new type is discovered.
+A second direction is the adaptive-adversary case under partial feedback,
+which is an open problem even in the known-$K$ setting. Finally, the
+Cauchy--Schwarz step (Step~9 of the proof) loses a $\sqrt{\Kmax}$ factor
+in the worst case; sleeping-experts techniques \citep{mourtada2017} may
+remove this when $K'\ll\Kmax$, tightening the instance-adaptive bound of
+\Cref{cor:adaptive}.
 
 \paragraph{Reproducibility.}
-Our Python implementation (NumPy, SciPy, Matplotlib) of
-\textsc{Grow-Catalogue}, the baselines, and the experiment harness is
-available at
-\textcolor{blue}{\href{https://github.com/CS6002-SSG/grow-catalogue}{github.com/CS6002-SSG/grow-catalogue}}.
-All experiments in \Cref{sec:exp} can be reproduced by running
-\texttt{python plot\_presentation.py} after installing the dependencies
-listed in \texttt{requirements.txt}.
+Our Python implementation and all experiment scripts are at
+\textcolor{blue}{\href{https://github.com/CS6002-SSG/grow-catalogue}{github.com/CS6002-SSG/grow-catalogue}}. The experiments
+in \Cref{sec:exp} can be reproduced by running
+\texttt{python plot\_presentation.py} and
+\texttt{python plot\_regret\_over\_sqrtT.py} after installing the
+dependencies in \texttt{requirements.txt}.
 
-% =============================================================================
 \bibliography{refs}
 
 \onecolumn
 \appendix
-% =============================================================================
-\section{Implementation Notes}
+\section{Implementation details}
 \label{app:impl}
 
 The main text already contains the full proof of \Cref{thm:main}. This
-appendix only collects low-level implementation details of
-\Cref{alg:gc}, provided for reproducibility.
+appendix records low-level implementation details useful for
+reproducibility.
 
-\paragraph{Computing $\cE(C;\epsilon)$ in low dimension.}
-For $n\le 4$ we enumerate all $(n-1)$-subsets of the hyperplanes that define
-the partition of $\cP$ induced by the catalogue, solve the resulting linear
-system, and keep each intersection point that lies in $\cP$. The set of
-hyperplanes consists of (i) $n$ simplex constraints ($p_i\ge 0$ and the
-bounding hyperplane of $\cP$), and (ii) $|C|\binom{n}{2}$ pairwise
-best-response constraints, one per pair of targets per attacker type. For
-$n=3$, $\Kmax=4$ this gives at most $4+4\cdot 3=16$ hyperplanes and
-$\binom{16}{2}=120$ candidate intersections, which is tractable.
+\paragraph{Computing $\cE(C;\epsilon)$.}
+For $n\le 4$ we enumerate all $(n-1)$-subsets of the hyperplanes defining
+the partition of $\cP$, solve the resulting linear systems, and keep
+each intersection point that lies in $\cP$. The set of hyperplanes
+consists of (i) $n$ simplex constraints ($p_i\ge 0$ for each $i$ and the
+outer bounding hyperplane of $\cP$), and (ii) $|C|\binom{n}{2}$
+pairwise best-response constraints, one per pair of targets per attacker
+type. For $n=3,\Kmax=4$ this gives at most $4+4\cdot 3=16$ hyperplanes
+and $\binom{16}{2}=120$ candidate intersections, which is tractable.
 
 \paragraph{Anytime learning rate.}
-The learning rate $\eta_t=\sqrt{\log|\cE|/t}$ is a standard anytime
-schedule \citep[e.g.,][Ch.~2]{cesa2006} that avoids needing to know the
-epoch length $L_i$ in advance. It guarantees the $\sqrt{L_i\log|\cE|}$
-regret bound of \Cref{prop:hedge} without any horizon parameter, which
-is what allows Step~3 of the proof to go through after every restart.
+The schedule $\eta_t=\sqrt{\log|\cE|/t}$ \citep[\S 2]{cesa2006} is
+necessary for the $\sqrt{L_i\log|\cE_i|}$ per-epoch bound of Step~3 to
+hold, since $L_i$ is not known at the start of $\mathrm{Ep}_i$.
 
-\paragraph{Total vs.\ incremental recomputation.}
-The total variant rebuilds $\cE(C;\epsilon)$ from scratch on every
-discovery round; the incremental variant keeps all old vertices that
-still lie on the boundary of some region after the refinement and only
-computes new vertices at intersections of old region boundaries with the
-new hyperplanes introduced by the discovered type. Both produce the same
-$\cE(C;\epsilon)$ and hence the same per-step distribution, which is why
-the two variants are statistically indistinguishable in
-\Cref{tab:comparison}.
-
-\paragraph{Hyperparameters in the experiments.}
-The staggered-uniform adversary uses horizon $T=4000$ split into
-$\Kmax=4$ phases of $1000$ rounds. The rolling window for
-\Cref{fig:per-round} is $75$ rounds. Each configuration is averaged over
-$40$ random game instances.
-Dependencies: \texttt{numpy>=1.26}, \texttt{scipy>=1.11},
-\texttt{matplotlib>=3.8}. The full code and a \texttt{requirements.txt}
-are in the GitHub repository linked in \Cref{sec:conc}.
-
+\paragraph{Hyperparameters.}
+Unless stated otherwise, the experiments use $n=3$, $R=1$, $\Kmax=3$ or
+$4$, $T\in\{4000,6000\}$, and averaging over 40--80 seeds. The rolling
+window in \Cref{fig:per-round} is $75$ rounds. Dependencies:
+\texttt{numpy>=1.26}, \texttt{scipy>=1.11}, \texttt{matplotlib>=3.8}.
+Both the code and a \texttt{requirements.txt} are at the GitHub repository
+linked in \Cref{sec:conc}.
 
 \end{document}

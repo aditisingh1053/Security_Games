@@ -26,7 +26,13 @@ They allow an adversarially chosen sequence of attacker types from a known finit
 
 
 Slide 5. Sequential versus simultaneous.
-A quick word on modelling. There are two ways to think about the timing of each round. In the simultaneous version, the defender and the attacker act at the same time, the attacker does not see the coverage vector, and the loss is linear in the coverage. Off the shelf online learning gives you square root of T times log n regret almost for free in that case. In the sequential version, which is the real Stackelberg model, the defender commits first, the attacker observes, and then best responds. Here the loss is not linear, not convex, and not even continuous in the coverage vector, because the best response can jump discretely as the coverage crosses a boundary. We consciously chose the sequential model because it is strictly harder for the defender. The attacker can exploit any exposed corner of our randomisation, so a regret bound proved in the sequential setting is a worst case bound that automatically covers the simultaneous case as well.
+A quick word on modelling. There are two ways to think about the timing of each round. In the simultaneous version, 
+the defender and the attacker act at the same time, the attacker does not see the coverage vector, and the loss is linear 
+in the coverage. Off the shelf online learning gives you square root of T times log n regret almost for free in that case. 
+In the sequential version, which is the real Stackelberg model, the defender commits first, the attacker observes, and then 
+best responds. Here the loss is not linear, not convex, and not even continuous in the coverage vector, because the best response 
+can jump discretely as the coverage crosses a boundary. We consciously chose the sequential model because it is strictly harder 
+for the defender. The attacker can exploit any exposed corner of our randomisation, so a regret bound proved in the sequential setting is a worst case bound that automatically covers the simultaneous case as well.
 
 
 Slide 6. Where our project sits.
@@ -86,7 +92,11 @@ The first piece is the standard experts guarantee, which is Proposition 1 of the
 
 
 Slide 20. Within epoch approximation by Lemma 4.3.
-But we do not want to compete against the best element of a finite set, we want to compete against p star, the best coverage vector in the entire capital P. That is exactly what Lemma 4.3 gives us. Inside epoch i all attackers are from the current catalogue C i, so we apply Lemma 4.3 to that catalogue and that sub sequence. It tells us that the best element of cal E i is within 2 epsilon L i of the best strategy over all of P, and since p star is in P, the same bound applies to p star restricted to epoch i.
+But we do not want to compete against the best element of a finite set, we want to compete against p star, 
+the best coverage vector in the entire capital P. That is exactly what Lemma 4.3 gives us. Inside epoch i all
+attackers are from the current catalogue C i, so we apply Lemma 4.3 to that catalogue and that sub sequence. 
+It tells us that the best element of cal E i is within 2 epsilon L i of the best strategy over all of P, and 
+since p star is in P, the same bound applies to p star restricted to epoch i.
 
 
 Slide 21. Per epoch combined bound.
