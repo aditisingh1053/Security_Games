@@ -132,7 +132,7 @@ that of \citet{balcan2015} with $k$ replaced by $\Kmax$ and is sublinear
 whenever $\Kmax\cdot(n^2+\Kmax\log n)=o(T)$. Experiments on synthetic SSG
 instances confirm the predicted $\sqrt{T}$ scaling, and the empirical regret
 stays comfortably below the analytic $C\sqrt{T}$ envelope. Our implementation and all experiment scripts are at
-\textcolor{blue}{\href{https://github.com/aditisingh1053/Security_Games}{github.com/aditisingh1053/Security_Games}}.
+\textcolor{blue}{\href{https://github.com/aditisingh1053/Security_Games}{github.com/aditisingh1053/Security\_Games}}.
 
 \section{Introduction}
 \label{sec:intro}
@@ -512,10 +512,9 @@ instance-adaptive refinement) are stated after the proof in
 \label{sec:proof}
 
 The proof closely tracks the structure of the known-$K$ proof of \citet[Sec.~5]{balcan2015}
-but has two non-trivial departures: (i) the expert set is no longer static
+but has two non-trivial deviations: (i) the expert set is no longer static
 but grows over time, and (ii) the discovery rounds introduce an extra
-bounded additive term. We make both departures explicit and account for
-them carefully.
+bounded additive term. We account for both the deviations in our proof.
 
 \begin{proof}[Proof:- ]
 Fix an oblivious adversarial sequence $\avec=a_1,\dots,a_T\in K^T$ with
