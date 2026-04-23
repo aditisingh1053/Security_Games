@@ -19,9 +19,8 @@ repository reproduces the two experimental figures in that report.
 
     figures/                    figures included in the report
     presentation/               slide deck and its own figures
-    artifacts/                  everything else (old scripts, latex build
-                                leftovers, reference papers, planning notes)
-
+    reference-papers/           Important relevant references
+    
 ## Setup
 
     python -m venv venv
