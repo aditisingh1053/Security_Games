@@ -1,3 +1,0 @@
-\beamer@sectionintoc {1}{Literature review and motivation}{3}{0}{1}
-\beamer@sectionintoc {2}{Problem setup}{12}{0}{2}
-\beamer@sectionintoc {3}{Proof, algorithm, and results}{20}{0}{3}
