@@ -3,12 +3,12 @@
 Code accompanying the report **"No-Regret Learning in Stackelberg Security
 Games with an Unknown, Bounded Set of Attacker Types"**.
 
-The algorithm and regret bound are described in `project_report.pdf`. This
+The algorithm and regret bound are described in `gt_report.pdf`. This
 repository reproduces the two experimental figures in that report.
 
 ## Directory layout
 
-    project_report.pdf          compiled report (main deliverable)
+    gt_report.pdf               compiled report (main deliverable)
     project_report.tex          report source
     refs.bib                    bibliography
 
@@ -20,7 +20,7 @@ repository reproduces the two experimental figures in that report.
     figures/                    figures included in the report
     presentation/               slide deck and its own figures
     reference-papers/           Important relevant references
-    
+
 ## Setup
 
     python -m venv venv
@@ -44,6 +44,7 @@ Wall-clock is a few minutes on a laptop.
     bibtex   project_report
     pdflatex project_report.tex
     pdflatex project_report.tex
+    mv project_report.pdf gt_report.pdf
 
 Requires a TeX Live installation with `texlive-latex-recommended`,
 `texlive-latex-extra`, and `texlive-science`.
