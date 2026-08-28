@@ -10,6 +10,8 @@ repository reproduces the two experimental figures in that report.
 
     gt_report.pdf               compiled report (main deliverable)
     project_report.tex          report source
+    project_report_extended.tex report source + Section 9 "Extensions"
+    project_report_extended.pdf compiled extended report
     refs.bib                    bibliography
 
     code/
@@ -45,6 +47,11 @@ Wall-clock is a few minutes on a laptop.
     pdflatex project_report.tex
     pdflatex project_report.tex
     mv project_report.pdf gt_report.pdf
+
+Same sequence for `project_report_extended.tex`, which is
+`project_report.tex` verbatim plus a new Section 9 covering two
+extensions (periodic type revelation; side information with an unknown
+type set) and an erratum for Step 7 of the Theorem 6 proof.
 
 Requires a TeX Live installation with `texlive-latex-recommended`,
 `texlive-latex-extra`, and `texlive-science`.
