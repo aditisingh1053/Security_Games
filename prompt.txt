@@ -1,0 +1,5 @@
+ formal with the proof and explain each step nicely and follow the writting style exactly as our report has used untill now. explain each non trivial step nicely.
+
+ for the experiment part, look at the original experiments we had done for grow catalogue and make them more tractable and reporduce them with a more tractable 
+ approach for which we can extend it to n=20, and do the same for the new alogirhtm which you do for the above idea described. make sure to remain consitent with notations all along
+ if you get confused ask question before proceeding with everthing 

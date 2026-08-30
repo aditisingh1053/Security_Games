@@ -4,3 +4,10 @@ __pycache__/
 results/*.png
 artifacts/
 new_start/
+# LaTeX build artefacts
+*.aux
+*.log
+*.blg
+*.out
+*.toc
+*.synctex.gz
