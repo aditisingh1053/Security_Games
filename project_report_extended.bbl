@@ -1,4 +1,4 @@
-\begin{thebibliography}{21}
+\begin{thebibliography}{20}
 \providecommand{\natexlab}[1]{#1}
 \providecommand{\url}[1]{\texttt{#1}}
 \expandafter\ifx\csname urlstyle\endcsname\relax
@@ -28,13 +28,6 @@ A.~Blum, N.~Haghtalab, and A.~D. Procaccia.
 N.~Cesa-Bianchi and G.~Lugosi.
 \newblock \emph{Prediction, Learning, and Games}.
 \newblock Cambridge University Press, 2006.
-
-\bibitem[Cesa-Bianchi et~al.(2005)Cesa-Bianchi, Lugosi, and
-  Stoltz]{cesabianchi2005}
-N.~Cesa-Bianchi, G.~Lugosi, and G.~Stoltz.
-\newblock Minimizing regret with label efficient prediction.
-\newblock \emph{IEEE Transactions on Information Theory}, 51\penalty0
-  (6):\penalty0 2152--2162, 2005.
 
 \bibitem[Conitzer and Sandholm(2006)]{conitzer2006}
 V.~Conitzer and T.~Sandholm.

@@ -329,7 +329,7 @@ class BlockGrowCatalogue:
         it is read purely as a set.  The only thing done with it is a
         membership test by `type_id`, so no information carried by the order
         of the list -- in particular the order in which the types first
-        attacked -- can reach the algorithm.  That matters because Problem 17
+        attacked -- can reach the algorithm.  That matters because Problem 15
         grants the defender the set and nothing else.
 
         Returns True if the catalogue grew (so the block just finished was a

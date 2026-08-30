@@ -9,9 +9,6 @@ The algorithm and regret bound are described in `gt_report.pdf`.
 
 * an impossibility theorem for partial-information feedback with an unknown
   attacker set -- linear regret even with a single attacker type;
-* an exact bit price for the side information that repairs it: on a universe
-  of `M` candidate types, and given any oracle emitting `b` bits over the
-  whole horizon, the optimal regret is `min{T, log2 M - b} +- 3`;
 * the BLOCK-GROW-CATALOGUE algorithm, which recovers sublinear regret from a
   periodic set-revelation oracle, together with a matching lower bound in the
   revelation length and a separation between scheduled and defender-chosen
@@ -46,8 +43,8 @@ This repository reproduces every figure in both reports.
       bench_oracle.py           Table 3 (enumeration vs oracle runtimes; App. C)
       plot_tractable_regret.py  Figure 4 (Algorithm 1 at n = 10, 20; App. D)
       plot_block_revelation.py  Figure 5 (Algorithm 2 at n = 10, 20; App. D)
-      plot_impossibility.py     Figure 3 (Theorems 12, 15, 24 and
-                                Propositions 16, 26 in simulation)
+      plot_impossibility.py     Figure 3 (Theorems 12, 22 and
+                                Propositions 14, 24 in simulation)
       verify_theory.py          re-runs the non-asymptotic claims of
                                 Sections 9-10 and Appendix C; prints PASS/FAIL
 
