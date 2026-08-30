@@ -2,16 +2,16 @@
 
 Produces `figures/block_revelation.{pdf,png}`:
 
-  (a) cumulative regret at n = 10 against the C t^{2/3} envelope of Theorem 28;
+  (a) cumulative regret at n = 10 against the C t^{2/3} envelope of Theorem 20;
   (b) the same at n = 20;
   (c) final regret as a function of the revelation granularity B, whose
-      worst-case growth is the 2 K' B additive term of Theorem 28;
-  (d) full information (Theorem 6) against block revelation (Theorem 28) as
+      worst-case growth is the 2 K' B additive term of Theorem 20;
+  (d) full information (Theorem 6) against block revelation (Theorem 20) as
       T grows, on a log-log scale.
 
 Panels (a)-(c) use the staggered-uniform adversary of Section 7, which
 spreads the discovery blocks across the horizon and so exercises the epoch
-decomposition of Definition 25.  Panel (d) uses the stationary uniform-random
+decomposition of Definition 18.  Panel (d) uses the stationary uniform-random
 adversary, because it compares two algorithms against the best *fixed*
 strategy in hindsight and that comparator is only meaningful for a stationary
 sequence.
@@ -212,7 +212,7 @@ def main():
     ax.loglog(Ts_arr, full_curve, "s-", color="tab:green", lw=1.6, ms=4,
               label="full information (Thm. 6)")
     ax.loglog(Ts_arr, block_curve, "o-", color="tab:blue", lw=1.6, ms=4,
-              label="block revelation (Thm. 28)")
+              label="block revelation (Thm. 20)")
     ax.loglog(Ts_arr, full_curve[0] * (Ts_arr / Ts_arr[0]) ** 0.5, color="tab:green",
               ls="--", lw=0.9, label=r"slope $1/2$")
     ax.loglog(Ts_arr, block_curve[0] * (Ts_arr / Ts_arr[0]) ** (2.0 / 3.0), color="tab:blue",

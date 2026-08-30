@@ -889,45 +889,25 @@ $C\sqrt T$ envelope and tracks the epoch structure of the proof.
 \section{Partial-Information Feedback with an Unknown Type Set}
 \label{sec:partial}
 
-\Cref{prob:unknownK} pairs an \emph{unknown} attacker set $K$ with
-\emph{full-information} feedback, and \Cref{thm:main} shows that the pairing
-is benign: the price of not knowing $K$ is a factor $\sqrt{\Kmax}$ over the
-known-$K$ rate of \citet[Theorem 5.1]{balcan2015}. \Citet[Section
-6]{balcan2015} show that the other relaxation is benign as well: with $K$
-\emph{known} but only the attacked target observed, regret
-$O(T^{2/3}nk\log^{1/3}(nk))$ is achievable (their Theorem 6.1). It is natural
-to expect that the two relaxations compose, and that the unknown-$K$ problem
-under partial-information feedback admits a $T^{2/3}$-type bound with $k$
-replaced by $\Kmax$.
+\Cref{thm:main} shows that not knowing $K$ is affordable: under
+full-information feedback it costs a factor $\sqrt{\Kmax}$ over the known-$K$
+rate of \citet[Theorem 5.1]{balcan2015}. Not observing $a_t$ is affordable
+too: with $K$ known and only the attacked target observed,
+\citet[Theorem 6.1]{balcan2015} achieve $O(T^{2/3}nk\log^{1/3}(nk))$. One
+expects the two relaxations to compose. They do not.
 
-This section shows that it does not, and that the failure is total: no
-algorithm achieves regret $o(T)$, \emph{even when $\Kmax=1$}, i.e.\ even when
-a single fixed attacker type attacks in every one of the $T$ rounds. The
-obstruction is not the cardinality of $K$ --- it is that the defender can
-never learn \emph{which} type it is facing, because the only thing it ever
-observes is a target index, and the space of types that could have produced
-that index is infinite.
-
-\Cref{sec:partial,sec:block,sec:exp2,sec:conc2} extend the report in four
-steps, and it is worth stating them together before starting.
-\Cref{thm:impossible} is the impossibility just described.
-\Cref{thm:bits} sharpens it into an exact accounting: on a universe of
-$M$ candidate types, and given any oracle that emits at most $b$ bits over
-the whole horizon, the optimal regret is $\min\{T,\log_2 M-b\}\pm 3$, so the
-attainable regret is the number of bits still needed to name the attacker,
-and no \emph{finite} budget helps on an infinite universe.
-\Cref{prop:sqrtT} closes \Cref{sec:partial} by showing that this naming
-account is exactly a $\Kmax=1$ phenomenon: two attacker types already force
-$\Omega(\sqrt{T})$ on a two-element universe, under full information and with
-$K$ known.
-\Cref{sec:block} then fixes the model rather than the algorithm: an oracle
-that every $B$ rounds reports the \emph{set} of types met so far restores
-sublinear regret, at the rate
-$\tilde O(n\Kmax^{4/3}T^{2/3}+\Kmax B)$ (\Cref{thm:block}), with the additive
-term tight (\Cref{thm:blocklb}) and with a sharp separation between
-scheduled and defender-chosen reporting times (\Cref{prop:adaptive}).
-\Cref{sec:exp2} makes both algorithms oracle-efficient, which moves the
-experiments from $n=3$ targets to $n=20$.
+We show that under partial information with an unknown type set no algorithm
+achieves regret $o(T)$ --- \emph{even when $\Kmax=1$}, so that one fixed type
+attacks in every round. The obstruction is not how many types the adversary
+has, but that the defender can never learn \emph{which} type it faces: it
+sees only a target index, and infinitely many types produce that same index.
+\Cref{thm:bits} turns this into an exact accounting. On a universe of $M$
+candidate types, and given any oracle emitting $b$ bits over the whole
+horizon, the optimal regret is $\min\{T,\log_2 M-b\}\pm 3$: regret is the
+number of bits still needed to \emph{name} the attacker, and no finite budget
+helps when the universe is infinite. \Cref{prop:sqrtT} shows this naming
+account is special to $\Kmax=1$: two types already force $\Omega(\sqrt T)$ on
+a two-element universe, under full information and with $K$ known.
 
 \subsection{The problem}
 \label{sec:partial-problem}
@@ -936,47 +916,35 @@ experiments from $n=3$ targets to $n=20$.
 \label{prob:partial}
 A repeated SSG as in \Cref{sec:model} is played, with three modifications.
 \begin{enumerate}[leftmargin=1.2em,itemsep=0.05em,topsep=0.2em]
-  \item There is a set $\Univ$ of attacker types, the \emph{universe}, which
-  is known to the defender. It is not assumed to be finite;
-  \Cref{thm:impossible} takes it infinite, while \Cref{thm:bits,prop:sqrtT}
-  measure what happens when it is not.
-  \item The set $K\subseteq\Univ$ of attacker types is not revealed to the
-  defender at the start; however, the defender is given a constant
-  $\Kmax\ge 1$ with the promise $|K|\le\Kmax$.
-  \item Feedback is \emph{partial information} in the sense of
-  \citet[Section 3]{balcan2015}: at the end of round $t$ the defender observes
-  only the attacked target $b_{a_t}(\pvec_t)$. It never observes $a_t$, and
-  the utility vectors of a type are never revealed.
+  \item There is a set $\Univ$ of attacker types, the \emph{universe}, known
+  to the defender and not assumed finite.
+  \item The set $K\subseteq\Univ$ is not revealed to the defender; it is
+  given only a constant $\Kmax\ge 1$ with the promise $|K|\le\Kmax$.
+  \item Feedback is \emph{partial information} \citep[Section 3]{balcan2015}:
+  at the end of round $t$ the defender observes only the attacked target
+  $b_{a_t}(\pvec_t)$. It never observes $a_t$, and utility vectors are never
+  revealed.
 \end{enumerate}
-The adversary is oblivious, and the benchmark $\pvec^{*}$ and the regret
-$\Regret(T)$ are as in \Cref{eq:pstar,eq:regret}.
+The adversary is oblivious, and $\pvec^{*}$ and $\Regret(T)$ are as in
+\Cref{eq:pstar,eq:regret}.
 \end{problem}
 
-Two remarks fix the exact informational content of \Cref{prob:partial}.
-First, the defender's own payoff is \emph{not} additional feedback: the
-defender knows $u_d^c$ and $u_d^u$, so from the observed target
-$i_t=b_{a_t}(\pvec_t)$ and its own $\pvec_t$ it computes
-$U_d(i_t,\pvec_t)$ exactly. Second, \Cref{prob:partial} is at least as hard as
-each of the two settings it weakens: \Cref{prob:unknownK} is recovered by
-revealing $a_t$ and the utilities of each type on first contact, and the
-setting of \citet[Section 6]{balcan2015} is recovered by revealing $K$ at
-$t=0$.
+The defender's own payoff is not extra feedback: it knows $u_d^c$ and
+$u_d^u$, so $U_d(i_t,\pvec_t)$ follows from the observed target and its own
+play. And \Cref{prob:partial} is at least as hard as each setting it weakens:
+revealing $a_t$ recovers \Cref{prob:unknownK}, and revealing $K$ at $t=0$
+recovers \citet[Section 6]{balcan2015}.
 
-\subsection{A three-target gadget}
+\subsection{The gadget $G_3$}
 \label{sec:gadget}
 
-All lower bounds in this and the next section are proved in one fixed game,
-which we call $G_3$ and which is the game of
-\citet[Theorem 7.1]{balcan2015}, up to letting the single resource stand
-idle. It has $n=3$ targets and one resource, with
-schedules $\mathcal{D}=\{\emptyset,\{1\},\{2\},\{3\}\}$: the resource covers
-one target or is left idle. The four pure strategies give
-$\cP=\mathrm{conv}\{\mathbf{0},e_1,e_2,e_3\}
-=\{\pvec\in[0,1]^3:p_1+p_2+p_3\le 1\}$. Allowing the resource to idle only
-enlarges the defender's action set and therefore only strengthens the lower
-bounds; every argument below also goes through verbatim on the simplex
-$\{\pvec\ge 0:\sum_i p_i=1\}$ that one gets by forcing the resource to be
-assigned, since each of the coverage vectors we exhibit has $\sum_i p_i=1$. The defender's payoffs are
+Every lower bound below is proved in one fixed game $G_3$: the game of
+\citet[Theorem 7.1]{balcan2015}, with $n=3$ targets, one resource, and
+schedules $\mathcal{D}=\{\emptyset,\{1\},\{2\},\{3\}\}$, so that
+$\cP=\{\pvec\in[0,1]^3:p_1+p_2+p_3\le 1\}$. Letting the resource idle only
+enlarges the defender's action set and so only strengthens the lower bounds;
+every coverage vector we exhibit has $\sum_i p_i=1$, so each argument also
+runs verbatim on the simplex. The defender's payoffs are
 \begin{equation}
 u_d^c(i)=u_d^u(i)=-1\ \ (i\in\{1,3\}),\qquad u_d^c(2)=u_d^u(2)=0,
 \label{eq:g3-def}
@@ -986,42 +954,31 @@ so that by \Cref{eq:Ud}
 U_d(1,\pvec)=U_d(3,\pvec)=-1,\qquad U_d(2,\pvec)=0
 \label{eq:g3-payoff}
 \end{equation}
-for every $\pvec\in\cP$. Throughout \Cref{sec:partial,sec:block} the types
-of $G_3$ break ties in favour of the lowest-indexed target, as in
-\citet[Section 7]{balcan2015}; \Cref{sec:model} permits any fixed consistent
-rule, and fixing one is part of specifying the instance. The choice is used
-only to describe the feedback: at every coverage vector we exhibit as a
-benchmark, the attacked target is the \emph{strict} maximizer, so the value
-of the benchmark does not depend on the rule.
+for every $\pvec\in\cP$. The defender's payoff therefore depends on $\pvec_t$
+only through which target the attacker picks: a round is worth $0$ if
+target~$2$ is attacked and $-1$ otherwise. We say the defender \emph{hits} at
+round $t$ if $b_{a_t}(\pvec_t)=2$ and \emph{misses} otherwise. Types break
+ties towards the lowest-indexed target, as in \citet[Section 7]{balcan2015};
+at every benchmark we exhibit, target~$2$ is the \emph{strict} maximizer, so
+the benchmark's value does not depend on the rule.
 
-In $G_3$ the defender's payoff depends on
-$\pvec_t$ \emph{only} through which target the attacker chooses: the round is
-worth $0$ if target~$2$ is attacked and $-1$ otherwise. We say the defender
-\emph{hits} at round $t$ if $b_{a_t}(\pvec_t)=2$ and \emph{misses} otherwise.
-
-We now record the family of attacker types that $G_3$ admits. The statement
-is \citet[Lemma 7.2]{balcan2015}; we give the utility vectors explicitly,
-because the lower bounds below need the best response at \emph{every}
-$\pvec\in\cP$ and not only on the segment considered there.
-
-\begin{lemma}[realizable threshold types; cf.\ {\citealp[Lemma 7.2]{balcan2015}}]
-\label{lem:realize}
-For every pair $0\le r_1\le r_2\le 1$, the attacker type
-$\alpha_{r_1,r_2}$ with utility vectors
+\paragraph{Threshold types.}
+For $0\le r_1\le r_2\le 1$ let $\alpha_{r_1,r_2}$ be the attacker with
 \begin{equation}
 u^c_{\alpha}=(r_1-1,\;0,\;-r_2),\qquad
-u^u_{\alpha}=(r_1,\;0,\;1-r_2)
+u^u_{\alpha}=(r_1,\;0,\;1-r_2),
 \label{eq:type-utils}
 \end{equation}
-has all its utilities in $[-1,1]$ and satisfies, for every $\pvec\in\cP$,
+all six entries of which lie in $[-1,1]$. Substituting into
+$U_\alpha(i,\pvec)=u^c_\alpha(i)p_i+u^u_\alpha(i)(1-p_i)$ gives, for every
+$\pvec\in\cP$,
 \begin{equation}
 U_\alpha(1,\pvec)=r_1-p_1,\quad U_\alpha(2,\pvec)=0,\quad
 U_\alpha(3,\pvec)=(1-r_2)-p_3 .
 \label{eq:type-U}
 \end{equation}
-Consequently, if ties are broken in favour of the lowest-indexed target, the
-restriction of $b_\alpha$ to the segment
-$\{(p,0,1-p):p\in[0,1]\}$ is
+So on the segment $\pvec=(p,0,1-p)$ the three utilities are $r_1-p$, $0$ and
+$p-r_2$, and comparing them gives
 \begin{equation}
 b_{\alpha_{r_1,r_2}}\bigl((p,0,1-p)\bigr)=
 \begin{cases}
@@ -1031,180 +988,126 @@ b_{\alpha_{r_1,r_2}}\bigl((p,0,1-p)\bigr)=
 \end{cases}
 \label{eq:type-line}
 \end{equation}
-\end{lemma}
+This is \citet[Lemma 7.2]{balcan2015}; we record the utility vectors
+explicitly because the arguments below need the best response at every
+$\pvec\in\cP$, not only on that segment. A type is thus named by an interval
+$(r_1,r_2]$, and the defender's task is to locate it.
 
-\begin{proof}
-Since $0\le r_1\le r_2\le 1$ we have $r_1-1\in[-1,0]$, $-r_2\in[-1,0]$,
-$r_1\in[0,1]$ and $1-r_2\in[0,1]$, so all six numbers in
-\Cref{eq:type-utils} lie in $[-1,1]$ and $\alpha_{r_1,r_2}$ is a legitimate
-attacker type in the sense of \Cref{sec:model}. For \Cref{eq:type-U},
-substitute \Cref{eq:type-utils} into
-$U_\alpha(i,\pvec)=u^c_\alpha(i)p_i+u^u_\alpha(i)(1-p_i)$:
-\begin{align*}
-U_\alpha(1,\pvec)&=(r_1-1)p_1+r_1(1-p_1)=r_1-p_1,\\
-U_\alpha(2,\pvec)&=0\cdot p_2+0\cdot(1-p_2)=0,\\
-U_\alpha(3,\pvec)&=-r_2p_3+(1-r_2)(1-p_3)=(1-r_2)-p_3 .
-\end{align*}
-On the segment $\pvec=(p,0,1-p)$ these read
-$U_\alpha(1,\pvec)=r_1-p$, $U_\alpha(2,\pvec)=0$ and
-$U_\alpha(3,\pvec)=p-r_2$. If $p\le r_1$ then $U_\alpha(1,\pvec)\ge 0$ and
-$U_\alpha(3,\pvec)=p-r_2\le r_1-r_2\le 0$, so target~$1$ attains the maximum
-(and wins any tie, being lowest-indexed). If $r_1<p\le r_2$ then
-$U_\alpha(1,\pvec)<0$ and $U_\alpha(3,\pvec)\le 0=U_\alpha(2,\pvec)$, so
-target~$2$ attains the maximum and wins the tie against target~$3$. If
-$p>r_2$ then $U_\alpha(3,\pvec)>0=U_\alpha(2,\pvec)>U_\alpha(1,\pvec)$, and
-target~$3$ is the strict maximizer.
-\end{proof}
-
-The next lemma is the structural fact that drives both lower bounds. It says
-that in $G_3$ a hit is a very informative but very rare event: a coverage
-vector hits at most one member of any family of types with disjoint
-threshold intervals.
+The next lemma is the structural fact driving every lower bound: a hit is
+very informative but very rare, because one coverage vector can hit at most
+one type of any disjoint family.
 
 \begin{lemma}[the hit condition]
 \label{lem:hit}
-Let $0\le r_1<r_2\le 1$ and write $\alpha=\alpha_{r_1,r_2}$. For every
-$\pvec\in\cP$,
+Let $0\le r_1<r_2\le 1$ and $\alpha=\alpha_{r_1,r_2}$. For every $\pvec\in\cP$,
 \begin{equation}
 b_\alpha(\pvec)=2
 \iff
 p_1>r_1\ \text{ and }\ p_3\ge 1-r_2 ,
 \label{eq:hit-iff}
 \end{equation}
-and in that case $p_1\in(r_1,r_2]$. Consequently, if
-$\{\alpha_{r_1^{(j)},r_2^{(j)}}\}_{j\in J}$ is any family of types whose
-intervals $(r_1^{(j)},r_2^{(j)}]$ are pairwise disjoint, then for every
-$\pvec\in\cP$ there is \emph{at most one} $j\in J$ with
-$b_{\alpha_{r_1^{(j)},r_2^{(j)}}}(\pvec)=2$.
+and then $p_1\in(r_1,r_2]$. Hence if the intervals of a family of types are
+pairwise disjoint, every $\pvec\in\cP$ hits \emph{at most one} of them.
 \end{lemma}
 
 \begin{proof}
 By \Cref{eq:type-U} and lowest-index tie-breaking, target~$2$ is chosen
-exactly when $U_\alpha(2,\pvec)=0$ strictly beats $U_\alpha(1,\pvec)$ and
-weakly beats $U_\alpha(3,\pvec)$, that is, when
-$r_1-p_1<0$ and $(1-r_2)-p_3\le 0$; this is \Cref{eq:hit-iff}. If it holds,
-then $p_1\le 1-p_2-p_3\le 1-p_3\le r_2$ because $\pvec\in\cP$ and
-$p_2\ge 0$, so $p_1\in(r_1,r_2]$. The last claim follows because a single
-$p_1$ cannot lie in two disjoint intervals.
+exactly when $U_\alpha(2,\pvec)=0$ strictly beats $U_\alpha(1,\pvec)=r_1-p_1$
+and weakly beats $U_\alpha(3,\pvec)=(1-r_2)-p_3$, which is
+\Cref{eq:hit-iff}. Then $p_1\le 1-p_2-p_3\le 1-p_3\le r_2$, so
+$p_1\in(r_1,r_2]$; and a single $p_1$ cannot lie in two disjoint intervals.
 \end{proof}
 
 \subsection{Identification is a comparison search}
 \label{sec:comparison}
 
-Fix an integer $M\ge 2$ and let
+Fix $M\ge 2$ and let
 \begin{equation}
 I_j=\Bigl(\tfrac{j-1}{M},\tfrac{j}{M}\Bigr],\qquad
 \alpha^{(j)}=\alpha_{\frac{j-1}{M},\frac{j}{M}},\qquad j\in[M],
 \label{eq:dyadic}
 \end{equation}
-so that $I_1,\dots,I_M$ partition $(0,1]$ and
-$\Univ_M\coloneqq\{\alpha^{(1)},\dots,\alpha^{(M)}\}$ is a set of $M$
-distinct attacker types. \Cref{lem:hit} applies to $\Univ_M$ because the
-$I_j$ are pairwise disjoint.
+so $I_1,\dots,I_M$ partition $(0,1]$ and
+$\Univ_M\coloneqq\{\alpha^{(1)},\dots,\alpha^{(M)}\}$ consists of $M$
+distinct types, to which \Cref{lem:hit} applies.
 
-The defender's whole interaction with an instance $K=\{\alpha^{(j)}\}$ is
-then a search for the index $j$ in which every query returns one of three
-answers and the answer ``$2$'' is consistent with at most one candidate. The
-following lemma bounds how fast \emph{any} such search can succeed. It
-refines the classical $\Omega(\log_2 M)$ bound for comparison-based search in
-three ways that the statements below need: it charges \emph{every}
-unsuccessful query rather than only counting queries until termination; it
-bounds the whole tail of the success time rather than its worst case; and it
-allows the searcher to be fed, alongside the answers, an arbitrary side
-channel of bounded total width. It is the combinatorial core of
-\Cref{thm:impossible,thm:bits,thm:blocklb}, and is stated abstractly so that
-it can be used three times.
+Facing an instance $K=\{\alpha^{(j)}\}$, the defender is searching for the
+index $j$: each play is a query, each observation an answer in $\{1,2,3\}$,
+and by \Cref{lem:hit} the answer ``$2$'' is consistent with at most one
+candidate. The following lemma bounds how fast \emph{any} such search can
+succeed. It sharpens the classical $\Omega(\log_2 M)$ comparison-search bound
+in the three ways we need: it charges every unsuccessful query, not just the
+number of queries until termination; it bounds the whole tail of the success
+time; and it lets the searcher be fed a side channel of bounded total width,
+which is what \Cref{thm:bits} prices.
 
 \begin{lemma}[comparison trees identify slowly]
 \label{lem:count}
-Let $M\ge 1$, let $j$ be drawn uniformly at random from $[M]$, and fix a
-\emph{side-information budget} $b\ge 0$. Consider any interactive protocol in
-which, for $t=1,2,\dots$, a \emph{deterministic} strategy picks a query $q_t$
-as a function of everything it has seen so far and then receives, in this
-order, an answer $o_t=\mathcal{O}(q_t,j)\in\{1,2,3\}$ and a \emph{side
-message} $\mu_t\in\Sigma_t$. The alphabets $\Sigma_0,\Sigma_1,\Sigma_2,\dots$
-are fixed before play, $\mu_0\in\Sigma_0$ is delivered before the first query,
-each $\mu_t$ may be an arbitrary function of $j$ and of the history, and the
-total width of the side channel is bounded:
+Let $M\ge 1$, let $j$ be uniform on $[M]$, and fix a \emph{side-information
+budget} $b\ge 0$. Consider any interactive protocol in which, for
+$t=1,2,\dots$, a \emph{deterministic} strategy picks a query $q_t$ as a
+function of everything seen so far and receives, in order, an answer
+$o_t=\mathcal{O}(q_t,j)\in\{1,2,3\}$ and a \emph{side message}
+$\mu_t\in\Sigma_t$. The alphabets $\Sigma_0,\Sigma_1,\dots$ are fixed before
+play, $\mu_0$ arrives before the first query, each $\mu_t$ is an arbitrary
+function of $j$ and the history, and
 \begin{equation}
 \sum_{t\ge 0}\log_2|\Sigma_t|\;\le\;b .
 \label{eq:budget}
 \end{equation}
-Assume the single requirement that
+Assume only that
 \begin{equation}
 \bigl|\{j'\in[M]:\mathcal{O}(q,j')=2\}\bigr|\le 1
 \qquad\text{for every query } q .
 \label{eq:one-hit}
 \end{equation}
-Let $\tau=\min\{t:o_t=2\}$, with $\tau=\infty$ if no such $t$ exists. Then
+Let $\tau=\min\{t:o_t=2\}$, with $\tau=\infty$ if there is no such $t$. Then
+for every $u\ge 1$ and every $T\ge 1$,
 \begin{equation}
-\Pr[\tau\le u]\;\le\;\frac{2^{b}\,(2^{u}-1)}{M}\qquad\text{for every } u\ge 1,
+\Pr[\tau\le u]\;\le\;\frac{2^{b}\,(2^{u}-1)}{M},
 \label{eq:tau-tail}
 \end{equation}
-and consequently, for every $T\ge 1$,
 \begin{equation}
-\EE\bigl[\min\{\tau-1,\,T\}\bigr]\;\ge\;T-2^{b}\,\frac{2^{T+1}-T-2}{M}
+\EE\bigl[\min\{\tau-1,\,T\}\bigr]\;\ge\;T-2^{b}\,\frac{2^{T+1}-T-2}{M},
 \label{eq:count-final}
 \end{equation}
-and, in the cruder form that is easiest to read off,
+and, in the form easiest to read off,
 \begin{equation}
 \EE\bigl[\min\{\tau-1,\,T\}\bigr]\;\ge\;
 \min\bigl\{T,\ \lfloor\log_2 M\rfloor-b\bigr\}-2 .
 \label{eq:count-clean}
 \end{equation}
-Taking $b=0$, i.e.\ $|\Sigma_t|=1$ for every $t$, gives the side-channel-free
-statement used in \Cref{thm:impossible,thm:blocklb}.
+Setting $b=0$ gives the side-channel-free form used in
+\Cref{thm:impossible,thm:blocklb}.
 \end{lemma}
 
 \begin{proof}
-Fix $t\ge 1$ and let $H_t$ be the set of \emph{transcripts}
-$(\mu_0,o_1,\mu_1,\dots,o_{t-1},\mu_{t-1})$ of the first $t-1$ rounds that
-contain no answer $2$. Each such transcript has $o_s\in\{1,3\}$ for
-$s\le t-1$ and $\mu_s\in\Sigma_s$ for $s\le t-1$, so by \Cref{eq:budget}
-\[
-|H_t|\;\le\;2^{t-1}\prod_{s=0}^{t-1}|\Sigma_s|\;\le\;2^{t-1}\,2^{b}.
-\]
-Suppose $\tau(j)=t$. Then the first $t-1$ rounds produced by $j$ form some
-transcript $h\in H_t$, and, since the strategy is deterministic, the query
-issued at round $t$ is the fixed query $q_t(h)$ determined by $h$; moreover
+The idea is a counting one: a searcher that has not yet hit has learned only
+which of $2^{t-1}$ answer histories it is in, refined by at most $2^{b}$ side
+messages, and each such transcript can be the prefix of a hit for at most one
+index.
+
+Formally, let $H_t$ be the set of transcripts
+$(\mu_0,o_1,\mu_1,\dots,o_{t-1},\mu_{t-1})$ of the first $t-1$ rounds
+containing no answer $2$. Each has $o_s\in\{1,3\}$ and $\mu_s\in\Sigma_s$, so
+by \Cref{eq:budget}, $|H_t|\le 2^{t-1}\prod_{s<t}|\Sigma_s|\le 2^{t-1}2^{b}$.
+If $\tau(j)=t$ then $j$ produces some $h\in H_t$; the strategy being
+deterministic, the round-$t$ query is the fixed $q_t(h)$, and
 $\mathcal{O}(q_t(h),j)=2$. By \Cref{eq:one-hit} at most one index answers $2$
-to $q_t(h)$, so for each $h\in H_t$ there is at most one $j$ with $\tau(j)=t$
-and transcript $h$. As distinct $j$ with $\tau(j)=t$ must be counted under
-some $h\in H_t$,
-\[
-\bigl|\{j\in[M]:\tau(j)=t\}\bigr|\;\le\;|H_t|\;\le\;2^{b}\,2^{t-1},
-\]
-and summing over $t\le u$ gives
-$|\{j:\tau(j)\le u\}|\le 2^{b}\sum_{t=1}^{u}2^{t-1}=2^{b}(2^u-1)$. Dividing by
-$M$ proves \Cref{eq:tau-tail}.
+to $q_t(h)$, so each $h$ accounts for at most one such $j$, giving
+$|\{j:\tau(j)=t\}|\le 2^{b}2^{t-1}$. Summing over $t\le u$ and dividing by
+$M$ gives \Cref{eq:tau-tail}.
 
-For \Cref{eq:count-final}, put $X=\min\{\tau-1,T\}$, a random variable with
-values in $\{0,1,\dots,T\}$. For $0\le s\le T-1$ we have $X>s$ if and only if
-$\tau-1>s$, i.e.\ $\tau>s+1$. Hence
+For \Cref{eq:count-final}, put $X=\min\{\tau-1,T\}$. Since $X>s$ iff
+$\tau>s+1$,
 \begin{align*}
-\EE[X]&=\sum_{s=0}^{T-1}\Pr[X>s]
-      =\sum_{u=1}^{T}\Pr[\tau>u]
-      =\sum_{u=1}^{T}\bigl(1-\Pr[\tau\le u]\bigr)\\
-      &\ge T-2^{b}\sum_{u=1}^{T}\frac{2^{u}-1}{M}
-       = T-2^{b}\,\frac{2^{T+1}-2-T}{M},
+\EE[X]&=\sum_{s=0}^{T-1}\Pr[X>s]=\sum_{u=1}^{T}\bigl(1-\Pr[\tau\le u]\bigr)\\
+&\ge T-2^{b}\sum_{u=1}^{T}\frac{2^{u}-1}{M},
 \end{align*}
-using $\sum_{u=1}^{T}2^u=2^{T+1}-2$.
-
-For \Cref{eq:count-clean}, write $L=\lfloor\log_2 M\rfloor-b$. If $L\le 0$ the
-claim is vacuous because $X\ge 0$. If $0<L$ and $T\le L$, then
-$M\ge 2^{\lfloor\log_2 M\rfloor}=2^{L+b}$, so the subtracted term in
-\Cref{eq:count-final} is at most
-$2^{b}\,2^{T+1}/2^{L+b}=2^{\,T+1-L}\le 2$, giving $\EE[X]\ge T-2$. If
-$0<L<T$, let $h=\lfloor L\rfloor$ and $f=L-h\in[0,1)$. Then $h\le T$ is an
-integer and $X\ge\min\{\tau-1,h\}$ pointwise, so \Cref{eq:count-final} with
-horizon $h$, together with $M\ge 2^{L+b}$, gives
-$\EE[X]\ge h-2^{b}2^{h+1}/M=h-2^{\,1-f}$. Now $2-f\ge 2^{\,1-f}$ for every
-$f\in[0,1)$: the two sides agree at $f=0$, and on $[0,1)$ the left side falls
-with slope $-1$ while the right side falls with slope
-$-2^{\,1-f}\ln 2\le-\ln 2>-1$. Hence $\EE[X]\ge h+f-2=L-2$. In all cases
-$\EE[X]\ge\min\{T,L\}-2$; when $b$ is an integer and $M$ a power of two we
-have $f=0$ and the middle step is the plain $2^{\,T+1-L}\le 2$ of the
-previous case.
+which is \Cref{eq:count-final} because $\sum_{u\le T}2^u=2^{T+1}-2$.
+\Cref{eq:count-clean} follows from \Cref{eq:count-final} by a short case
+analysis on $L=\lfloor\log_2 M\rfloor-b$, deferred to
+\Cref{app:count-clean}.
 \end{proof}
 
 \subsection{The impossibility theorem}
@@ -1212,220 +1115,158 @@ previous case.
 
 \begin{theorem}[unknown $K$ with partial information is not learnable]
 \label{thm:impossible}
-Let $G_3$ be the game of \Cref{eq:g3-def} and let
-$\Univ=\{\alpha_{r_1,r_2}:0\le r_1\le r_2\le 1\}$ be the (infinite) universe
-of threshold types of \Cref{lem:realize}. Then for every horizon $T\ge 1$ and
-every $\Kmax\ge 1$, every online algorithm for \Cref{prob:partial} ---
-randomized or deterministic, and even one that knows $T$, $\Univ$, $\Kmax$
-and the construction below --- suffers, on some instance with $|K|=1$,
+Let $G_3$ be as in \Cref{eq:g3-def} and let
+$\Univ=\{\alpha_{r_1,r_2}:0\le r_1\le r_2\le 1\}$ be the infinite universe of
+threshold types \Cref{eq:type-utils}. For every $T\ge 1$ and every
+$\Kmax\ge 1$, every online algorithm for \Cref{prob:partial} --- randomized
+or deterministic, even one knowing $T$, $\Univ$, $\Kmax$ and the construction
+--- suffers, on some instance with $|K|=1$,
 \begin{equation}
 \EE[\Regret(T)]\;\ge\;T-2+\frac{T+2}{2^{T}}\;>\;T-2 .
 \label{eq:impossible}
 \end{equation}
-The game $G_3$ does not depend on $T$; only the adversary's choice of $K$
-inside the fixed universe $\Univ$ does.
+The game does not depend on $T$; only the adversary's choice of $K$ inside
+the fixed universe does.
 \end{theorem}
 
 \begin{proof}
-Set $M=2^{T}$ and let $\Univ_M=\{\alpha^{(1)},\dots,\alpha^{(M)}\}\subset\Univ$
-be as in \Cref{eq:dyadic}. Following the route of
-\citet[Theorem 7.1]{balcan2015}, we invoke Yao's minimax principle: we
-exhibit a distribution over instances and lower bound the expected regret of
-every \emph{deterministic} algorithm against it.
+Set $M=2^{T}$ and take $\Univ_M\subset\Univ$ as in \Cref{eq:dyadic}. By
+Yao's minimax principle it suffices to exhibit a distribution over instances
+against which every \emph{deterministic} algorithm suffers this much: draw
+$j$ uniformly from $[M]$ and set $K=\{\alpha^{(j)}\}$, with
+$a_t=\alpha^{(j)}$ for all $t$. This is legal for every $\Kmax\ge1$ and
+oblivious, since $\avec$ is fixed before play.
 
-\paragraph{The distribution over instances.}
-Draw $j$ uniformly from $[M]$ and set $K=\{\alpha^{(j)}\}$ and
-$a_t=\alpha^{(j)}$ for every $t\in[T]$. This is a legal instance of
-\Cref{prob:partial} for every $\Kmax\ge 1$, since $|K|=1$; the sequence
-$\avec$ is fixed before play begins, so the adversary is oblivious.
-
-\paragraph{Step 1 (the benchmark is $0$).}
-Let $\pvec^{*}=\bigl(\tfrac{2j-1}{2M},0,1-\tfrac{2j-1}{2M}\bigr)$, whose
-first coordinate is the midpoint of $I_j$ and which lies in $\cP$. With
-$r_1=\tfrac{j-1}{M}$ and $r_2=\tfrac{j}{M}$ we have
-$p^{*}_1=\tfrac{2j-1}{2M}>\tfrac{2j-2}{2M}=r_1$ and
-$p^{*}_3=1-\tfrac{2j-1}{2M}>1-\tfrac{2j}{2M}=1-r_2$, both strictly, so
-\Cref{eq:hit-iff} gives $b_{\alpha^{(j)}}(\pvec^{*})=2$ --- and does so
-under \emph{any} tie-breaking rule, since target~$2$ is the strict maximizer
-at $\pvec^{*}$. Hence, by \Cref{eq:g3-payoff},
-$U_d(b_{a_t}(\pvec^{*}),\pvec^{*})=0$ for every $t$. Since
-$U_d(i,\pvec)\le 0$ for every target $i$ and every $\pvec$ by
-\Cref{eq:g3-payoff}, no coverage vector can do better, so this $\pvec^{*}$ is
-indeed a maximizer in \Cref{eq:pstar}. Therefore
-$\sum_{t=1}^{T}U_d(b_{a_t}(\pvec^{*}),\pvec^{*})=0$, and by \Cref{eq:regret}
-\begin{align}
-\Regret(T)&=-\EE\Bigl[\sum_{t=1}^{T}U_d(b_{a_t}(\pvec_t),\pvec_t)\Bigr]\notag\\
-&=\EE\bigl[\#\{t\le T:\text{miss at }t\}\bigr],
+\emph{The benchmark is $0$.} Let
+$\pvec^{*}=\bigl(\tfrac{2j-1}{2M},0,1-\tfrac{2j-1}{2M}\bigr)$, whose first
+coordinate is the midpoint of $I_j$. Then $p^{*}_1>r_1$ and
+$p^{*}_3>1-r_2$ strictly, so $b_{\alpha^{(j)}}(\pvec^{*})=2$ by
+\Cref{eq:hit-iff} under any tie-breaking rule, and $\pvec^{*}$ earns $0$ every
+round. As $U_d\le 0$ everywhere by \Cref{eq:g3-payoff}, no coverage vector
+does better, so $\pvec^{*}$ is a maximizer in \Cref{eq:pstar} and
+\begin{equation}
+\Regret(T)=\EE\bigl[\#\{t\le T:\text{miss at }t\}\bigr].
 \label{eq:regret-is-misses}
-\end{align}
-again by \Cref{eq:g3-payoff}. So regret counts missed rounds exactly.
+\end{equation}
+Regret counts missed rounds exactly.
 
-\paragraph{Step 2 (the interaction is a comparison search).}
-A deterministic algorithm for \Cref{prob:partial} is a family of maps
-$\pvec_t=\pvec_t(o_1,\dots,o_{t-1})$, where $o_s=b_{a_s}(\pvec_s)\in\{1,2,3\}$
-is the only feedback it receives; its own past plays are determined by the
-same history and carry no extra information, and as noted after
-\Cref{prob:partial} its realized payoffs are functions of $(o_s,\pvec_s)$.
-Define the query $q_t=\pvec_t$ and the answer map
-$\mathcal{O}(\pvec,j')=b_{\alpha^{(j')}}(\pvec)$. The intervals $I_1,\dots,I_M$
-are pairwise disjoint, so \Cref{lem:hit} gives exactly the hypothesis
-\Cref{eq:one-hit}: for every $\pvec\in\cP$ at most one $j'\in[M]$ satisfies
-$\mathcal{O}(\pvec,j')=2$. Hence the interaction is a protocol of the type
-covered by \Cref{lem:count}, with budget $b=0$ because
-\Cref{prob:partial} gives the defender no channel other than $o_t$.
+\emph{The interaction is a comparison search.} A deterministic algorithm is a
+family of maps $\pvec_t=\pvec_t(o_1,\dots,o_{t-1})$, the observations being
+its only feedback. Take $q_t=\pvec_t$ and
+$\mathcal{O}(\pvec,j')=b_{\alpha^{(j')}}(\pvec)$. The $I_j$ are disjoint, so
+\Cref{lem:hit} gives exactly \Cref{eq:one-hit}, and \Cref{prob:partial}
+provides no channel beyond $o_t$, so the budget is $b=0$.
 
-\paragraph{Step 3 (counting).}
-Let $\tau$ be the first round at which the algorithm hits. Every round
-$t<\tau$ is a miss, and there are at least $\min\{\tau-1,T\}$ such rounds in
-$[T]$. Combining with \Cref{eq:regret-is-misses} and \Cref{eq:count-final}
-with $b=0$ and $M=2^{T}$,
-\begin{align*}
-\EE_j\bigl[\Regret(T)\bigr]&\;\ge\;\EE_j\bigl[\min\{\tau-1,T\}\bigr]\\
-&\;\ge\;T-\frac{2^{T+1}-T-2}{2^{T}}\;=\;T-2+\frac{T+2}{2^{T}} .
-\end{align*}
-
-\paragraph{Step 4 (Yao).}
-Let $A$ be any randomized algorithm and let $A_\omega$ denote its
-deterministic realization under internal randomness $\omega$. Then
-\begin{align*}
-\max_{K,\avec}\EE[\Regret(T;A)]
-&\;\ge\;\EE_j\EE_\omega[\Regret(T;A_\omega,j)]\\
-&\;=\;\EE_\omega\EE_j[\Regret(T;A_\omega,j)],
-\end{align*}
-and the inner expectation is at least $T-2+(T+2)2^{-T}$ for every $\omega$ by
-Steps 1--3. This proves \Cref{eq:impossible}.
+\emph{Counting.} Every round before the first hit $\tau$ is a miss, so by
+\Cref{eq:regret-is-misses} and \Cref{eq:count-final} with $b=0$, $M=2^{T}$,
+\[
+\EE_j\bigl[\Regret(T)\bigr]\ \ge\ \EE_j\bigl[\min\{\tau-1,T\}\bigr]
+\ \ge\ T-\frac{2^{T+1}-T-2}{2^{T}},
+\]
+which is \Cref{eq:impossible}. Averaging over a randomized algorithm's
+internal randomness preserves the bound, since it holds for every
+deterministic realization.
 \end{proof}
 
 \begin{remark}[the bound is exactly tight]
 \label{rem:tight-lb}
-The constant in \Cref{eq:impossible} cannot be improved. The defender that
-maintains the set of indices consistent with the observations so far --- an
-integer interval, by \Cref{eq:type-line} --- and plays
-$\pvec_t=(k/M,0,1-k/M)$ for its midpoint $k$ attains expected regret exactly
-$T-2+(T+2)2^{-T}$ on this family, as we verify in \Cref{sec:exp-imp}. Since
-$\Regret(T)\le T$ always in $G_3$, \Cref{thm:impossible} says the defender
-loses all but two of the $T$ rounds.
+The constant cannot be improved: the defender that keeps the set of indices
+consistent with its observations --- an integer interval, by
+\Cref{eq:type-line} --- and plays $\pvec_t=(k/M,0,1-k/M)$ for its midpoint
+$k$ attains expected regret exactly $T-2+(T+2)2^{-T}$, as
+\Cref{sec:exp-imp} verifies. Since $\Regret(T)\le T$ always in $G_3$, the
+defender loses all but two of the $T$ rounds.
 \end{remark}
 
 \subsection{What exactly fails, and what would fix it}
 \label{sec:whatfails}
 
-\Cref{thm:impossible} is not a statement about how many types the adversary
-has; the hard instance uses a single type, deployed in every round. It is a
-statement about how many types the adversary \emph{could} have had. The next
-theorem makes that precise by re-running the argument on a universe of finite
-resolution, exhibiting a matching algorithm, and --- since the diagnosis is
-that the defender is missing the \emph{name} of a type --- pricing the
-supplement that would repair it. We charge that supplement in bits.
+\Cref{thm:impossible} is not about how many types the adversary has --- the
+hard instance uses one --- but about how many it \emph{could} have had. The
+diagnosis is that the defender is missing a \emph{name}, and a name is a
+bounded object; so we price the missing supplement in bits.
 
 \begin{definition}[side-information oracle of budget $b$]
 \label{def:budget}
-A \emph{side-information oracle of budget $b$} for \Cref{prob:partial} is
-given by alphabets $\Sigma_0,\Sigma_1,\dots,\Sigma_T$ fixed before play with
-$\sum_{t}\log_2|\Sigma_t|\le b$, together with message maps that hand the
-defender $\mu_0\in\Sigma_0$ before round~$1$ and $\mu_t\in\Sigma_t$ at the end
-of round $t$. Each $\mu_t$ may be an arbitrary function of the instance
-$(K,\avec)$ and of the history so far. Nothing is assumed about what the
-messages mean; $b$ measures only how many bits of them there are.
+A \emph{side-information oracle of budget $b$} for \Cref{prob:partial} is a
+family of alphabets $\Sigma_0,\dots,\Sigma_T$ fixed before play with
+$\sum_t\log_2|\Sigma_t|\le b$, together with maps handing the defender
+$\mu_0\in\Sigma_0$ before round~$1$ and $\mu_t\in\Sigma_t$ at the end of round
+$t$. Each $\mu_t$ may be an arbitrary function of the instance $(K,\avec)$
+and of the history. Nothing is assumed about what the messages mean; $b$
+counts only how many bits of them there are.
 \end{definition}
 
 \begin{theorem}[regret is the number of bits needed to name the type]
 \label{thm:bits}
-Fix $M\ge 2$ and a budget $b\ge 0$, and consider \Cref{prob:partial} in
-$G_3$ with $\Kmax=1$, augmented by a side-information oracle of budget $b$.
-Parts (i) and (iii) hold for every real $b\ge 0$; part (ii), which has to
-build $2^{b}$ blocks, is stated for integer $b$.
+Fix $M\ge 2$ and a budget $b\ge 0$, and consider \Cref{prob:partial} in $G_3$
+with $\Kmax=1$ plus a side-information oracle of budget $b$. Parts (i) and
+(iii) hold for real $b$; part (ii), which builds $2^{b}$ blocks, is stated
+for integer $b$.
 \begin{enumerate}[leftmargin=1.2em,itemsep=0.05em,topsep=0.2em]
-  \item On the universe $\Univ_M$ of \Cref{eq:dyadic}, every algorithm and
-  every such oracle suffer
-  $\EE[\Regret(T)]\ge\min\{T,\lfloor\log_2 M\rfloor-b\}-2$
-  on some instance.
-  \item For integer $b$, on $\Univ_M$ there are an oracle of budget $b$ and an
-  algorithm that
-  together suffer
-  $\Regret(T)\le\min\bigl\{T,\ \max\{0,\lceil\log_2 M\rceil-b\}\bigr\}$
-  on every instance.
-  \item On the infinite universe $\Univ$ of \Cref{thm:impossible}, every
-  algorithm and every oracle of \emph{any} finite budget $b$ suffer
-  $\EE[\Regret(T)]\ge T-2$ on some instance with $|K|=1$.
+  \item On $\Univ_M$, every algorithm and every such oracle suffer
+  $\EE[\Regret(T)]\ge\min\{T,\lfloor\log_2 M\rfloor-b\}-2$ on some instance.
+  \item On $\Univ_M$ there are an oracle of budget $b$ and an algorithm
+  suffering $\Regret(T)\le\min\{T,\max\{0,\lceil\log_2 M\rceil-b\}\}$ on
+  every instance.
+  \item On the infinite universe $\Univ$, every algorithm and every oracle of
+  \emph{any} finite budget suffer $\EE[\Regret(T)]\ge T-2$ on some instance
+  with $|K|=1$.
 \end{enumerate}
-Hence on $\Univ_M$ the optimal regret is $\min\{T,\log_2 M-b\}\pm 3$ --- and
-$\pm 2$ when $M$ is a power of two, which is the only case used below --- so
-one bit of threat intelligence buys exactly one round, until the type has
-been named and the remaining rounds are free. Taking $b=0$ recovers the statement that
-the optimal regret is $\min\{T,\log_2|\Univ_M|\}\pm 3$, and (iii) says that
-on an infinite universe no fixed quantity of intelligence buys anything at
-all.
+Hence the optimal regret on $\Univ_M$ is $\min\{T,\log_2 M-b\}\pm 3$, and
+$\pm 2$ when $M$ is a power of two. One bit of threat intelligence buys
+exactly one round, until the type is named and the rest are free; on an
+infinite universe no fixed quantity of intelligence buys anything.
 \end{theorem}
 
 \begin{proof}
-(i) Repeat Steps~1--4 of the proof of \Cref{thm:impossible} on $\Univ_M$
-verbatim; the only change is in Step~2, where the protocol handed to
-\Cref{lem:count} now also carries the messages $\mu_t$, so it is a protocol
-of budget $b$ rather than $0$. Note that \Cref{lem:count} allows $q_t$ to
-depend on $\mu_0,\dots,\mu_{t-1}$, which is exactly the freedom a defender
-reading the oracle has, and that \Cref{eq:one-hit} is a property of the
-answer map $\mathcal{O}$ alone and is therefore untouched by the side
-channel. Step~3 now invokes \Cref{eq:count-clean} instead of
-\Cref{eq:count-final} and gives
-$\EE_j[\Regret(T)]\ge\min\{T,\lfloor\log_2 M\rfloor-b\}-2$ for every
-deterministic algorithm; Step~4 is unchanged.
+(i) Run the proof of \Cref{thm:impossible} on $\Univ_M$ verbatim, except that
+the protocol handed to \Cref{lem:count} now also carries the messages
+$\mu_t$, so its budget is $b$ rather than $0$. This is legitimate because
+\Cref{lem:count} lets $q_t$ depend on $\mu_0,\dots,\mu_{t-1}$ --- exactly the
+freedom a defender reading the oracle has --- and because \Cref{eq:one-hit}
+is a property of $\mathcal{O}$ alone, untouched by the side channel.
+Invoking \Cref{eq:count-clean} in place of \Cref{eq:count-final} gives the
+claim.
 
-(ii) Write $m=\lceil\log_2 M\rceil$. If $b\ge m$ let the oracle name $j$
-outright, using $\lceil\log_2 M\rceil\le b$ bits, and let the defender play
-the midpoint of $I_j$ forever; by \Cref{eq:hit-iff} it hits in every round
-and the regret is $0$. Otherwise split $[M]$ into $2^{b}$ consecutive blocks
-of $\lceil M/2^{b}\rceil$ or fewer indices each and let $\mu_0$ name the
-block containing $j$; this is one message from an alphabet of size $2^{b}$,
-so the budget is met. The defender then runs the midpoint search of
-\Cref{rem:tight-lb} restricted to that block: it keeps the sub-interval
-$[\ell,h]$ of indices consistent with everything it has seen, initially the
-announced block, and plays $\pvec=(k/M,0,1-k/M)$ for its midpoint $k$. By
-\Cref{eq:type-line} at that $\pvec$, the observation is target~$2$ if $j=k$,
-target~$1$ if $j>k$ and target~$3$ if $j<k$, so every missed round replaces
-$[\ell,h]$ by one of its two halves and every hit leaves it unchanged.
-Starting from $\lceil M/2^{b}\rceil\le 2^{\,m-b}$ candidates, at most $m-b$
-misses can occur before $[\ell,h]$ is a singleton, after which every round is
-a hit; and trivially at most $T$ rounds are missed. By
-\Cref{eq:regret-is-misses} the regret equals the number of misses.
+(ii) Write $m=\lceil\log_2 M\rceil$. If $b\ge m$, let the oracle name $j$
+outright and the defender play the midpoint of $I_j$ forever: it hits every
+round and regret is $0$. Otherwise split $[M]$ into $2^{b}$ consecutive
+blocks of at most $\lceil M/2^{b}\rceil\le 2^{m-b}$ indices and let $\mu_0$
+name the block containing $j$ --- one message from an alphabet of size
+$2^{b}$, so the budget is met. The defender then binary-searches inside that
+block: it keeps the consistent sub-interval $[\ell,h]$ and plays
+$\pvec=(k/M,0,1-k/M)$ for its midpoint $k$. By \Cref{eq:type-line} the
+observation is target~$2$ if $j=k$, target~$1$ if $j>k$ and target~$3$ if
+$j<k$, so every miss halves $[\ell,h]$ and every hit leaves it alone. At most
+$m-b$ misses occur before $[\ell,h]$ is a singleton, after which every round
+hits; and trivially at most $T$ rounds are missed. Apply
+\Cref{eq:regret-is-misses}.
 
-(iii) Apply (i) on the sub-universe $\Univ_{M}\subset\Univ$ with
-$M=2^{T+b}$, for which $\lfloor\log_2 M\rfloor-b=T$; the instance produced
-has $|K|=1$.
+(iii) Apply (i) on $\Univ_{M}\subset\Univ$ with $M=2^{T+b}$, for which
+$\lfloor\log_2 M\rfloor-b=T$.
 \end{proof}
 
-\begin{remark}[what the budget does and does not cover]
-\label{rem:budget}
-\Cref{def:budget} is deliberately permissive: the oracle may look at the
-whole instance, may speak before the game starts, may adapt its messages to
-the defender's plays, and is free to use any encoding at all. What it may
-not do is exceed $b$ bits in total. The lower bound is therefore
-information-theoretic and not an artefact of any particular reporting format;
-in particular it applies to the block-revelation oracle of \Cref{sec:block}
-whenever that oracle's messages can be encoded in $b$ bits. What
-\Cref{thm:bits} does \emph{not} capture is \emph{when} the bits arrive:
-\Cref{thm:blocklb} below shows that even an oracle with a generous budget
-still costs $\Theta(\Kmax B)$ if it is made to speak only every $B$ rounds.
-Volume and latency are two independent obstructions, and the two lower
+\Cref{def:budget} is deliberately permissive --- the oracle may inspect the
+whole instance, speak before play, adapt to the defender, and use any
+encoding --- so the lower bound is information-theoretic, not an artefact of
+a reporting format. What \Cref{thm:bits} does \emph{not} capture is
+\emph{when} the bits arrive; \Cref{thm:blocklb} below shows that even a
+generous budget still costs $\Theta(\Kmax B)$ if it may speak only every $B$
+rounds. Volume and latency are independent obstructions, and the two lower
 bounds isolate them one at a time.
-\end{remark}
 
-\begin{remark}[the two lower bounds are incomparable]
-\label{rem:contrast}
-\Cref{tab:landscape} places \Cref{thm:impossible} among the known results.
-\Citet[Theorem 7.1]{balcan2015} obtain $\Omega(T)$ with \emph{full}
-information, but their construction uses a type set of size $2^{T+1}-2$, and
-the sequence it plays --- the $T$ postfixes of a random $T$-bit string ---
-contains $T$ \emph{distinct} types, so it needs $\Kmax\ge T$ and is
-consistent with \Cref{thm:main}. \Cref{thm:impossible} obtains $\Omega(T)$
-with $|K|=1$, and hence for every $\Kmax\ge 1$, but needs partial
-information and an infinite universe. Neither implies the other. Together
-with \Cref{thm:main} and \citet[Theorem 6.1]{balcan2015} they show that
-either relaxation of \citet[Theorem 5.1]{balcan2015} alone is affordable ---
-a $\sqrt{\Kmax}$ multiplicative price for not knowing $K$, an exponent
-$2/3$ instead of $1/2$ for not observing $a_t$ --- while their conjunction is
-not affordable at all.
-\end{remark}
+Two further points are worth recording. First, the instance of
+\Cref{thm:impossible} is \emph{stationary}, so the bound survives telling the
+defender $|K|$, the full frequency vector, or that the sequence is i.i.d.:
+none of these is informative when $|K|=1$. What is missing is not which types
+attack when --- the quantity \citet[Section 6]{balcan2015} must estimate ---
+but the identity of the types. Second, \citet{letchford2009} learn a
+near-optimal commitment against a \emph{single} unknown type from few
+best-response queries, which only appears to conflict: any such bound must
+depend on the geometry of the best-response regions, and $\Univ_M$ drives the
+region to width $2^{-T}$. \Cref{thm:bits} says exactly that this dependence
+cannot be removed.
 
 \begin{table}[t]
 \centering
@@ -1449,219 +1290,812 @@ partial & unknown, $\le\Kmax$,  & \\
 \end{tabular}
 \caption{The landscape, with $\Lambda_n=n^2+\Kmax\log n$. Rows 1--3 are
 Theorems 5.1, 6.1 and 7.1 of \citet{balcan2015}; row 4 is \Cref{thm:main};
-row 5 is \Cref{thm:impossible}; row 6 is \Cref{thm:bits}, which is tight up
-to an additive $3$; row 7 is \Cref{prop:sqrtT} together with \Cref{thm:main}
-at $k=2$, and is tight up to a constant. The $\Omega(\sqrt T)$ half of row 7
-holds under partial information as well, but the matching upper bound does
-not: with partial information the best bound we can cite for a known
-two-type set is the $O(T^{2/3})$ of \citet[Theorem 6.1]{balcan2015}, and
-closing that gap is one of the open problems of \Cref{sec:conc2}. Row 8 is
-\Cref{thm:block}, in the model of \Cref{prob:block}.}
+row 5 is \Cref{thm:impossible}; row 6 is \Cref{thm:bits}; row 7 is
+\Cref{prop:sqrtT} with \Cref{thm:main} at $k=2$; row 8 is \Cref{thm:block}.
+Rows 3 and 5 are incomparable: the construction of row 3 plays $T$
+\emph{distinct} types, so it needs $\Kmax\ge T$ and is consistent with
+\Cref{thm:main}, whereas row 5 uses $|K|=1$ but needs partial information and
+an infinite universe. The $\Omega(\sqrt T)$ half of row 7 holds under partial
+information too, but the matching upper bound there is only the $O(T^{2/3})$
+of row 2; closing that gap is an open problem of \Cref{sec:conc2}.}
 \label{tab:landscape}
 \end{table}
-
-\begin{remark}[the adversary is not the difficulty]
-\label{rem:stationary}
-The instance of \Cref{thm:impossible} is stationary: one fixed type attacks
-in every round. The lower bound therefore continues to hold if the defender
-is additionally told $|K|$ exactly, told the full frequency vector of the
-type sequence, or told that the sequence is i.i.d.; none of these is
-informative when $|K|=1$. What the defender is missing is not information
-about \emph{which types attack when}, which is the quantity that
-\citet[Section 6]{balcan2015} must estimate, but information about the
-identity of the types themselves.
-\end{remark}
-
-\begin{remark}[reconciliation with query-based learning]
-\label{rem:letchford}
-\Citet{letchford2009} show that a defender facing a \emph{single} unknown
-attacker type can learn a near-optimal commitment from a small number of
-best-response queries, which at first sight is in tension with
-\Cref{thm:impossible}. There is no contradiction. Any query bound of that
-kind must depend on the geometry of the best-response regions, and the family
-$\Univ_M$ of \Cref{eq:dyadic} drives the region that has to be located down
-to width $1/M=2^{-T}$. \Cref{thm:bits} says exactly that a dependence
-of this kind cannot be removed: the attainable regret is the number of bits
-needed to name the attacker type, and an infinite universe makes that number
-unbounded.
-\end{remark}
 
 \subsection{A $\sqrt{T}$ floor as soon as $\Kmax\ge 2$}
 \label{sec:floor}
 
-\Cref{thm:bits} makes the $\Kmax=1$ problem entirely a naming problem: on a
-universe of resolution $M$ the regret is $\min\{T,\log_2 M-b\}\pm 3$, which
-for a fixed finite universe does not grow with the horizon at all. The next
-proposition shows that this is a property of $\Kmax=1$ and of nothing else.
-With two attacker types the regret is $\Omega(\sqrt{T})$ on the
-\emph{smallest possible} universe, under \emph{full}-information feedback,
-and even if the defender is told $K$ in advance. Two consequences are worth
-naming. First, the $\sqrt{T}$ of \Cref{thm:main} is not an artefact of the
-analysis. Second, whatever the answer to the finite-$M$ question of
-\Cref{sec:conc2} turns out to be for $\Kmax\ge 2$, it must keep growing with
-the horizon, and so it cannot have the saturating form
-$\min\{T,f(M,\Kmax)\}$ that governs $\Kmax=1$.
+For $\Kmax=1$ the problem is entirely a naming problem: by \Cref{thm:bits}
+the regret stops growing once the type is named, so on a fixed finite
+universe it does not grow with $T$ at all. That is special to one type. With
+two types the regret is $\Omega(\sqrt T)$ on the \emph{smallest possible}
+universe, under \emph{full} information, and even if the defender is told $K$
+in advance --- because it must now track which of two known opponents is
+currently more frequent, and no naming settles that.
 
 \begin{proposition}[two types already cost $\sqrt{T}$]
 \label{prop:sqrtT}
-Consider $G_3$ with the two attacker types
-$\alpha^{(1)}=\alpha_{0,1/2}$ and $\alpha^{(2)}=\alpha_{1/2,1}$ of
-\Cref{lem:realize}, so that $|\Univ|=|K|=\Kmax=2$. Let $a_1,\dots,a_T$ be
-drawn i.i.d.\ and uniformly from $K$. Then every online algorithm ---
-randomized or deterministic, under full information or partial information,
-and even one that is told $K$ together with the utility vectors at $t=0$ ---
-satisfies
+Consider $G_3$ with the two types $\alpha^{(1)}=\alpha_{0,1/2}$ and
+$\alpha^{(2)}=\alpha_{1/2,1}$, so $|\Univ|=|K|=\Kmax=2$, and let
+$a_1,\dots,a_T$ be drawn i.i.d.\ uniformly from $K$. Then every online
+algorithm --- randomized or deterministic, under either feedback model, and
+even one told $K$ with its utility vectors at $t=0$ --- satisfies
 \begin{equation}
 \EE\bigl[\Regret(T)\bigr]\;\ge\;\tfrac{1}{2}\sqrt{\lfloor T/2\rfloor}
 \label{eq:sqrtT}
 \end{equation}
-for every $T\ge 2$, where the expectation is over the sequence as well as the
-algorithm's randomization; consequently some fixed sequence forces at least
-this much.
+for every $T\ge 2$; consequently some fixed sequence forces at least this
+much.
 \end{proposition}
 
 \begin{proof}
-The intervals $(0,\tfrac12]$ and $(\tfrac12,1]$ of the two types are
-disjoint, so \Cref{lem:hit} applies: every $\pvec\in\cP$ hits at most one of
-$\alpha^{(1)},\alpha^{(2)}$. Write $N_i=|\{t:a_t=\alpha^{(i)}\}|$, so
-$N_1+N_2=T$.
+The two intervals $(0,\tfrac12]$ and $(\tfrac12,1]$ are disjoint, so by
+\Cref{lem:hit} every $\pvec$ hits at most one type. Write
+$N_i=|\{t:a_t=\alpha^{(i)}\}|$, so $N_1+N_2=T$.
 
-\emph{The benchmark.} A fixed $\pvec$ earns $0$ on the rounds at which it
-hits and $-1$ on the others, by \Cref{eq:g3-payoff}, and by the previous
-paragraph it hits on at most $\max\{N_1,N_2\}$ rounds. That value is
-attained: $\pvec=(\tfrac14,0,\tfrac34)$ satisfies $p_1>0$ and
-$p_3\ge\tfrac12$, so by \Cref{eq:hit-iff} it hits $\alpha^{(1)}$ in every one
-of its $N_1$ rounds, and symmetrically $\pvec=(\tfrac34,0,\tfrac14)$ hits
-$\alpha^{(2)}$ in every one of its $N_2$ rounds. Hence
-$\sum_t U_d(b_{a_t}(\pvec^{*}),\pvec^{*})=-\min\{N_1,N_2\}$.
+\emph{Benchmark.} A fixed $\pvec$ earns $0$ when it hits and $-1$ otherwise,
+so it earns at least $-\min\{N_1,N_2\}$, and this is attained:
+$\pvec=(\tfrac14,0,\tfrac34)$ hits $\alpha^{(1)}$ in all $N_1$ of its rounds
+by \Cref{eq:hit-iff}, and $(\tfrac34,0,\tfrac14)$ hits $\alpha^{(2)}$ in all
+$N_2$ of its rounds. Hence the benchmark earns $-\min\{N_1,N_2\}$.
 
-\emph{The algorithm.} Fix a round $t$ and condition on the algorithm's
-history, which is a function of $a_1,\dots,a_{t-1}$ and of its internal
-randomization and is therefore independent of $a_t$. The played $\pvec_t$
-hits at most one of the two types, and $a_t$ equals that type with
-probability $\tfrac12$; so $\Pr[\text{hit at }t]\le\tfrac12$ conditionally,
-hence unconditionally. Summing,
-$\EE[\sum_t U_d(b_{a_t}(\pvec_t),\pvec_t)]=-\,\EE[\#\text{misses}]\le -T/2$.
+\emph{Algorithm.} Fix $t$ and condition on the history, which depends only on
+$a_1,\dots,a_{t-1}$ and the algorithm's randomness, hence is independent of
+$a_t$. The played $\pvec_t$ hits at most one type, and $a_t$ is that type
+with probability $\tfrac12$, so $\Pr[\text{hit at }t]\le\tfrac12$ and the
+algorithm earns at most $-T/2$ in expectation.
 
-\emph{Combining.} Since $\min\{N_1,N_2\}=\tfrac12(T-|N_1-N_2|)$,
+\emph{Combining.} As $\min\{N_1,N_2\}=\tfrac12(T-|N_1-N_2|)$,
 \[
-\EE[\Regret(T)]\;\ge\;\tfrac{T}{2}-\EE\bigl[\min\{N_1,N_2\}\bigr]
-\;=\;\tfrac{1}{2}\,\EE\bigl[\,|N_1-N_2|\,\bigr].
+\EE[\Regret(T)]\;\ge\;\tfrac{T}{2}-\EE[\min\{N_1,N_2\}]
+\;=\;\tfrac{1}{2}\EE\bigl[|N_1-N_2|\bigr],
 \]
-Now $N_1-N_2=S_T\coloneqq\sum_{t\le T}\varepsilon_t$ with
-$\varepsilon_t=\pm1$ independent and uniform. The process $|S_m|$ is a
-submartingale, so $\EE|S_T|\ge\EE|S_{2\nu}|$ with $\nu=\lfloor T/2\rfloor$,
-and the classical identity
-$\EE|S_{2\nu}|=2\nu\binom{2\nu}{\nu}4^{-\nu}$ together with
-$\binom{2\nu}{\nu}4^{-\nu}\ge 1/(2\sqrt{\nu})$ gives
-$\EE|S_T|\ge\sqrt{\nu}$. (The inequality
-$\binom{2\nu}{\nu}4^{-\nu}\ge1/(2\sqrt\nu)$ holds with equality at $\nu=1$
-and follows by induction, since the ratio of consecutive left-hand sides is
-$(2\nu+1)/(2\nu+2)$ and that of right-hand sides is $\sqrt{\nu/(\nu+1)}$,
-and $(2\nu+1)^2(\nu+1)\ge \nu(2\nu+2)^2$ reduces to $\nu+1\ge0$.)
-This is \Cref{eq:sqrtT}. Nothing in the argument refers to the feedback
-model or to knowledge of $K$: the only facts used are that $\pvec_t$ cannot
-hit both types and that $a_t$ is independent of the past.
+and $N_1-N_2$ is a simple random walk $S_T$, for which
+$\EE|S_T|\ge\sqrt{\lfloor T/2\rfloor}$ (\Cref{app:walk}). Nothing here refers
+to the feedback model or to knowledge of $K$: only that $\pvec_t$ cannot hit
+both types and that $a_t$ is independent of the past.
 \end{proof}
 
-The bound is tight on this instance, and in a strong sense: the inequality
-$\Pr[\text{hit at }t]\le\tfrac12$ is an equality for any algorithm that
-always plays inside one of the two intervals, so every such algorithm ---
-including follow the leader, and including one that is simply told $K$ ---
-has expected regret \emph{exactly} $\tfrac12\EE|N_1-N_2|$, which is
-$\sqrt{T/(2\pi)}\,(1+o(1))$. The remaining freedom buys nothing at all.
-\Cref{fig:impossible}(c) shows the measured curve sitting on that value.
+The bound is tight on this instance in a strong sense: $\Pr[\text{hit}]\le
+\tfrac12$ is an \emph{equality} for any algorithm that plays inside one of
+the two intervals, so every such algorithm --- follow-the-leader included,
+and one simply told $K$ included --- has expected regret exactly
+$\tfrac12\EE|N_1-N_2|=\sqrt{T/(2\pi)}(1+o(1))$. The remaining freedom buys
+nothing; \Cref{fig:impossible}(c) shows the measured curve sitting on that
+value.
 
-\begin{remark}[the phase transition at $\Kmax=2$]
-\label{rem:phase}
-\Cref{thm:bits,prop:sqrtT} bracket the finite-universe problem from two
-sides. With $\Kmax=1$ the regret is $\min\{T,\log_2 M\}\pm 3$ and stops
-growing once the type has been named. With $\Kmax=2$ it is
-$\Omega(\sqrt{T})$ even at $M=2$, because the defender must now track which
-of its two known opponents is currently more frequent, and no naming can
-settle that. The transition is therefore not about how hard it is to
-identify a type but about whether identification is the whole problem. On
-the upper side, \citet[Theorem 6.1]{balcan2015} run with $k=M$ --- legitimate
-here, since a finite universe \emph{is} a known type set --- gives
-$O(\min\{T,\,T^{2/3}nM\log^{1/3}(nM)\})$ under partial information, and
+So \Cref{thm:bits,prop:sqrtT} bracket the finite-universe problem from two
+sides, and the transition at $\Kmax=2$ is not about how hard a type is to
+identify but about whether identification is the whole problem. On the upper
+side, \citet[Theorem 6.1]{balcan2015} with $k=M$ --- legitimate, since a
+finite universe \emph{is} a known type set --- gives
+$O(\min\{T,T^{2/3}nM\log^{1/3}(nM)\})$ under partial information, and
 \Cref{thm:main} gives $O(\sqrt{T\Kmax(n^2+\Kmax\log n)})$ under full
-information. Closing the gap between $\Omega(\sqrt T)$ and these is the
-finite-$M$ question of \Cref{sec:conc2}.
-\end{remark}
+information. Closing the gap to $\Omega(\sqrt T)$ is the finite-$M$ question
+of \Cref{sec:conc2}.
 
 % ==========================================================================
 \section{Block Revelation: Recovering Sublinear Regret}
 \label{sec:block}
 
-\Cref{thm:impossible} says that the defender must be told \emph{something}
-about the identity of its opponents. \Cref{thm:bits} says how little
-may suffice: what the defender is missing is the name of a type, and a name
-is a bounded object. This section studies the weakest such supplement we
-could find that is realistic in the applications of \Cref{sec:intro} --- a
-periodic threat-intelligence report --- and shows that it restores sublinear
-regret at the partial-information rate of \citet[Theorem 6.1]{balcan2015}.
+\Cref{thm:impossible} says the defender must be told \emph{something} about
+who its opponents are, and \Cref{thm:bits} says how little may do: what is
+missing is a name, and a name is a bounded object. This section supplies the
+weakest such supplement we could find that is realistic in the applications
+of \Cref{sec:intro} --- a periodic threat-intelligence report --- and shows
+it restores sublinear regret at the partial-information rate of
+\citet[Theorem 6.1]{balcan2015}.
 
-The supplement is deliberately meagre. Every $B$ rounds, an oracle hands the
-defender the \emph{set} of attacker types that have attacked at least once so
-far, together with their utility vectors. It does not say when any of them
-attacked, how often, or how many are still to come. In particular the
-defender still cannot attribute any individual round to a type, which is
-precisely the difficulty that \citet[Section 6]{balcan2015} solve by
-estimating type frequencies from best responses; that difficulty is
-untouched, and it is why the rate below is $T^{2/3}$ rather than $\sqrt{T}$.
+The supplement is deliberately meagre: every $B$ rounds an oracle hands over
+the \emph{set} of types that have attacked so far, with their utility
+vectors. It never says when any of them attacked, how often, or how many are
+still to come, so the defender still cannot attribute a round to a type ---
+precisely the difficulty \citet[Section 6]{balcan2015} solve by estimating
+frequencies from best responses. That difficulty is untouched, which is why
+the rate below is $T^{2/3}$ and not $\sqrt T$.
 
 \subsection{The model}
 
 \begin{problem}[Unknown-$K$ repeated SSG with block revelation]
 \label{prob:block}
-Fix a \emph{revelation length} $B\in\NN$, known to the defender, and
-partition the horizon into $N_B=\lceil T/B\rceil$ \emph{revelation blocks}
+Fix a \emph{revelation length} $B\in\NN$, known to the defender, and split
+the horizon into $N_B=\lceil T/B\rceil$ \emph{revelation blocks}
 \begin{equation}
 \cB_\nu=\{(\nu-1)B+1,\ \dots,\ \min\{\nu B,T\}\},\qquad \nu\in[N_B].
 \label{eq:blocks}
 \end{equation}
-The game is \Cref{prob:partial}, with one addition: at the end of block
-$\cB_\nu$ the defender is given the set
+The game is \Cref{prob:partial} with one addition: at the end of $\cB_\nu$
+the defender receives
 \begin{equation}
 D_\nu\;=\;\{a_t\ :\ t\le \min\{\nu B,T\}\}\ \subseteq\ K
 \label{eq:Dnu}
 \end{equation}
-of types that have attacked so far, together with the utility vectors
-$(u^c_\alpha,u^u_\alpha)$ of each $\alpha\in D_\nu$. We set $D_0=\emptyset$.
-Nothing else is revealed: not $|K|$, not the rounds at which any type
-attacked, and not the number of times any type attacked. Within a round the
-feedback is still partial information.
+together with the utility vectors of each $\alpha\in D_\nu$, where
+$D_0=\emptyset$. Nothing else is revealed --- not $|K|$, not when any type
+attacked, not how often. Within a round the feedback is still partial.
 \end{problem}
 
-Three observations delimit \Cref{prob:block}. First, it is strictly weaker
-than \Cref{prob:unknownK}: even at $B=1$ the defender learns the type of
-round $t$ only when that type is new, and on every other round it still sees
-nothing but a target. Second, $B\ge T$ makes the revelation useless and
+Three remarks delimit the model. It is strictly weaker than
+\Cref{prob:unknownK}: even at $B=1$ the defender learns a round's type only
+when that type is new. Taking $B\ge T$ makes the revelation useless and
 recovers \Cref{prob:partial}, so by \Cref{thm:impossible} some bound on $B$
-is necessary; \Cref{thm:blocklb} below quantifies this. Third, the oracle is
-\emph{cumulative} rather than incremental --- it reports the whole set
-$D_\nu$, not the increment $D_\nu\setminus D_{\nu-1}$ --- but the two are
-equivalent for a defender that remembers $D_{\nu-1}$, and we use whichever is
-more convenient.
+is necessary --- \Cref{thm:blocklb} quantifies which. And the oracle is
+cumulative rather than incremental, but a defender that remembers $D_{\nu-1}$
+can convert between the two, so we use whichever is convenient.
 
 \subsection{The algorithm}
 
 \Cref{alg:bgc} is \Cref{alg:gc} with two changes forced by the model: the
 catalogue is refreshed at checkpoints rather than at discovery rounds, and
 the inner learner is the partial-information algorithm of
-\citet[Algorithm 1]{balcan2015} rather than Polynomial Weights, because the
-loss of an expert can no longer be computed from the feedback. We write
-$\mathcal{A}(C)$ for a fresh instance of that algorithm run on the
-$\epsilon$-approximate extreme-point set $\cE(C;\epsilon)$ with attacker set
-$C$; as there, $\mathcal{A}(C)$ spends $|C|$ rounds of each of its internal
-estimation blocks playing the barycentric-spanner strategies and the rest
-playing the strategy proposed by its full-information sub-routine. We fix
-$\epsilon=1/T$ once and for all rather than tuning it to a segment length.
-This is admissible for every segment, because the discretization error of
-\Cref{lem:43} is $2\epsilon L$ and so only decreases with $\epsilon$, while
-the size bound of \Cref{lem:44} does not depend on $\epsilon$ at all; and it
-is convenient, because it lets a single expert set serve a catalogue for the
-whole horizon.
+\citet[Algorithm 1]{balcan2015} rather than Polynomial Weights, since an
+expert's loss can no longer be computed from the feedback. Write
+$\mathcal{A}(C)$ for a fresh instance run on $\cE(C;\epsilon)$ with attacker
+set $C$; it spends $|C|$ rounds of each internal estimation block playing
+barycentric-spanner strategies and the rest playing what its full-information
+sub-routine proposes. We fix $\epsilon=1/T$ throughout rather than tuning it
+per segment: this is admissible because the discretization error of
+\Cref{lem:43} is $2\epsilon L$ and only decreases with $\epsilon$, while the
+size bound of \Cref{lem:44} does not involve $\epsilon$ at all.
+
+One property that \Cref{thm:main} got for free must be arranged here. There
+the inner learner was Polynomial Weights, which is anytime, so an epoch's
+length being revealed only at its end cost nothing; the algorithm of
+\citet[Theorem 6.1]{balcan2015} instead tunes itself to a horizon given in
+advance. \Cref{lem:anytime} in \Cref{app:anytime} supplies the anytime form
+we need: there is an $\mathcal{A}(C)$ not receiving its horizon, and an
+absolute constant $c_2$, whose regret on $[1,L]$ is at most
+$c_2 L^{2/3}n|C|\log^{1/3}(n|C|)$ for \emph{every} $L\le T$ simultaneously,
+against any oblivious sequence drawn from $C$. Both features matter below:
+the guarantee must hold at every prefix, because the instance keeps running
+past the epoch we bound.
+
+\begin{algorithm}[t]
+\caption{\textsc{Block-Grow-Catalogue} (partial information, revelation
+length $B$).}
+\label{alg:bgc}
+\begin{algorithmic}[1]
+\small
+\Require horizon $T$, revelation length $B$, game primitives, default
+$\pvec_{\text{def}}\in\cP$
+\State $C\gets\emptyset$;~$\epsilon\gets 1/T$;~$\mathcal{A}\gets\textsc{null}$
+\For{$t=1,\dots,T$}
+  \If{$C=\emptyset$} \State play $\pvec_t\gets\pvec_{\text{def}}$
+  \Else \State play the $\pvec_t$ prescribed by $\mathcal{A}$
+  \EndIf
+  \State observe the attacked target $i_t=b_{a_t}(\pvec_t)$; pass $i_t$ to $\mathcal{A}$
+  \If{$t=\nu B$ for some $\nu$, or $t=T$} \Comment{checkpoint}
+    \State query the oracle for $D_\nu$
+    \If{$D_\nu\ne C$} \Comment{discovery block}
+      \State $C\gets D_\nu$
+      \State $\mathcal{A}\gets\mathcal{A}(C)$ \Comment{restart; the state built
+      during $\cB_\nu$ is discarded}
+    \EndIf
+  \EndIf
+\EndFor
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{Block structure}
+
+The analysis rests on a decomposition of the horizon playing the role of
+Step~1 of \Cref{sec:proof}, but at the granularity of blocks. The picture is
+simple: blocks in which the revealed set grows are written off, and between
+them lie \emph{epochs} on which the catalogue is fixed and --- crucially ---
+correct.
+
+\begin{definition}[discovery blocks and epochs]
+\label{def:blocks}
+Call $\cB_\nu$ a \emph{discovery block} if $D_\nu\supsetneq D_{\nu-1}$ and a
+\emph{clean block} otherwise, and let $\beta_1<\cdots<\beta_m$ enumerate the
+discovery blocks. For $j\in[m]$ the $j$-th \emph{epoch} is the set of rounds
+in the clean blocks separating $\beta_j$ from the next discovery block,
+\begin{equation}
+\Ep_j\;=\;\bigcup_{\nu=\beta_j+1}^{\beta_{j+1}-1}\cB_\nu,
+\qquad L_j=|\Ep_j|,
+\label{eq:block-epoch}
+\end{equation}
+with $\beta_{m+1}\coloneqq N_B+1$.
+\end{definition}
+
+\begin{lemma}[the decomposition]
+\label{lem:blocks}
+Let $K'=|\{a_1,\dots,a_T\}|\le\Kmax$ be the number of types that actually
+appear, and let $C_j\coloneqq D_{\beta_j}$ be the catalogue \Cref{alg:bgc}
+holds at the end of block $\beta_j$. Then
+\begin{enumerate}[leftmargin=1.2em,itemsep=0.05em,topsep=0.2em]
+  \item $\beta_1=1$ and $m\le K'$, and
+  $[1,T]=\bigl(\bigsqcup_{j}\cB_{\beta_j}\bigr)\sqcup\bigl(\bigsqcup_{j}\Ep_j\bigr)$
+  with the discovery blocks contributing at most $mB\le K'B$ rounds and
+  $\sum_j L_j\le T$;
+  \item \emph{(containment)} if $\cB_\nu$ is clean then $a_t\in D_{\nu-1}$
+  for every $t\in\cB_\nu$; consequently $C_t=C_j$ and $a_t\in C_j$ for every
+  $t\in\Ep_j$, and throughout $\Ep_j$ the algorithm runs one uninterrupted
+  instance $\mathcal{A}(C_j)$ started at the first round of $\Ep_j$, no
+  estimate of which \emph{at a round of $\Ep_j$} rests on a type outside
+  $C_j$;
+  \item \emph{(determinism)} $\beta_1,\dots,\beta_m$ and $\Ep_1,\dots,\Ep_m$
+  are functions of $\avec$ alone, independent of the defender's plays and
+  randomization.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+(i) $D_0=\emptyset\ne D_1$, so $\cB_1$ is a discovery block. Each discovery
+block adds a type, so $m\le|D_{\beta_m}|\le K'$. Every block is either a
+discovery block or lies in exactly one $\Ep_j$, and each holds at most $B$
+rounds; the $\Ep_j$ are disjoint subsets of $[1,T]$.
+
+(ii) Contrapositive of the first claim: if $a_t\notin D_{\nu-1}$ for some
+$t\in\cB_\nu$ then $a_t\in D_\nu\setminus D_{\nu-1}$ by \Cref{eq:Dnu}, so
+$\cB_\nu$ is a discovery block. For the rest, \Cref{alg:bgc} changes $C$ only
+at discovery blocks, so $C$ is constant on $\Ep_j$ and equals $D_{\beta_j}$;
+and for $t\in\cB_\nu\subseteq\Ep_j$ we get $a_t\in D_{\nu-1}=D_{\beta_j}=C_j$
+since no block strictly between $\beta_j$ and $\nu$ is a discovery block. No
+restart is triggered inside $\Ep_j$, and the instance was restarted at the
+checkpoint closing $\beta_j$.
+
+The restriction to rounds of $\Ep_j$ is not cosmetic: the instance is
+\emph{not} discarded when $\Ep_j$ ends. It runs on through the next discovery
+block, which is exactly where a contaminated round can occur; \Cref{alg:bgc}
+discards it at the checkpoint closing that block, so no contaminated
+observation reaches a later epoch, and since \Cref{thm:block} uses only the
+prefix $\Ep_j$, none enters the bound at all.
+
+(iii) By \Cref{eq:Dnu} each $D_\nu$ is a function of
+$a_1,\dots,a_{\min\{\nu B,T\}}$, hence so is the predicate ``$\cB_\nu$ is a
+discovery block'', hence so are the $\beta_j$ and the epochs.
+\end{proof}
+
+Part (ii) is what makes the analysis work, and it deserves a sentence. The
+defender cannot tell, \emph{while a block is being played}, whether the
+attacking type is one it knows. It does not have to: a round whose type is
+outside the catalogue can only sit inside a block that the very next
+checkpoint flags as a discovery block. Contamination is confined to blocks
+that get detected --- one checkpoint late, but before any of it can influence
+a later epoch.
+
+\subsection{Main result}
+
+\begin{theorem}[block revelation restores no-regret]
+\label{thm:block}
+Let the defender play \Cref{alg:bgc} in \Cref{prob:block}. For any oblivious
+$\avec\in K^T$ with $|K|\le\Kmax$, and $K'\le\Kmax$ the number of distinct
+types appearing,
+\begin{equation}
+\EE[\Regret(T)]\;\le\;
+c\, n\,K'^{4/3}\,T^{2/3}\log^{1/3}(nK')\;+\;2K'B
+\label{eq:block-main}
+\end{equation}
+for an absolute constant $c$; in particular
+$\EE[\Regret(T)]=O(n\Kmax^{4/3}T^{2/3}\log^{1/3}(n\Kmax)+\Kmax B)$.
+\end{theorem}
+
+\begin{proof}
+Adopt the notation of \Cref{def:blocks,lem:blocks}. The horizon splits into
+at most $K'$ discovery blocks and at most $K'$ epochs. We charge the former
+at face value and run \Cref{lem:anytime} on the latter.
+
+\emph{Epochs.} Fix $j$. By \Cref{lem:blocks}(ii) the defender runs one
+uninterrupted instance $\mathcal{A}(C_j)$ --- the anytime wrapper of
+\Cref{lem:anytime}, not the horizon-dependent algorithm inside it --- on a
+sequence of length $L_j$ drawn from the known set $C_j$, under partial
+information, with no contaminated estimate. Two hypotheses need checking, and
+they are the two \Cref{lem:anytime} was stated to cover. The sequence
+$(a_t)_{t\in\Ep_j}$ must be \emph{oblivious}, because
+\citet[Lemma 6.3]{balcan2015} needs the attacker met at a random exploration
+round to be a random attacker of the block; it is, because by
+\Cref{lem:blocks}(iii) the epoch is determined by $\avec$ alone. And $L_j$ is
+unknown when the instance starts, which is exactly what the anytime form
+handles. Hence
+\begin{align}
+&\max_{\pvec\in\cP}\sum_{t\in\Ep_j}\!U_d(b_{a_t}(\pvec),\pvec)
+ -\EE\!\left[\sum_{t\in\Ep_j}\!U_d(b_{a_t}(\pvec_t),\pvec_t)\right]\notag\\
+&\hspace{4em}\le\;c_2\,L_j^{2/3}\,n\,|C_j|\,\log^{1/3}\!\bigl(n|C_j|\bigr).
+\label{eq:balcan61-epoch}
+\end{align}
+Note the left side already compares against the unrestricted maximum over
+$\cP$, so the passage through $\cE(C_j;\epsilon)$ is internal to
+\citet[Theorem 6.1]{balcan2015} and need not be repeated. Since
+$\pvec^{*}\in\cP$ is a feasible competitor in that maximum, the same bound
+holds with $\max_{\pvec\in\cP}$ replaced by the value of $\pvec^{*}$ on
+$\Ep_j$ --- the substitution of Sub-step 4b of \Cref{sec:proof}.
+
+\emph{Discovery blocks.} Each round costs at most $2$, since
+$U_d\in[-1,1]$, and there are at most $K'B$ such rounds, for a total of
+$2K'B$. We do not try to learn there, and \Cref{thm:blocklb} shows nothing is
+lost by not trying.
+
+\emph{Summing.} Using $|C_j|\le K'$ uniformly and then H\"older with
+exponents $3$ and $3/2$ on $(1,\dots,1)$ and $(L_j^{2/3})_j$,
+\begin{equation}
+\sum_{j=1}^{m}L_j^{2/3}
+\;\le\;m^{1/3}\Bigl(\sum_{j=1}^{m}L_j\Bigr)^{2/3}
+\;\le\;K'^{1/3}\,T^{2/3},
+\label{eq:holder}
+\end{equation}
+by $m\le K'$ and $\sum_j L_j\le T$ from \Cref{lem:blocks}(i). Adding the two
+contributions gives \Cref{eq:block-main} with $c=c_2$, and $K'\le\Kmax$ gives
+the second form. As with the Cauchy--Schwarz step \Cref{eq:CS}, equality in
+\Cref{eq:holder} needs all epochs equally long --- an adversary spreading its
+reveals evenly --- and that is where the extra $K'^{1/3}$ is generated.
+\end{proof}
+
+\begin{remark}[the two prices, separated]
+\label{rem:price}
+\Cref{eq:block-main} differs from \citet[Theorem 6.1]{balcan2015} at $k=\Kmax$
+in two places, of different natures. The factor $\Kmax^{1/3}$ is the
+\emph{price of not knowing $K$}, produced by H\"older over the epochs, and is
+the partial-information counterpart of the $\sqrt{\Kmax}$ that
+Cauchy--Schwarz produces in \Cref{thm:main}. The additive $2\Kmax B$ is the
+\emph{price of batching}, unavoidable by \Cref{thm:blocklb} up to a factor
+$2B/(B-2)$. The exponent $2/3$ is inherited untouched: block revelation
+supplies identities but says nothing about frequencies, which is what the
+barycentric-spanner estimator must reconstruct, so improving the exponent
+here would improve their Theorem 6.1.
+
+It is worth seeing what exactly buys the $\Kmax^{1/3}$, and the cleanest way
+is to price a \emph{stronger} oracle. Suppose that at one round $t=P$ the
+defender were told all of $K$, including types that have not yet attacked.
+The first $P$ rounds cost at most $2P$, and thereafter the defender is in the
+known-$K$ setting, giving
+$\EE[\Regret(T)]\le 2P+O((T-P)^{2/3}n\Kmax\log^{1/3}(n\Kmax))$ with no
+$\Kmax^{1/3}$ at all. So that factor is not the price of an unknown $K$ as
+such; it is the price of learning $K$ \emph{incrementally}, one type at a
+time, which is what forces the epoch decomposition. An oracle that can name a
+type before it ever attacks avoids it; the oracle of \Cref{prob:block}, which
+only reports what has already happened, cannot.
+
+Finally, \Cref{alg:bgc} never reads $\Kmax$ --- the bound is stated in terms
+of the $K'$ types that actually appear, so it is automatically
+instance-adaptive in the sense of \Cref{cor:adaptive}, and the defender needs
+only $T$ and $B$.
+\end{remark}
+
+\subsection{How coarse may the revelation be?}
+
+\begin{corollary}[free batching, and the number of oracle calls]
+\label{cor:B}
+The additive term of \Cref{eq:block-main} is dominated as soon as $B\le
+B^{*}$, where
+\begin{align}
+B^{*}&\;=\;\tfrac{1}{2}\,c\,n\,\Kmax^{1/3}\,T^{2/3}\log^{1/3}(n\Kmax)\notag\\
+&\;=\;\Theta\!\bigl(n\Kmax^{1/3}T^{2/3}\log^{1/3}(n\Kmax)\bigr),
+\label{eq:Bstar}
+\end{align}
+and then $\EE[\Regret(T)]=O(n\Kmax^{4/3}T^{2/3}\log^{1/3}(n\Kmax))$:
+batching is free. Equivalently the defender need consult the oracle only
+\begin{equation}
+N_B=\lceil T/B^{*}\rceil=
+O\!\left(\frac{T^{1/3}}{n\,\Kmax^{1/3}\log^{1/3}(n\Kmax)}\right)
+\label{eq:ncalls}
+\end{equation}
+times, and this is optimal: by \Cref{thm:blocklb}, for $N\ge\Kmax$ no
+algorithm receiving $N$ evenly spaced revelations has worst-case regret $R$
+unless
+\begin{equation}
+N\;\ge\;\frac{\Kmax\,T}{R+2\Kmax},
+\label{eq:ncalls-lb}
+\end{equation}
+which at $R=\Theta(n\Kmax^{4/3}T^{2/3}\log^{1/3}(n\Kmax))$ matches
+\Cref{eq:ncalls} up to a constant. Batching is free up to $\Theta(T^{1/3})$
+reports and not beyond.
+\end{corollary}
+
+\begin{proof}
+Solving $2\Kmax B\le c\,n\Kmax^{4/3}T^{2/3}\log^{1/3}(n\Kmax)$ for $B$ gives
+\Cref{eq:Bstar}, and \Cref{eq:ncalls} is $\lceil T/B^{*}\rceil$. For
+\Cref{eq:ncalls-lb}, $N$ evenly spaced revelations is \Cref{prob:block} with
+$B=T/N$; the hypothesis $T\ge\Kmax B$ of \Cref{thm:blocklb} reads
+$N\ge\Kmax$, and that theorem then gives $R\ge\Kmax(T/N-2)$, which
+rearranges. (For $N<\Kmax$ the same theorem with $\Kmax$ replaced by $N$
+gives the stronger $R\ge T-2N$, so such an $N$ is never worth using.)
+\end{proof}
+
+\begin{corollary}[regime of applicability]
+\label{cor:regime2}
+The bound of \Cref{thm:block} is sublinear in $T$ if and only if
+$n\Kmax^{4/3}\log^{1/3}(n\Kmax)=o(T^{1/3})$ and $\Kmax B=o(T)$; for
+$\Kmax=O(1)$ and $B\le B^{*}$ the rate is $\tilde O(nT^{2/3})$.
+\end{corollary}
+
+\begin{proof}
+Divide by $T$ and require both terms to vanish.
+\end{proof}
+
+\subsection{The additive term is necessary}
+
+The $\Theta(\Kmax B)$ term is not an artefact of the analysis. The
+construction is $G_3$ again with the dyadic family \Cref{eq:dyadic} applied
+recursively: each new type hides \emph{inside} the previous one, so one
+coverage vector is optimal against all of them --- making the benchmark
+perfect --- while each must still be located from scratch.
+
+\begin{theorem}[a matching lower bound in $B$]
+\label{thm:blocklb}
+Let $G_3$ and $\Univ$ be as in \Cref{thm:impossible}. For every $B\ge 1$,
+every $\Kmax\ge 1$ and every $T\ge \Kmax B$, there is a distribution over
+instances of \Cref{prob:block} with $|K|=\Kmax$ on which every online
+algorithm suffers
+\begin{equation}
+\EE[\Regret(T)]\;\ge\;\Kmax\,(B-2).
+\label{eq:blocklb}
+\end{equation}
+\end{theorem}
+
+\begin{proof}
+Put $M=2^{B}$, draw $k_1,\dots,k_{\Kmax}$ independently and uniformly from
+$[M]$, and define nested intervals $J_0=(0,1]\supset J_1\supset\cdots$ by
+letting $J_j$ be the $k_j$-th of the $M$ equal sub-intervals of $J_{j-1}$:
+\begin{equation}
+J_j=\Bigl(\ell_{j-1}+\tfrac{k_j-1}{M}|J_{j-1}|,\ \
+        \ell_{j-1}+\tfrac{k_j}{M}|J_{j-1}|\Bigr],
+\label{eq:nested}
+\end{equation}
+$\ell_{j-1}$ and $|J_{j-1}|$ being the left endpoint and length of
+$J_{j-1}$. Let $\alpha^{[j]}$ be the threshold type with interval $J_j$, put
+$K=\{\alpha^{[1]},\dots,\alpha^{[\Kmax]}\}$, and let $a_t=\alpha^{[j]}$ for
+$t\in\cB_j$ and $a_t=\alpha^{[\Kmax]}$ for $t>\Kmax B$. The sequence is fixed
+once the $k_j$ are drawn, so the adversary is oblivious, and each $J_j$ is a
+\emph{proper} sub-interval of $J_{j-1}$, so the $\Kmax$ types are distinct.
+As before we bound deterministic algorithms and appeal to Yao.
+
+\emph{The benchmark is $0$.} Let $\mu$ be the midpoint of the innermost
+interval $J_{\Kmax}$ and $\pvec^{*}=(\mu,0,1-\mu)$. Nesting gives
+$r_1^{[j]}\le r_1^{[\Kmax]}<\mu$ and $1-r_2^{[j]}\le 1-r_2^{[\Kmax]}<1-\mu$
+for every $j$, so $\pvec^{*}$ hits every type by \Cref{eq:hit-iff}, under any
+tie-breaking rule, and regret again counts misses.
+
+\emph{Each block is a fresh search.} When $\cB_j$ begins, the checkpoint
+closing $\cB_{j-1}$ has revealed $\alpha^{[1]},\dots,\alpha^{[j-1]}$, hence
+$J_{j-1}$, and nothing about $\alpha^{[j]}$, which has not yet attacked.
+Moreover the whole transcript of $\cB_1,\dots,\cB_{j-1}$ is a function of
+$k_1,\dots,k_{j-1}$ alone: inductively, each play is determined by earlier
+observations, and each observation by that play and the interval then
+attacking. As $k_j$ is drawn independently, it remains uniform on $[M]$
+conditionally on everything the defender has seen and been told.
+
+Condition on that transcript. Within $\cB_j$ the defender's plays are
+deterministic functions of the observations made inside $\cB_j$, the only
+attacker is $\alpha^{[j]}$, and its interval is one of $M$ disjoint
+sub-intervals of $J_{j-1}$, so \Cref{lem:hit} gives \Cref{eq:one-hit}. The
+conditioning has absorbed everything the oracle said before $\cB_j$ and it
+says nothing during $\cB_j$, so the budget is $b=0$. \Cref{lem:count} with
+$M=2^{B}$ and horizon $B$ gives
+$\EE[\#\text{misses in }\cB_j]\ge B-(2^{B+1}-B-2)/2^{B}>B-2$. Summing over
+$j\in[\Kmax]$ and averaging over the algorithm's randomness gives
+\Cref{eq:blocklb}.
+\end{proof}
+
+\begin{remark}[the additive term is tight]
+\label{rem:blocktight}
+\Cref{thm:block,thm:blocklb} bracket the cost of batching between
+$\Kmax(B-2)$ and $2\Kmax B$, so it is $\Theta(\Kmax B)$ for $B\ge 3$, the two
+differing by $2B/(B-2)$ --- $4$ at $B=4$ and $2+o(1)$ thereafter; for
+$B\le 2$ the lower bound is vacuous. Two special cases: $\Kmax=1$, $B=T$
+recovers $\EE[\Regret(T)]\ge T-2$, so \Cref{thm:impossible} is the $B\to T$
+limit; and $B=1$ makes the bound of \Cref{thm:block}
+$O(n\Kmax^{4/3}T^{2/3}\log^{1/3}(n\Kmax)+\Kmax)$, the partial-information
+analogue of \Cref{thm:main} and, to our knowledge, the first sublinear bound
+for an unknown attacker set under partial-information feedback.
+\end{remark}
+
+\subsection{Scheduled versus chosen revelation times}
+\label{sec:adaptive}
+
+\Cref{prob:block} fixes the checkpoints before play, which is what a
+subscription looks like: reports arrive on a calendar, not on demand. How
+much of the $\Theta(\Kmax B)$ is due to the calendar rather than to the
+number of reports? On the very instances of \Cref{thm:blocklb} the answer is
+sharp: the same number of reports costs $T-2\Kmax$ when their times are fixed
+and only $\Kmax$ when the defender picks them.
+
+\begin{proposition}[choosing the revelation times is exponentially cheaper]
+\label{prop:adaptive}
+Consider the variant of \Cref{prob:block} in which the defender has a budget
+of $N$ \emph{queries} rather than a schedule: at the end of any round it may
+spend one and receive $D_\nu$ as in \Cref{eq:Dnu}. Let the instance be played
+in $G_3$ with types whose threshold intervals form a chain under inclusion
+--- as every instance of \Cref{thm:blocklb} does. Then the defender that
+plays the midpoint of the smallest revealed interval, and queries at the end
+of every round in which target~$1$ or~$3$ was attacked, spends at most $K'$
+queries and suffers $\Regret(T)\le K'\le\Kmax$, for every horizon and every
+order of appearance. By contrast \Cref{thm:blocklb} with $B=T/\Kmax$ says
+that $N=\Kmax$ revelations on a fixed schedule leave regret at least
+$T-2\Kmax$.
+\end{proposition}
+
+\begin{proof}
+Let $D$ be the revealed set and $J(D)$ the smallest of their intervals, which
+exists because they form a chain; let $\mu$ be its midpoint and
+$\pvec=(\mu,0,1-\mu)$. For each $\alpha_{r_1,r_2}\in D$ we have
+$J(D)\subseteq(r_1,r_2]$, so $r_1<\mu<r_2$ and \Cref{eq:hit-iff} makes
+$\pvec$ hit it. So a round in which target~$1$ or~$3$ is attacked --- the
+only rounds the defender queries, and by \Cref{eq:g3-payoff} the only ones
+that cost anything --- has an attacker outside $D$; the query then returns a
+set containing it, enlarging $D$. As $|D|\le K'$ throughout, there are at
+most $K'$ such rounds, bounding both misses and queries. The benchmark is
+$0$, since the midpoint of the smallest interval of all $K'$ types hits every
+round and $U_d\le 0$ everywhere; apply \Cref{eq:regret-is-misses}.
+\end{proof}
+
+\begin{remark}[why this does not extend for free]
+\label{rem:adaptive}
+The proposition rests on a feature of $G_3$ that a general SSG lacks: there,
+a missed round is a \emph{certificate} that the catalogue is stale, so the
+defender knows exactly when to query. In general a type outside the catalogue
+may best-respond at $\pvec_t$ exactly as predicted and still differ elsewhere
+in $\cP$, corrupting the estimates without announcing itself; and conversely
+a round can look anomalous merely because \Cref{alg:bgc} is exploring.
+Whether $N$ self-timed queries beat the $\Theta(\Kmax T/N)$ of
+\Cref{thm:blocklb} in a general repeated SSG is open. What
+\Cref{prop:adaptive} settles is that the lower bound is a statement about
+schedules, not about report counts.
+\end{remark}
+
+% ==========================================================================
+\section{Experiments}
+\label{sec:exp2}
+
+The experiments of \Cref{sec:exp} ran at $n=3$ targets, limited not by the
+online algorithm but by the expert set: \Cref{alg:gc} needs
+$\cE(C;\epsilon)$ explicitly, and building it by enumerating $(n-1)$-subsets
+of the defining hyperplanes costs $7.3\times10^{14}$ linear solves at $n=10$.
+Neither algorithm actually needs that set, however --- each only needs to
+\emph{optimize a linear function over it}, which one call to a
+Bayesian-Stackelberg solver does. \Cref{app:oracle} gives the construction
+and \Cref{app:bign} the resulting runs at $n=10$ and $n=20$; here we report
+what they show and then test the lower bounds directly.
+
+At $n=10$ and $n=20$ with $\Kmax=4$, \Cref{alg:gc} stays below the $C\sqrt t$
+envelope of \Cref{thm:main} throughout, and \Cref{alg:bgc} below the
+$Ct^{2/3}$ envelope of \Cref{thm:block}. Fitting the growth over
+$T\in\{250,\dots,2000\}$ gives exponent $0.664$ for block revelation --- the
+$2/3$ of \Cref{thm:block}, to the resolution of the experiment --- and
+$0.317$ for full information, comfortably inside the $1/2$ of
+\Cref{thm:main}. Sweeping $B$ at fixed $T$ gives regret growing linearly in
+$B$ with slope $0.47$, well below the worst-case $2K'=8$, which is expected:
+the worst case is attained only by the nested adversary of
+\Cref{thm:blocklb}, exhibited separately in \Cref{fig:impossible}(d).
+
+\subsection{The lower bounds, in simulation}
+\label{sec:exp-imp}
+
+
+\Cref{fig:impossible} plays the gadget $G_3$ of \Cref{sec:gadget} for real:
+attacker types are built from the utility vectors of \Cref{eq:type-utils},
+best responses are computed from those utilities, and the defender's payoff
+is read off the attacked target. The defender is the optimal one for this
+game, namely the midpoint version-space search of \Cref{thm:bits}(ii),
+and the expectation over the hidden type is computed exactly, by averaging
+over all $M$ candidates rather than by sampling.
+
+Panel (a) is \Cref{thm:impossible}: with $M=2^{T}$ the measured expected
+regret equals $T-2+(T+2)2^{-T}$ for every $T\le 14$, to machine precision,
+confirming both the lower bound and the claim in \Cref{rem:tight-lb} that it
+is exactly attained.
+
+Panel (b) is \Cref{thm:bits}. The universe is fixed at $M=2^{10}$ and the
+defender is helped by an oracle of budget $b\in\{0,2,4,6\}$ that names the
+block of $M/2^{b}$ indices containing the true type, exactly as in the proof
+of \Cref{thm:bits}(ii); everything else is the real game. Each curve
+saturates, and it saturates at $\log_2 M-b-2$, which is the lower bound of
+\Cref{thm:bits}(i): the measured values at $T=14$ are $8.01$, $6.04$, $4.13$
+and $2.38$ against predictions $8$, $6$, $4$ and $2$. The hollow markers are
+a separate run with budget $0$ on the smaller universe $\Univ_{M/2^{b}}$, and
+they land on the corresponding curve to machine precision --- the regret
+depends on $M$ and $b$ only through $\log_2 M-b$, which is what makes
+\Cref{thm:bits} an accounting identity rather than two unrelated bounds. The
+case $b=0$ also says that the linear growth in panel~(a) is caused by the
+universe being infinite and by nothing else.
+
+Panel (c) is \Cref{prop:sqrtT}, and it is the one panel that shows a
+$T$-dependence rather than a saturation. With $|K|=2$ on the two-element
+universe, follow the leader has measured regret $1.57$, $6.35$ and $25.60$ at
+$T=16$, $256$ and $4096$, against the exact optimum
+$\tfrac12\EE|N_1-N_2|=1.571$, $6.377$, $25.531$ and the floor
+$\tfrac12\sqrt{\lfloor T/2\rfloor}=1.41$, $5.66$, $22.63$. The dotted line is
+the same universe with $|K|=1$, where the regret is $0.5$ at every horizon.
+The two curves are the phase transition of \Cref{sec:floor}.
+
+Panel (d) is \Cref{thm:blocklb}: on the nested-interval instance the measured
+regret tracks $|K|(B-2)$ across $|K|\in\{1,2,3,4\}$ and
+$B\in\{4,8,16,32\}$, so the additive $\Theta(\Kmax B)$ of \Cref{thm:block} is
+real and not an artefact of the analysis.
+
+Panel (e) is \Cref{prop:adaptive}, on the same instances as panel (d) with
+$|K|=4$ and $T=|K|B$, so that the two schemes are compared at the same
+report budget $N=|K|=4$. Scheduling the four reports on a fixed grid costs
+$|K|(B-2)$, which is $120$ rounds at $B=32$; letting the defender choose
+their times costs exactly $4$, and the measured query count is $4.00$, so the
+defender does not even exceed its budget. The measured adaptive regret is
+$3.72$, $3.98$, $4.00$, $4.00$ for $B=4,8,16,32$ --- it is below $|K|$ only
+because a lucky initial play occasionally hits the first type outright.
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=0.96\textwidth]{figures/impossibility.pdf}
+\vspace{-0.5em}
+\caption{The gadget $G_3$ in simulation, against the optimal defender.
+(a) \Cref{thm:impossible}: with $|\Univ_M|=2^{T}$ the regret is $T-2+o(1)$.
+(b) \Cref{thm:bits}: with a budget of $b$ bits on a universe of resolution
+$M=2^{10}$ the regret saturates at $\log_2 M-b-2$ (dotted lines), and a
+budget-$b$ run on $\Univ_M$ (solid) coincides with a budget-$0$ run on
+$\Univ_{M/2^{b}}$ (hollow markers). (c) \Cref{prop:sqrtT}: two types on a
+two-element universe cost $\Theta(\sqrt T)$, one type costs $0.5$ at every
+horizon. (d) \Cref{thm:blocklb}: on the nested
+instance the regret matches $|K|(B-2)$ (dashed lines). (e)
+\Cref{prop:adaptive}: the same $N=|K|$ reports cost $|K|(B-2)$ on a fixed
+schedule and $|K|$ when the defender picks their times. Panels (c) and (e)
+have logarithmic vertical axes.}
+\label{fig:impossible}
+\end{figure*}
+
+% ==========================================================================
+\section{Discussion and Open Problems}
+\label{sec:conc2}
+
+\Cref{sec:partial,sec:block} locate the boundary of learnability for the
+unknown-$K$ repeated security game. On one side, \Cref{thm:main}: an unknown
+attacker set of bounded size costs only $\sqrt{\Kmax}$, provided the defender
+is told after each round which type attacked. On the other,
+\Cref{thm:impossible}: told nothing but the attacked target, every algorithm
+loses all but two of the $T$ rounds --- not because the adversary has many
+types, but because the defender cannot name the one it faces.
+\Cref{thm:bits} prices this in a currency a security operations centre can
+use: given any side channel emitting $b$ bits over the horizon, the optimal
+regret is $\min\{T,\log_2 M-b\}\pm 3$. Regret is the number of bits still
+needed to name the attacker; it is linear precisely when that number exceeds
+the horizon, and on an infinite universe no finite budget reduces it at all.
+
+Between the two lies \Cref{prob:block}, where an oracle periodically reports
+the \emph{set} of types met so far --- a list of names, nothing about when or
+how often. \Cref{thm:block} shows this suffices: \Cref{alg:bgc} attains
+$O(n\Kmax^{4/3}T^{2/3}\log^{1/3}(n\Kmax)+\Kmax B)$, the partial-information
+rate of \citet[Theorem 6.1]{balcan2015} degraded by $\Kmax^{1/3}$ for the
+unknown catalogue and by an additive $\Kmax B$ for the batching, the latter
+tight by \Cref{thm:blocklb}. \Cref{cor:B} makes this a deployment statement:
+the report needs to arrive only $\tilde O(T^{1/3})$ times over a horizon of
+length $T$ --- and, by the matching bound there, not fewer.
+
+Two independent obstructions are thus isolated. \Cref{thm:bits} is about
+\emph{volume}: too few bits and the type cannot be named. \Cref{thm:blocklb}
+is about \emph{latency}: even unlimited bits, delivered on a calendar of
+period $B$, still cost $\Theta(\Kmax B)$, because the defender plays blind
+between a type's arrival and the report naming it. \Cref{prop:adaptive} shows
+these are genuinely different resources --- in $G_3$, letting the defender
+choose \emph{when} the same $\Kmax$ reports arrive collapses the latency cost
+from $T-2\Kmax$ to $\Kmax$. Two views from the online-learning literature
+place these results: \Cref{thm:bits} is a security-game analogue of
+\emph{label efficient prediction} \citep{cesabianchi2005}, except that there
+the budget limits how \emph{often} the learner may look whereas
+\Cref{def:budget} limits how \emph{much} it may be told, so the rate is
+governed by $\log_2|\Univ|$ rather than by the number of experts; and the
+additive $\Theta(\Kmax B)$ is a delay phenomenon of the kind studied under
+delayed feedback \citep{joulani2013}, except that the delay applies to the
+\emph{identity} of the opponent rather than to the loss.
+
+Five questions are left open.
+
+\paragraph{Is the exponent $2/3$ necessary here?}
+The exponent in \Cref{thm:block} is inherited from
+\citet[Theorem 6.1]{balcan2015} and untouched by the unknown catalogue, so
+improving it would improve their result. Whether $T^{2/3}$ is optimal for
+partial-information feedback even with $K$ known is not known; the natural
+attack replaces their explore-then-exploit estimator by importance-weighted
+estimates on the exploit rounds, which needs a version of
+\Cref{lem:blocks}(ii) for a continuously updated estimator.
+
+\paragraph{Is the factor $\Kmax^{1/3}$ necessary?}
+It comes from H\"older over the epochs, exactly as the $\sqrt{\Kmax}$ of
+\Cref{thm:main} comes from Cauchy--Schwarz. \Cref{thm:blocklb} bounds only
+the additive term and \Cref{prop:sqrtT} only the $T$-dependence; a bound
+$\Omega(\Kmax^{c}T^{2/3})$ matching the multiplicative price is open under
+both feedback models. The obvious attempt --- $\Kmax/2$ disjoint copies of
+the two-type construction of \Cref{prop:sqrtT}, one per epoch --- fails
+instructively. Per-epoch lower bounds do not add, because the benchmark
+\Cref{eq:pstar} is a \emph{single} fixed coverage vector: with all intervals
+disjoint, \Cref{lem:hit} says no $\pvec$ hits more than one type, so the
+global benchmark is far weaker than the sum of the per-epoch ones and the
+global regret correspondingly smaller. A matching lower bound must let the
+epochs share a good comparator, as the nested family of \Cref{thm:blocklb}
+does, while still forcing fresh learning in each.
+
+The complementary attack is on the upper bound: avoid the restart and both
+factors go with it, since without epochs there is neither a Cauchy--Schwarz
+nor a H\"older step. Algorithms tracking a \emph{growing} expert set
+\citep{mourtada2017} do that, and \Cref{sec:related} already notes them as a
+drop-in for the Polynomial-Weights sub-routine. But replacing the sub-routine
+is not enough: Steps~4 and 5 of \Cref{sec:proof} also use the epoch structure
+to pass from the epoch-local optimum to the global $\pvec^{*}$. Under partial
+information it is worse still --- the estimator of \Cref{lem:lift}(ii) is
+defined relative to a fixed catalogue, its spanner and ambient set both
+changing when $C$ grows, so estimates from before and after a discovery block
+are not estimates of comparable quantities.
+
+\paragraph{Confounded search: $\Kmax\ge 2$ on a finite universe.}
+\Cref{thm:bits} pins the optimum at $\min\{T,\log_2 M-b\}\pm 3$ for
+$\Kmax=1$, because a miss then halves the version space unambiguously. For
+$\Kmax\ge 2$ the defender does not know which opponent produced the
+observation, so the search is corrupted. \Cref{prop:sqrtT} settles one half
+--- the answer must contain $\Omega(\sqrt T)$, already at $M=2$ --- and the
+two upper bounds we can write down, $O(\sqrt{T\Kmax(n^2+\Kmax\log n)})$ and
+$O(T^{2/3}nM\log^{1/3}(nM))$, contain no $\log M$ while the lower bound
+contains no $M$ at all. The joint dependence is open.
+
+\paragraph{One theorem for volume and latency together.}
+\Cref{thm:bits} charges for bits and ignores timing; \Cref{thm:blocklb}
+charges for timing and lets bits be free. Neither subsumes the other, and a
+defender buying threat intelligence pays for both. The missing statement is a
+lower bound in a pair $(b,\lambda)$ --- budget and worst-case delay between a
+type's first attack and the message naming it --- degrading to
+\Cref{thm:bits} at $\lambda=0$ and to \Cref{thm:blocklb} at $b=\infty$. We
+expect $\Omega(\min\{T,\log_2 M-b\}+\Kmax\lambda)$, but the two arguments
+resist being run at once: \Cref{lem:count} conditions on a transcript that
+the latency argument needs to keep random. A related gap is the oracle whose
+messages are unbounded in length but weak in content --- one reporting the
+utilities of a uniformly random element of $D_\nu$, say --- which
+\Cref{thm:bits} does not cover, its budget being a bound on message length.
+
+\paragraph{Self-timed reports in a general game.}
+\Cref{prop:adaptive} shows that in $G_3$ a defender choosing its own report
+times pays $\Kmax$ rather than $\Kmax B$, because there a missed round
+certifies a stale catalogue; \Cref{rem:adaptive} explains why that
+certificate is special to the gadget. Whether another trigger --- a
+statistical test on the estimator, say --- recovers a comparable saving in a
+general repeated SSG, and whether the $\Theta(\Kmax T/N)$ of \Cref{cor:B} is
+the truth for self-timed queries, we leave open. This is the question with
+the most direct operational content: it asks whether to subscribe to a
+periodic feed or to keep a budget of on-demand lookups.
+
+\bibliography{refs}
+
+
+
+
+
+\appendix
+\section{Deferred proofs and details}
+
+\subsection{The clean form of the counting lemma}
+\label{app:count-clean}
+
+We derive \Cref{eq:count-clean} from \Cref{eq:count-final}. Write
+$L=\lfloor\log_2 M\rfloor-b$ and $X=\min\{\tau-1,T\}$. If $L\le 0$ the claim
+is vacuous, since $X\ge 0$.
+
+If $0<L$ and $T\le L$, then $M\ge 2^{\lfloor\log_2 M\rfloor}=2^{L+b}$, so the
+subtracted term in \Cref{eq:count-final} is at most
+$2^{b}2^{T+1}/2^{L+b}=2^{\,T+1-L}\le 2$, giving $\EE[X]\ge T-2$.
+
+If $0<L<T$, let $h=\lfloor L\rfloor$ and $f=L-h\in[0,1)$. Then $h\le T$ is an
+integer and $X\ge\min\{\tau-1,h\}$ pointwise, so \Cref{eq:count-final} at
+horizon $h$, with $M\ge 2^{L+b}$, gives
+$\EE[X]\ge h-2^{b}2^{h+1}/M=h-2^{\,1-f}$. Now $2-f\ge 2^{\,1-f}$ on
+$[0,1)$: the two sides agree at $f=0$, and the left falls with slope $-1$
+while the right falls with slope $-2^{\,1-f}\ln 2\le-\ln 2>-1$. Hence
+$\EE[X]\ge h+f-2=L-2$. In all cases $\EE[X]\ge\min\{T,L\}-2$. For integer $b$
+and $M$ a power of two, $f=0$ and this is the plain $2^{\,T+1-L}\le 2$ of the
+previous case.
+
+\subsection{The random-walk bound of \Cref{prop:sqrtT}}
+\label{app:walk}
+
+Let $S_T=\sum_{t\le T}\varepsilon_t$ with $\varepsilon_t=\pm1$ independent
+and uniform. We claim $\EE|S_T|\ge\sqrt{\lfloor T/2\rfloor}$. Since $|S_m|$
+is a submartingale, $\EE|S_T|\ge\EE|S_{2\nu}|$ for $\nu=\lfloor T/2\rfloor$,
+and the classical identity $\EE|S_{2\nu}|=2\nu\binom{2\nu}{\nu}4^{-\nu}$
+reduces the claim to
+\begin{equation}
+\binom{2\nu}{\nu}4^{-\nu}\;\ge\;\frac{1}{2\sqrt{\nu}} .
+\label{eq:centralbinom}
+\end{equation}
+This holds with equality at $\nu=1$ and follows by induction: the ratio of
+consecutive left-hand sides is $(2\nu+1)/(2\nu+2)$ and of right-hand sides
+$\sqrt{\nu/(\nu+1)}$, and $(2\nu+1)^2(\nu+1)\ge\nu(2\nu+2)^2$ reduces to
+$\nu+1\ge 0$. Hence $\EE|S_T|\ge 2\nu/(2\sqrt\nu)=\sqrt{\nu}$.
+
+\section{An anytime partial-information learner}
+\label{app:anytime}
 
 One property of $\mathcal{A}(C)$ that the proof of \Cref{thm:main} obtained
 for free has to be arranged explicitly here. There the inner learner was
@@ -1773,614 +2207,9 @@ $O\bigl(n^{4/3}K'^{5/3}T^{2/3}\log^{1/3}(nK')+2K'B\bigr)$ in place of
 decomposition, the H\"older step that produces the $K'^{1/3}$, and the
 additive $2K'B$ are all independent of which form is used.
 
-\begin{algorithm}[t]
-\caption{\textsc{Block-Grow-Catalogue} (partial information, revelation
-length $B$).}
-\label{alg:bgc}
-\begin{algorithmic}[1]
-\small
-\Require horizon $T$, revelation length $B$, game primitives, default
-$\pvec_{\text{def}}\in\cP$
-\State $C\gets\emptyset$;~$\epsilon\gets 1/T$;~$\mathcal{A}\gets\textsc{null}$
-\For{$t=1,\dots,T$}
-  \If{$C=\emptyset$} \State play $\pvec_t\gets\pvec_{\text{def}}$
-  \Else \State play the $\pvec_t$ prescribed by $\mathcal{A}$
-  \EndIf
-  \State observe the attacked target $i_t=b_{a_t}(\pvec_t)$; pass $i_t$ to $\mathcal{A}$
-  \If{$t=\nu B$ for some $\nu$, or $t=T$} \Comment{checkpoint}
-    \State query the oracle for $D_\nu$
-    \If{$D_\nu\ne C$} \Comment{discovery block}
-      \State $C\gets D_\nu$
-      \State $\mathcal{A}\gets\mathcal{A}(C)$ \Comment{restart; the state built
-      during $\cB_\nu$ is discarded}
-    \EndIf
-  \EndIf
-\EndFor
-\end{algorithmic}
-\end{algorithm}
+\section{An oracle-efficient implementation}
+\label{app:oracle}
 
-\subsection{Block structure}
-
-The analysis rests on a decomposition of the horizon that plays the role of
-Step~1 of the proof of \Cref{thm:main}, but at the granularity of blocks
-rather than rounds.
-
-\begin{definition}[discovery blocks and epochs]
-\label{def:blocks}
-Call a block $\cB_\nu$ a \emph{discovery block} if $D_\nu\supsetneq D_{\nu-1}$
-and a \emph{clean block} otherwise, and let
-$\beta_1<\beta_2<\cdots<\beta_m$ enumerate the discovery blocks. For
-$j\in[m]$ define the $j$-th \emph{epoch} to be the set of rounds in the
-clean blocks that separate $\beta_j$ from the next discovery block,
-\begin{equation}
-\Ep_j\;=\;\bigcup_{\nu=\beta_j+1}^{\beta_{j+1}-1}\cB_\nu,
-\qquad L_j=|\Ep_j|,
-\label{eq:block-epoch}
-\end{equation}
-with the convention $\beta_{m+1}\coloneqq N_B+1$.
-\end{definition}
-
-\begin{lemma}[the decomposition]
-\label{lem:clean}
-Let $K'=|\{a_1,\dots,a_T\}|\le\Kmax$ be the number of distinct types that
-actually appear. Then
-\begin{enumerate}[leftmargin=1.2em,itemsep=0.05em,topsep=0.2em]
-  \item $\beta_1=1$, and $m\le K'$;
-  \item $[1,T]=\bigl(\bigcup_{j=1}^{m}\cB_{\beta_j}\bigr)\sqcup
-        \bigl(\bigcup_{j=1}^{m}\Ep_j\bigr)$, and the discovery blocks
-        contribute at most $mB\le K'B$ rounds in total;
-  \item $\sum_{j=1}^{m}L_j\le T$;
-  \item if $\cB_\nu$ is a clean block then $a_t\in D_{\nu-1}$ for every
-        $t\in\cB_\nu$;
-  \item the whole decomposition is deterministic: $\beta_1,\dots,\beta_m$
-        and $\Ep_1,\dots,\Ep_m$ are functions of the sequence $\avec$ alone,
-        and do not depend on the defender's plays or on its internal
-        randomization.
-\end{enumerate}
-\end{lemma}
-
-\begin{proof}
-(i) $D_0=\emptyset$ and $D_1\ne\emptyset$ (round $1$ is attacked by some
-type), so $\cB_1$ is a discovery block. Each discovery block satisfies
-$|D_{\beta_j}|\ge|D_{\beta_j-1}|+1$, so $|D_{\beta_m}|\ge m$; and
-$D_{\beta_m}\subseteq\{a_1,\dots,a_T\}$ gives $m\le K'$.
-
-(ii) By construction every block is either a discovery block or lies in
-exactly one $\Ep_j$: the blocks strictly between $\beta_j$ and $\beta_{j+1}$
-are clean by the definition of consecutive discovery blocks, and by (i) there
-are no blocks before $\beta_1=1$. Each block has at most $B$ rounds, so the
-$m$ discovery blocks contribute at most $mB$ rounds.
-
-(iii) Immediate from (ii), since the $\Ep_j$ are disjoint subsets of $[1,T]$.
-
-(iv) Contrapositive. If $a_t\notin D_{\nu-1}$ for some $t\in\cB_\nu$, then
-$a_t\in D_\nu\setminus D_{\nu-1}$ by \Cref{eq:Dnu}, so
-$D_\nu\supsetneq D_{\nu-1}$ and $\cB_\nu$ is a discovery block.
-
-(v) By \Cref{eq:Dnu} the revealed set $D_\nu$ is a function of
-$a_1,\dots,a_{\min\{\nu B,T\}}$ only. Hence so is the predicate
-``$\cB_\nu$ is a discovery block'', and therefore so are
-$\beta_1,\dots,\beta_m$ and the epochs of \Cref{eq:block-epoch}.
-\end{proof}
-
-Part (iv) is the containment property that makes the whole analysis go
-through, and it deserves a sentence of emphasis. The defender cannot tell,
-\emph{while a block is being played}, whether the type attacking at round $t$
-is one it knows about. What (iv) says is that it does not have to: a round
-whose type is outside the current catalogue can only occur inside a block
-that the very next checkpoint will flag as a discovery block. Contamination
-is therefore confined to blocks that are detected --- one checkpoint late,
-but before any of the contaminated information has been allowed to influence
-a later epoch.
-
-\begin{lemma}[epochs are clean runs of a fixed, correct catalogue]
-\label{lem:contain}
-Fix $j\in[m]$ and let $C_j\coloneqq D_{\beta_j}$ be the catalogue held by
-\Cref{alg:bgc} at the end of block $\beta_j$. Then
-\begin{enumerate}[leftmargin=1.2em,itemsep=0.05em,topsep=0.2em]
-  \item $C_t=C_j$ for every $t\in\Ep_j$;
-  \item $a_t\in C_j$ for every $t\in\Ep_j$;
-  \item throughout $\Ep_j$ the algorithm runs one uninterrupted instance
-        $\mathcal{A}(C_j)$, started at the first round of $\Ep_j$, and no
-        estimate that this instance uses \emph{at a round of $\Ep_j$} is
-        built on a round whose type lies outside $C_j$.
-\end{enumerate}
-\end{lemma}
-
-\begin{proof}
-(i) \Cref{alg:bgc} modifies $C$ only at a checkpoint at which $D_\nu\ne C$,
-i.e.\ only at discovery blocks. The blocks $\beta_j+1,\dots,\beta_{j+1}-1$
-are clean, so $C$ is unchanged throughout $\Ep_j$ and equals its value
-$D_{\beta_j}=C_j$ at the end of $\beta_j$.
-
-(ii) Let $t\in\Ep_j$, say $t\in\cB_\nu$ with $\beta_j<\nu<\beta_{j+1}$. By
-\Cref{lem:clean}(iv), $a_t\in D_{\nu-1}$. Since no block strictly between
-$\beta_j$ and $\nu$ is a discovery block, $D_{\nu-1}=D_{\beta_j}=C_j$.
-
-(iii) By (i) the catalogue does not change during $\Ep_j$, so no restart is
-triggered inside $\Ep_j$; and the instance was restarted at the checkpoint
-closing $\beta_j$, hence starts at the first round of $\Ep_j$. Every round
-$t\in\Ep_j$ has $a_t\in C_j$ by (ii), so every observation the instance
-consumes at a round of $\Ep_j$ is generated by a type in its own attacker
-set. The claim is restricted to rounds of $\Ep_j$ for a reason: the instance
-is \emph{not} discarded when $\Ep_j$ ends. It keeps running through the next
-discovery block $\cB_{\beta_{j+1}}$, and that block is precisely where, by
-\Cref{lem:clean}(iv), a contaminated round can occur. What
-\Cref{alg:bgc} guarantees is that the instance is discarded at the checkpoint
-closing that block, so no contaminated observation is ever used in a later
-epoch --- and, as \Cref{thm:block} uses only the prefix $\Ep_j$ of the
-instance's run, no contaminated observation enters the bound at all.
-\end{proof}
-
-\subsection{Main result}
-
-\begin{theorem}[block revelation restores no-regret]
-\label{thm:block}
-Let the defender play \Cref{alg:bgc} in the setting of \Cref{prob:block}.
-For any oblivious adversarial sequence $\avec\in K^T$ with $|K|\le\Kmax$, and
-with $K'\le\Kmax$ the number of distinct types appearing in $\avec$, the
-expected regret satisfies
-\begin{equation}
-\EE[\Regret(T)]\;\le\;
-c\, n\,K'^{4/3}\,T^{2/3}\log^{1/3}(nK')\;+\;2K'B
-\label{eq:block-main}
-\end{equation}
-for an absolute constant $c$. In particular
-\begin{equation}
-\EE[\Regret(T)]=
-O\!\Bigl(n\,\Kmax^{4/3}\,T^{2/3}\log^{1/3}(n\Kmax)\;+\;\Kmax B\Bigr).
-\label{eq:block-main-kmax}
-\end{equation}
-\end{theorem}
-
-\begin{proof}
-Fix the oblivious sequence $\avec$ and adopt the notation of
-\Cref{def:blocks} and \Cref{lem:clean}. The proof follows the skeleton of
-\Cref{sec:proof}; the steps that differ are Steps~1, 3 and 6.
-
-\paragraph{Step 1 (Block decomposition).}
-By \Cref{lem:clean}(ii) the horizon splits as
-\[
-[1,T]\;=\;\underbrace{\bigcup_{j=1}^{m}\cB_{\beta_j}}_{\text{discovery blocks}}
-\ \sqcup\ \underbrace{\bigcup_{j=1}^{m}\Ep_j}_{\text{epochs}},
-\qquad m\le K' .
-\]
-Unlike Step~1 of \Cref{sec:proof}, where the epochs were separated by
-\emph{single} discovery rounds, here they are separated by whole blocks;
-this is the only structural change, and it is what produces the additive
-$B$ in \Cref{eq:block-main}.
-
-\paragraph{Step 2 (Catalogue is constant and correct inside an epoch).}
-This is \Cref{lem:contain}(i)--(ii): $C_t=C_j$ and $a_t\in C_j$ for all
-$t\in\Ep_j$. It is the exact analogue of \Cref{eq:epoch-types}.
-
-\paragraph{Step 3 (Within-epoch regret).}
-By \Cref{lem:contain}(iii), during $\Ep_j$ the defender runs one
-uninterrupted instance $\mathcal{A}(C_j)$ --- the doubling wrapper of
-\Cref{lem:anytime}, not the horizon-dependent \citet[Algorithm 1]{balcan2015}
-inside it --- on an oblivious sequence of length $L_j$ all of whose types lie
-in the known set $C_j$, with partial-information feedback and with no
-contaminated estimate. These are exactly the hypotheses of
-\Cref{lem:anytime} with $n$ targets and the catalogue $C_j$. Two points
-deserve care, and they are the two the lemma was stated to cover. First, the
-guarantee is proved for an \emph{oblivious} sequence --- \citet[Lemma
-6.3]{balcan2015} needs the attacker met at a uniformly random exploration
-round to be a uniformly random attacker of the block --- and the
-sub-sequence $(a_t)_{t\in\Ep_j}$ is indeed oblivious, because by
-\Cref{lem:clean}(v) the epoch $\Ep_j$ is determined by $\avec$ alone and not
-by the defender's plays or by its randomization. Second, $L_j$ is not known
-when the instance starts, and \Cref{lem:anytime} is exactly the statement
-that this costs only a constant. Note also why \Cref{lem:anytime} has to hold
-at \emph{every} prefix and not merely at the end of a run: the instance keeps
-going into the discovery block $\cB_{\beta_{j+1}}$, where it does see
-contaminated rounds, so the only guarantee we may use is the one at the
-prefix of length $L_j$, which stops before them. Hence, with $c_2$ the
-constant of \Cref{lem:anytime},
-\begin{align}
-&\max_{\pvec\in\cP}\sum_{t\in\Ep_j}\!U_d(b_{a_t}(\pvec),\pvec)
- -\EE\!\left[\sum_{t\in\Ep_j}\!U_d(b_{a_t}(\pvec_t),\pvec_t)\right]\notag\\
-&\hspace{4em}\le\;c_2\,L_j^{2/3}\,n\,|C_j|\,\log^{1/3}\!\bigl(n|C_j|\bigr).
-\label{eq:balcan61-epoch}
-\end{align}
-Note that, in contrast to \Cref{eq:hedge-epoch}, the left-hand side already
-compares against the unrestricted maximum over $\cP$: \citet[Theorem
-6.1]{balcan2015} states its bound against the best fixed strategy in
-hindsight, so the passage through $\cE(C_j;\epsilon)$ and the associated
-$2\epsilon L_j$ term of \Cref{lem:43} are internal to their result and need
-not be repeated here.
-
-\paragraph{Step 4 (Pass from the epoch optimum to $\pvec^{*}$).}
-Exactly as in Sub-step 4b of \Cref{sec:proof}: the global benchmark
-$\pvec^{*}$ of \Cref{eq:pstar} is an element of $\cP$ and is therefore a
-feasible competitor in the maximization on the left of
-\Cref{eq:balcan61-epoch}, so
-\begin{equation}
-\max_{\pvec\in\cP}\sum_{t\in\Ep_j}\!U_d(b_{a_t}(\pvec),\pvec)
-\;\ge\;\sum_{t\in\Ep_j}\!U_d(b_{a_t}(\pvec^{*}),\pvec^{*}).
-\label{eq:opt-vs-pstar-block}
-\end{equation}
-Combining \Cref{eq:balcan61-epoch,eq:opt-vs-pstar-block},
-\begin{align}
-&\sum_{t\in\Ep_j}\!U_d(b_{a_t}(\pvec^{*}),\pvec^{*})
- -\EE\!\left[\sum_{t\in\Ep_j}\!U_d(b_{a_t}(\pvec_t),\pvec_t)\right]\notag\\
-&\hspace{4em}\le\;c_2\,L_j^{2/3}\,n\,|C_j|\,\log^{1/3}\!\bigl(n|C_j|\bigr).
-\label{eq:combined-epoch-block}
-\end{align}
-
-\paragraph{Step 5 (Discovery blocks).}
-Let $t$ lie in a discovery block. Since $U_d(i,\pvec)\in[-1,1]$ for every
-target $i$ and every $\pvec\in\cP$, exactly as in \Cref{eq:disc-bound},
-\[
-U_d(b_{a_t}(\pvec^{*}),\pvec^{*})-U_d(b_{a_t}(\pvec_t),\pvec_t)\;\le\;2 .
-\]
-By \Cref{lem:clean}(ii) there are at most $mB\le K'B$ such rounds, so their
-total contribution to the regret is at most
-\begin{equation}
-2K'B .
-\label{eq:disc-block-sum}
-\end{equation}
-This term is the entire price of batching the revelation, and it is charged
-at face value. We make no attempt to learn during a discovery block, and
-\Cref{thm:blocklb} shows that nothing is lost by not trying: a discovery
-block is exactly a stretch in which the defender faces a type from the
-infinite universe that it has not been told about, and on the instance of
-that theorem such a stretch costs $B-2$ rounds however the defender plays.
-
-\paragraph{Step 6 (Uniform bound on the catalogue).}
-$|C_j|\le|D_{\beta_m}|\le K'$ for every $j$, so
-$|C_j|\log^{1/3}(n|C_j|)\le K'\log^{1/3}(nK')$ uniformly in $j$, and this
-factor can be pulled out of the sum over epochs. This is the analogue of
-Step~7 of \Cref{sec:proof}, and it is simpler here only because
-\citet[Theorem 6.1]{balcan2015} has already absorbed $\log|\cE(C_j;\epsilon)|$
-into the displayed form of its bound.
-
-\paragraph{Step 7 (Summing across epochs).}
-Summing \Cref{eq:combined-epoch-block} over $j\in[m]$ and adding
-\Cref{eq:disc-block-sum},
-\begin{equation}
-\EE[\Regret(T)]\;\le\;
-c_2\,n\,K'\log^{1/3}(nK')\sum_{j=1}^{m}L_j^{2/3}\;+\;2K'B .
-\label{eq:block-after-sum}
-\end{equation}
-
-\paragraph{Step 8 (H\"older).}
-The sum of $m$ two-thirds powers is controlled by H\"older's inequality with
-exponents $3$ and $3/2$ applied to $(1,\dots,1)\in\RR^m$ and
-$(L_1^{2/3},\dots,L_m^{2/3})$:
-\begin{equation}
-\sum_{j=1}^{m}L_j^{2/3}
-\;\le\;m^{1/3}\Bigl(\sum_{j=1}^{m}L_j\Bigr)^{2/3}
-\;\le\;K'^{1/3}\,T^{2/3},
-\label{eq:holder}
-\end{equation}
-using $m\le K'$ and $\sum_j L_j\le T$ from \Cref{lem:clean}. As with the
-Cauchy--Schwarz step \Cref{eq:CS}, equality requires all epochs to have the
-same length, which corresponds to an adversary that spreads its type reveals
-evenly across the horizon; this is where the extra $K'^{1/3}$ over
-\citet[Theorem 6.1]{balcan2015} is generated.
-
-\paragraph{Step 9 (Final substitution).}
-Substituting \Cref{eq:holder} into \Cref{eq:block-after-sum} gives
-\Cref{eq:block-main} with $c=c_2$, and bounding $K'\le\Kmax$ gives
-\Cref{eq:block-main-kmax}.
-\end{proof}
-
-\begin{remark}[the two prices, separated]
-\label{rem:price}
-\Cref{eq:block-main} differs from \citet[Theorem 6.1]{balcan2015} with
-$k=\Kmax$ in exactly two places, and the two are of different natures. The
-factor $\Kmax^{1/3}$ is the \emph{price of not knowing $K$}: it comes from
-H\"older over the at most $\Kmax$ epochs in Step~8, and it is the
-partial-information counterpart of the factor $\sqrt{\Kmax}$ that
-Cauchy--Schwarz produces in Step~9 of \Cref{sec:proof}. The additive $2\Kmax
-B$ is the \emph{price of batching the revelation}, and by \Cref{thm:blocklb}
-it is unavoidable up to a factor $2B/(B-2)$, which is $2+o(1)$ as $B$ grows
-and is vacuous for $B\le 2$. The exponent $2/3$ is inherited unchanged from
-\citet[Theorem 6.1]{balcan2015} and is not affected by the unknown $K$ at
-all: block revelation supplies the identities of the types, but it supplies
-no information whatever about their frequencies, which is the quantity their
-barycentric-spanner estimator has to reconstruct. Any improvement of the
-exponent here would be an improvement of their Theorem 6.1.
-
-It is worth seeing exactly which feature of \Cref{prob:block} buys the
-$\Kmax^{1/3}$, and the cleanest way is to price a strictly stronger oracle.
-Suppose that at a single round $t=P$ the defender were told the whole of $K$,
-including the types that have not yet attacked. The first $P$ rounds cost at
-most $2P$, and from $P+1$ onwards the defender is in the known-$K$
-partial-information setting of \citet[Theorem 6.1]{balcan2015}, so
-\[
-\EE[\Regret(T)]\;\le\;2P+O\bigl((T-P)^{2/3}n\Kmax\log^{1/3}(n\Kmax)\bigr),
-\]
-with no $\Kmax^{1/3}$ at all, and the reveal is free for every
-$P=O(T^{2/3}n\Kmax\log^{1/3}(n\Kmax))$. The extra $\Kmax^{1/3}$ in
-\Cref{eq:block-main} is therefore not the price of an unknown $K$ as such: it
-is the price of learning $K$ \emph{incrementally}, one type at a time, which
-is what forces the epoch decomposition and the H\"older step. An oracle that
-can name a type before it has ever attacked avoids it; the oracle of
-\Cref{prob:block}, which only ever reports what has already happened, cannot.
-
-Note also that \Cref{alg:bgc} never reads $\Kmax$: the bound enters only the
-analysis, and \Cref{eq:block-main} is stated in terms of the number $K'$ of
-types that actually appear. \Cref{eq:block-main} is therefore automatically
-instance-adaptive, in exactly the sense that \Cref{cor:adaptive} makes
-explicit for \Cref{alg:gc}, and the defender does not need to be told
-$\Kmax$ at all --- only $T$ and $B$.
-\end{remark}
-
-\subsection{How coarse may the revelation be?}
-
-\begin{corollary}[free batching, and the number of oracle calls]
-\label{cor:B}
-The additive term of \Cref{eq:block-main} is dominated by the leading term
-as soon as $B\le B^{*}$, where
-\begin{align}
-B^{*}&\;=\;\tfrac{1}{2}\,c\,n\,\Kmax^{1/3}\,T^{2/3}\log^{1/3}(n\Kmax)\notag\\
-&\;=\;\Theta\!\bigl(n\Kmax^{1/3}T^{2/3}\log^{1/3}(n\Kmax)\bigr).
-\label{eq:Bstar}
-\end{align}
-For every such $B$,
-$\EE[\Regret(T)]=O\bigl(n\Kmax^{4/3}T^{2/3}\log^{1/3}(n\Kmax)\bigr)$,
-i.e.\ batching is free. Equivalently, the defender need consult the oracle
-only
-\begin{equation}
-N_B\;=\;\lceil T/B^{*}\rceil\;=\;
-O\!\left(\frac{T^{1/3}}{n\,\Kmax^{1/3}\log^{1/3}(n\Kmax)}\right)
-\label{eq:ncalls}
-\end{equation}
-times over the whole horizon, and this count is optimal: by
-\Cref{thm:blocklb}, for every $N\ge\Kmax$ no algorithm that receives $N$
-evenly spaced revelations can have worst-case regret $R$ unless
-\begin{equation}
-N\;\ge\;\frac{\Kmax\,T}{R+2\Kmax},
-\label{eq:ncalls-lb}
-\end{equation}
-which at $R=\Theta(n\Kmax^{4/3}T^{2/3}\log^{1/3}(n\Kmax))$ is
-$\Omega\bigl(T^{1/3}/(n\Kmax^{1/3}\log^{1/3}(n\Kmax))\bigr)$, matching
-\Cref{eq:ncalls} up to a constant. Batching is free up to
-$\Theta(T^{1/3})$ reports and not beyond. All of this is a genuine saving
-only when $B^{*}\le T$, i.e.\ when
-$n\Kmax^{1/3}\log^{1/3}(n\Kmax)\le c'T^{1/3}$ for $c'=2/c$; outside that
-regime even a single revelation at $t=T$ is too coarse, and
-\Cref{cor:regime2} already fails.
-\end{corollary}
-
-\begin{proof}
-Setting $2\Kmax B\le c\,n\Kmax^{4/3}T^{2/3}\log^{1/3}(n\Kmax)$ and solving
-for $B$ gives \Cref{eq:Bstar}; the displayed regret bound is then
-\Cref{eq:block-main-kmax} with the second term absorbed into the first.
-\Cref{eq:ncalls} is $\lceil T/B^{*}\rceil$. For \Cref{eq:ncalls-lb}, $N$
-evenly spaced revelations over $[1,T]$ is \Cref{prob:block} with $B=T/N$;
-the hypothesis $T\ge\Kmax B$ of \Cref{thm:blocklb} reads $N\ge\Kmax$, and
-under it that theorem gives $R\ge\Kmax(T/N-2)$, which rearranges to
-\Cref{eq:ncalls-lb}. (For $N<\Kmax$ the same theorem applied with $\Kmax$
-replaced by $N$ gives the stronger $R\ge T-2N$, so such an $N$ is never worth
-considering.)
-\end{proof}
-
-\begin{corollary}[regime of applicability]
-\label{cor:regime2}
-The bound of \Cref{thm:block} is sublinear in $T$ if and only if
-\[
-n\,\Kmax^{4/3}\log^{1/3}(n\Kmax)=o\bigl(T^{1/3}\bigr)
-\quad\text{and}\quad
-\Kmax B=o(T).
-\]
-In particular, for $\Kmax=O(1)$ and $B\le B^{*}$ the rate is
-$\tilde O(nT^{2/3})$.
-\end{corollary}
-
-\begin{proof}
-Divide \Cref{eq:block-main-kmax} by $T$ and require each of the two terms to
-vanish.
-\end{proof}
-
-\subsection{The additive term is necessary}
-
-\Cref{thm:blocklb} shows that the $\Theta(\Kmax B)$ term of
-\Cref{thm:block} is not an artefact of the analysis. The construction is the
-gadget $G_3$ of \Cref{sec:gadget} again, with the dyadic family of
-\Cref{eq:dyadic} applied recursively: each new type hides inside the
-previous one, so that a single coverage vector is optimal against all of
-them, while each of them must be located afresh.
-
-\begin{theorem}[a matching lower bound in $B$]
-\label{thm:blocklb}
-Let $G_3$ and $\Univ$ be as in \Cref{thm:impossible}. For every
-$B\ge 1$, every $\Kmax\ge 1$ and every horizon $T\ge \Kmax B$, there is a
-distribution over instances of \Cref{prob:block} with $|K|=\Kmax$ on which
-every online algorithm --- randomized or deterministic --- suffers
-\begin{equation}
-\EE[\Regret(T)]\;\ge\;\Kmax\,(B-2).
-\label{eq:blocklb}
-\end{equation}
-\end{theorem}
-
-\begin{proof}
-Put $M=2^{B}$. Draw indices $k_1,\dots,k_{\Kmax}$ independently and uniformly
-from $[M]$ and define nested intervals $J_0\supset J_1\supset\cdots\supset
-J_{\Kmax}$ by $J_0=(0,1]$ and
-\begin{equation}
-J_j=\Bigl(\ell_{j-1}+\tfrac{k_j-1}{M}\,|J_{j-1}|,\ \
-        \ell_{j-1}+\tfrac{k_j}{M}\,|J_{j-1}|\Bigr],
-\label{eq:nested}
-\end{equation}
-where $\ell_{j-1}$ and $|J_{j-1}|$ are the left endpoint and the length of
-$J_{j-1}$; that is, $J_j$ is a uniformly random one of the $M$ equal
-sub-intervals of $J_{j-1}$. Let $\alpha^{[j]}=\alpha_{r_1^{[j]},r_2^{[j]}}$
-be the type of \Cref{lem:realize} whose interval $(r_1^{[j]},r_2^{[j]}]$ is
-$J_j$, put $K=\{\alpha^{[1]},\dots,\alpha^{[\Kmax]}\}$, and let the sequence
-be $a_t=\alpha^{[j]}$ for every $t\in\cB_j$ and $j\in[\Kmax]$, and
-$a_t=\alpha^{[\Kmax]}$ for every $t>\Kmax B$. The sequence is fixed once
-$k_1,\dots,k_{\Kmax}$ are drawn, so the adversary is oblivious. The
-$\Kmax$ types are distinct, because $M=2^{B}\ge 2$ makes each $J_j$ a
-\emph{proper} sub-interval of $J_{j-1}$, so $|K|=\Kmax$ as required. As in \Cref{thm:impossible} we lower bound the
-expected regret of an arbitrary \emph{deterministic} algorithm and appeal to
-Yao's minimax principle.
-
-\paragraph{Step 1 (the benchmark is $0$).}
-Let $\mu=\tfrac{1}{2}(r_1^{[\Kmax]}+r_2^{[\Kmax]})$ be the midpoint of
-$J_{\Kmax}$ and put $\pvec^{*}=(\mu,0,1-\mu)\in\cP$. For every
-$j\in[\Kmax]$ the nesting $J_{\Kmax}\subseteq J_j$ gives
-$r_1^{[j]}\le r_1^{[\Kmax]}<r_2^{[\Kmax]}\le r_2^{[j]}$, hence
-$p^{*}_1=\mu>r_1^{[\Kmax]}\ge r_1^{[j]}$ and
-$p^{*}_3=1-\mu>1-r_2^{[\Kmax]}\ge 1-r_2^{[j]}$, both strictly, so
-$b_{\alpha^{[j]}}(\pvec^{*})=2$ by \Cref{eq:hit-iff}, under any
-tie-breaking rule. Thus $\pvec^{*}$ hits
-in every round and, as in \Cref{eq:regret-is-misses}, the regret equals the
-expected number of missed rounds.
-
-\paragraph{Step 2 (what the defender knows when block $j$ starts).}
-The checkpoint closing $\cB_{j-1}$ reveals
-$D_{j-1}=\{\alpha^{[1]},\dots,\alpha^{[j-1]}\}$ with utility vectors, hence
-$J_{j-1}$; it reveals nothing about $\alpha^{[j]}$, which has not yet
-attacked. Moreover the entire transcript of blocks $\cB_1,\dots,\cB_{j-1}$ is a
-function of $k_1,\dots,k_{j-1}$ alone: by induction on the rounds, the
-defender's play at any round of those blocks is determined by the earlier
-observations, and each observation is determined by that play together with
-the interval of the type then attacking, which is one of
-$J_1,\dots,J_{j-1}$. Since $k_j$ is drawn independently of
-$k_1,\dots,k_{j-1}$, it is therefore still uniform on $[M]$ conditionally on
-everything the defender has seen and been told before block $j$ begins.
-
-\paragraph{Step 3 (each block is a fresh comparison search).}
-Fix $j$ and condition on the transcript before $\cB_j$. Under that
-conditioning the defender's play at each round of $\cB_j$ is a deterministic
-function of the observations made earlier \emph{within} $\cB_j$, so the $B$
-rounds of the block form a protocol of the kind covered by \Cref{lem:count},
-with $k_j$ uniform on $[M]$ by Step~2. During $\cB_j$ the only attacker is
-$\alpha^{[j]}$, whose interval is one of the $M$ pairwise disjoint
-sub-intervals of $J_{j-1}$ indexed by $k_j$; applying \Cref{lem:hit} to that
-family, for every $\pvec\in\cP$ at most one candidate index yields
-$b(\pvec)=2$, which is the hypothesis \Cref{eq:one-hit}. The conditioning has
-already absorbed everything the oracle said before $\cB_j$, and it says
-nothing during $\cB_j$, so the budget is again $b=0$. \Cref{lem:count} with
-$M=2^{B}$ and horizon $B$ gives
-\[
-\EE\bigl[\#\{\text{misses in }\cB_j\}\bigr]\;\ge\;
-B-\frac{2^{B+1}-B-2}{2^{B}}\;>\;B-2 .
-\]
-
-\paragraph{Step 4 (summing and Yao).}
-Summing over $j\in[\Kmax]$ and using Step~1,
-$\EE[\Regret(T)]\ge\Kmax(B-2)$ for every deterministic algorithm. Averaging
-over the internal randomness of a randomized algorithm as in Step~4 of the
-proof of \Cref{thm:impossible} gives \Cref{eq:blocklb}.
-\end{proof}
-
-\begin{remark}[the additive term is tight]
-\label{rem:blocktight}
-\Cref{thm:block,thm:blocklb} bracket the dependence on the revelation
-granularity: the additive cost of batching is between $\Kmax(B-2)$ and
-$2\Kmax B$, so it is $\Theta(\Kmax B)$ for $B\ge 3$, the two bounds differing
-by the factor $2B/(B-2)$ --- $6$ at $B=3$, $4$ at $B=4$, and $2+o(1)$
-thereafter. For $B\le 2$ the lower bound is vacuous and only the upper bound
-$2\Kmax B$ survives. Two special cases are worth recording. Taking $\Kmax=1$ and $B=T$ recovers
-$\EE[\Regret(T)]\ge T-2$, i.e.\ \Cref{thm:impossible}: the impossibility is
-the $B\to T$ limit of \Cref{thm:blocklb}. Taking $B=1$ makes the additive
-term $2\Kmax$ and the bound of \Cref{thm:block} becomes
-$O(n\Kmax^{4/3}T^{2/3}\log^{1/3}(n\Kmax)+\Kmax)$, which is the
-partial-information analogue of \Cref{thm:main} and, to our knowledge, the
-first sublinear bound for an unknown attacker set under
-partial-information feedback.
-\end{remark}
-
-\subsection{Scheduled versus chosen revelation times}
-\label{sec:adaptive}
-
-\Cref{prob:block} fixes the checkpoints before play, which is what a
-threat-intelligence subscription looks like: reports arrive on a calendar,
-not on demand. It is worth recording how much of the $\Theta(\Kmax B)$ term
-is due to that calendar rather than to the number of reports, because the two
-are easy to confuse. \Cref{cor:B} counts reports; \Cref{thm:blocklb} charges
-for their timing. The next proposition separates the two as sharply as
-possible: on the very instances of \Cref{thm:blocklb}, the same number of
-reports costs $T-2\Kmax$ when their times are fixed in advance and only
-$\Kmax$ when the defender may pick them.
-
-\begin{proposition}[choosing the revelation times is exponentially cheaper]
-\label{prop:adaptive}
-Consider the variant of \Cref{prob:block} in which the defender is given a
-budget of $N$ \emph{queries} instead of a schedule: at the end of any round
-it may spend one query and receive, as in \Cref{eq:Dnu}, the set of types
-that have attacked so far together with their utility vectors. Let the
-instance be played in $G_3$ and let its types
-$\alpha_{r_1^{[1]},r_2^{[1]}},\dots,\alpha_{r_1^{[K']},r_2^{[K']}}$ have
-\emph{nested} threshold intervals, i.e.\ the intervals
-$(r_1^{[j]},r_2^{[j]}]$ form a chain under inclusion; this is the case for
-every instance constructed in \Cref{thm:blocklb}. Then the defender that
-\begin{enumerate}[leftmargin=1.2em,itemsep=0.05em,topsep=0.2em]
-  \item plays the midpoint of the smallest interval among the types revealed
-  so far (and any fixed $\pvec_{\mathrm{def}}$ before the first revelation),
-  and
-  \item spends a query at the end of every round in which target~$1$ or
-  target~$3$ was attacked,
-\end{enumerate}
-spends at most $K'$ queries --- so a budget of $N=\Kmax$ always suffices ---
-and suffers $\Regret(T)\le K'\le\Kmax$, for every horizon $T$ and every order
-in which the types appear. By contrast,
-\Cref{thm:blocklb} with $B=T/\Kmax$ says that $N=\Kmax$ revelations placed on
-a fixed schedule leave regret at least $T-2\Kmax$.
-\end{proposition}
-
-\begin{proof}
-Let $D$ be the set of types revealed so far and, when $D\ne\emptyset$, let
-$J(D)$ be the smallest of their intervals, which exists because the intervals
-form a chain; write $\mu$ for its midpoint and $\pvec=(\mu,0,1-\mu)$ for the
-played coverage vector. For every $\alpha=\alpha_{r_1,r_2}\in D$ we have
-$J(D)\subseteq(r_1,r_2]$, so $r_1<\mu<r_2$, and \Cref{eq:hit-iff} gives
-$b_\alpha(\pvec)=2$: the play hits every revealed type, under any
-tie-breaking rule, since target~$2$ is the strict maximizer. Consequently a
-round in which target~$1$ or~$3$ is attacked --- the only rounds in which the
-defender queries, and by \Cref{eq:g3-payoff} the only rounds that cost
-anything --- is a round whose attacker is \emph{not} in $D$. The query issued
-at the end of such a round returns a set containing that attacker, so it
-enlarges $D$ by at least one type. Since $|D|\le K'$ throughout, there are at
-most $K'$ such rounds in the whole horizon; the same count bounds the number
-of queries.
-
-The benchmark is $0$: taking $\pvec^{*}$ to be the midpoint of the smallest
-interval of \emph{all} $K'$ types makes every round a hit by the same
-computation, and $U_d\le 0$ everywhere in $G_3$, so no $\pvec$ does better.
-By \Cref{eq:regret-is-misses} the regret is the number of missed rounds,
-which we have just bounded by $K'$.
-\end{proof}
-
-\begin{remark}[why this does not extend for free]
-\label{rem:adaptive}
-\Cref{prop:adaptive} rests on a feature of $G_3$ that a general security game
-does not have: there, a missed round is a \emph{certificate} that the
-catalogue is stale, so the defender knows exactly when to spend a query. In a
-general SSG a type outside the catalogue may best-respond at $\pvec_t$
-exactly as the catalogue predicts and still differ elsewhere in $\cP$,
-corrupting the frequency estimates of \Cref{alg:bgc} without ever announcing
-itself; and conversely a round can look anomalous for reasons that have
-nothing to do with a new type, because \Cref{alg:bgc} deliberately plays
-exploration strategies. Whether a defender with $N$ self-timed queries can
-beat the $\Theta(\Kmax T/N)$ of \Cref{thm:blocklb} in a general repeated SSG
-is open; \Cref{prop:adaptive} shows only that the lower bound is a statement
-about schedules and not about report counts.
-\end{remark}
-
-% ==========================================================================
-\section{Tractable Experiments}
-\label{sec:exp2}
-
-The experiments of \Cref{sec:exp} were run at $n=3$ targets. The reason was
-not the online algorithm but the expert set: \Cref{alg:gc} needs
-$\cE(C;\epsilon)$ explicitly, and the implementation builds it by
-enumerating every $(n-1)$-subset of the $H(n,|C|)=n+|C|\binom{n}{2}$
-hyperplanes that define the partition. That is $\binom{H(n,|C|)}{n-1}$ linear
-solves, which is $1.5\times 10^{5}$ at $n=5,|C|=4$ but $7.3\times 10^{14}$ at
-$n=10$ and $5.9\times 10^{37}$ at $n=20$.
-
-This section removes that obstacle and reruns the experiments at $n=10$ and
-$n=20$, for \Cref{alg:gc} and for \Cref{alg:bgc}. The idea is that neither
-algorithm ever needs the set $\cE(C;\epsilon)$ itself; each needs only to
-\emph{optimize a linear function over it}, and that can be done with one call
-to a Bayesian-Stackelberg solver.
-
-\subsection{An oracle-efficient implementation}
-\label{sec:oracle}
 
 For a catalogue $C$ and $\pvec\in\cP$ define the \emph{lift}
 \begin{equation}
@@ -2582,6 +2411,9 @@ is an exact branch-and-bound solve, not a fixed amount of work.}
 \label{tab:oracle}
 \end{table}
 
+\section{Experiments at $n=10$ and $n=20$}
+\label{app:bign}
+
 \subsection{Full information at $n=10$ and $n=20$}
 \label{sec:exp-full}
 
@@ -2611,13 +2443,13 @@ adversary uninformative. The uniform-random adversary is stationary, so
 $\pvec^{*}$ is the right comparator, and panels (c) and (d) use it. The
 benchmark $\pvec^{*}$ is itself computed with one oracle call, so even
 \emph{evaluating} the regret at $n=20$ was out of reach before
-\Cref{sec:oracle}.
+\Cref{app:oracle}.
 
 \begin{figure*}[t]
 \centering
 \includegraphics[width=0.96\textwidth]{figures/tractable_regret.pdf}
 \vspace{-0.5em}
-\caption{\Cref{alg:gc} with the oracle implementation of \Cref{sec:oracle},
+\caption{\Cref{alg:gc} with the oracle implementation of \Cref{app:oracle},
 $\Kmax=4$, $T=1500$, mean over $4$ seeds. (a), (b) per-round regret under the
 staggered-uniform adversary, rolling window $101$; red dashed lines mark the
 phase boundaries, at which a new type becomes available. (c), (d) cumulative regret under the uniform-random
@@ -2694,233 +2526,6 @@ revelation (\Cref{thm:block}) as $T$ grows; fitted exponents $0.317$ and
 $0.664$.}
 \label{fig:block}
 \end{figure*}
-
-\subsection{The lower bounds, in simulation}
-\label{sec:exp-imp}
-
-\Cref{fig:impossible} plays the gadget $G_3$ of \Cref{sec:gadget} for real:
-attacker types are built from the utility vectors of \Cref{eq:type-utils},
-best responses are computed from those utilities, and the defender's payoff
-is read off the attacked target. The defender is the optimal one for this
-game, namely the midpoint version-space search of \Cref{thm:bits}(ii),
-and the expectation over the hidden type is computed exactly, by averaging
-over all $M$ candidates rather than by sampling.
-
-Panel (a) is \Cref{thm:impossible}: with $M=2^{T}$ the measured expected
-regret equals $T-2+(T+2)2^{-T}$ for every $T\le 14$, to machine precision,
-confirming both the lower bound and the claim in \Cref{rem:tight-lb} that it
-is exactly attained.
-
-Panel (b) is \Cref{thm:bits}. The universe is fixed at $M=2^{10}$ and the
-defender is helped by an oracle of budget $b\in\{0,2,4,6\}$ that names the
-block of $M/2^{b}$ indices containing the true type, exactly as in the proof
-of \Cref{thm:bits}(ii); everything else is the real game. Each curve
-saturates, and it saturates at $\log_2 M-b-2$, which is the lower bound of
-\Cref{thm:bits}(i): the measured values at $T=14$ are $8.01$, $6.04$, $4.13$
-and $2.38$ against predictions $8$, $6$, $4$ and $2$. The hollow markers are
-a separate run with budget $0$ on the smaller universe $\Univ_{M/2^{b}}$, and
-they land on the corresponding curve to machine precision --- the regret
-depends on $M$ and $b$ only through $\log_2 M-b$, which is what makes
-\Cref{thm:bits} an accounting identity rather than two unrelated bounds. The
-case $b=0$ also says that the linear growth in panel~(a) is caused by the
-universe being infinite and by nothing else.
-
-Panel (c) is \Cref{prop:sqrtT}, and it is the one panel that shows a
-$T$-dependence rather than a saturation. With $|K|=2$ on the two-element
-universe, follow the leader has measured regret $1.57$, $6.35$ and $25.60$ at
-$T=16$, $256$ and $4096$, against the exact optimum
-$\tfrac12\EE|N_1-N_2|=1.571$, $6.377$, $25.531$ and the floor
-$\tfrac12\sqrt{\lfloor T/2\rfloor}=1.41$, $5.66$, $22.63$. The dotted line is
-the same universe with $|K|=1$, where the regret is $0.5$ at every horizon.
-The two curves are the phase transition of \Cref{rem:phase}.
-
-Panel (d) is \Cref{thm:blocklb}: on the nested-interval instance the measured
-regret tracks $|K|(B-2)$ across $|K|\in\{1,2,3,4\}$ and
-$B\in\{4,8,16,32\}$, so the additive $\Theta(\Kmax B)$ of \Cref{thm:block} is
-real and not an artefact of the analysis.
-
-Panel (e) is \Cref{prop:adaptive}, on the same instances as panel (d) with
-$|K|=4$ and $T=|K|B$, so that the two schemes are compared at the same
-report budget $N=|K|=4$. Scheduling the four reports on a fixed grid costs
-$|K|(B-2)$, which is $120$ rounds at $B=32$; letting the defender choose
-their times costs exactly $4$, and the measured query count is $4.00$, so the
-defender does not even exceed its budget. The measured adaptive regret is
-$3.72$, $3.98$, $4.00$, $4.00$ for $B=4,8,16,32$ --- it is below $|K|$ only
-because a lucky initial play occasionally hits the first type outright.
-
-\begin{figure*}[t]
-\centering
-\includegraphics[width=0.96\textwidth]{figures/impossibility.pdf}
-\vspace{-0.5em}
-\caption{The gadget $G_3$ in simulation, against the optimal defender.
-(a) \Cref{thm:impossible}: with $|\Univ_M|=2^{T}$ the regret is $T-2+o(1)$.
-(b) \Cref{thm:bits}: with a budget of $b$ bits on a universe of resolution
-$M=2^{10}$ the regret saturates at $\log_2 M-b-2$ (dotted lines), and a
-budget-$b$ run on $\Univ_M$ (solid) coincides with a budget-$0$ run on
-$\Univ_{M/2^{b}}$ (hollow markers). (c) \Cref{prop:sqrtT}: two types on a
-two-element universe cost $\Theta(\sqrt T)$, one type costs $0.5$ at every
-horizon. (d) \Cref{thm:blocklb}: on the nested
-instance the regret matches $|K|(B-2)$ (dashed lines). (e)
-\Cref{prop:adaptive}: the same $N=|K|$ reports cost $|K|(B-2)$ on a fixed
-schedule and $|K|$ when the defender picks their times. Panels (c) and (e)
-have logarithmic vertical axes.}
-\label{fig:impossible}
-\end{figure*}
-
-% ==========================================================================
-\section{Discussion and Open Problems}
-\label{sec:conc2}
-
-\Cref{sec:partial,sec:block} locate the boundary of learnability for the
-unknown-$K$ repeated security game. On one side, \Cref{thm:main} shows that
-an unknown attacker set of bounded size costs only a factor $\sqrt{\Kmax}$ as
-long as the defender is told, after each round, which type attacked. On the
-other side, \Cref{thm:impossible} shows that if the defender is told nothing
-but the attacked target, then every algorithm loses all but two of the $T$
-rounds --- not because the adversary has many types, but because the defender
-cannot name the one type it faces. \Cref{thm:bits} quantifies
-this exactly, and in a currency that a security operations centre can price:
-on a universe of resolution $M$, and given \emph{any} side channel that emits
-$b$ bits over the whole horizon, the optimal regret is
-$\min\{T,\log_2 M-b\}\pm 3$. The attainable regret is the number of bits
-still needed to name the attacker; it is linear precisely when that number
-exceeds the horizon, and on an infinite universe no finite budget reduces it
-at all.
-
-Between the two lies \Cref{prob:block}, in which an oracle periodically
-reports the \emph{set} of types encountered so far. The information it
-supplies is exactly a list of names; it says nothing about when or how often
-any of them attacked. \Cref{thm:block} shows that this is enough:
-\Cref{alg:bgc} attains
-$O(n\Kmax^{4/3}T^{2/3}\log^{1/3}(n\Kmax)+\Kmax B)$, the
-partial-information rate of \citet[Theorem 6.1]{balcan2015} degraded by a
-factor $\Kmax^{1/3}$ for the unknown catalogue and by an additive $\Kmax B$
-for the batching, and \Cref{thm:blocklb} shows the additive term is tight up
-to a factor $2B/(B-2)$, hence up to $2+o(1)$ once $B$ is large. \Cref{cor:B} turns this into a deployment statement: the
-threat-intelligence report needs to arrive only $\tilde O(T^{1/3})$ times
-over a horizon of length $T$ for the batching to be free --- and, by the
-lower bound in the same corollary, not fewer.
-
-Two views of the same picture from the online-learning literature are worth
-recording, because they say where these results sit. The query-budget
-statement of \Cref{thm:bits} is a security-game analogue of \emph{label
-efficient prediction} \citep{cesabianchi2005}, where a learner may see the
-loss vector on only a bounded number of rounds; the difference is that there
-the budget limits how \emph{often} the learner may look, whereas
-\Cref{def:budget} limits how \emph{much} it may be told in total, and
-consequently the rate here is governed by $\log_2|\Univ|$ rather than by the
-number of experts. The additive $\Theta(\Kmax B)$ of \Cref{thm:block,thm:blocklb}
-is a delay phenomenon of the kind studied for general online learning under
-delayed feedback \citep{joulani2013}; what is specific to the present setting
-is that the delay applies not to the loss but to the \emph{identity} of the
-opponent, and that \Cref{thm:impossible} makes the undelayed identity
-indispensable rather than merely helpful.
-
-Two independent obstructions are thus isolated. \Cref{thm:bits} is about
-\emph{volume}: too few bits, and the type cannot be named. \Cref{thm:blocklb}
-is about \emph{latency}: even an unrestricted number of bits, delivered on a
-calendar of period $B$, still costs $\Theta(\Kmax B)$, because the defender
-must play blind between the arrival of a type and the arrival of the report
-that names it. \Cref{prop:adaptive} shows the two are genuinely different
-resources: in $G_3$, letting the defender choose \emph{when} the same
-$\Kmax$ reports arrive collapses the latency cost from $T-2\Kmax$ to
-$\Kmax$.
-
-Five questions are left open.
-
-\paragraph{Is the exponent $2/3$ necessary here?}
-\Cref{rem:price} observes that the exponent in \Cref{thm:block} is inherited
-from \citet[Theorem 6.1]{balcan2015} and is untouched by the unknown
-catalogue, so any improvement would improve their result. It is not known
-whether $T^{2/3}$ is optimal for partial-information feedback even with $K$
-known; the natural attack is to replace their explore-then-exploit estimator
-by importance-weighted estimates on the exploit rounds, which would require a
-version of \Cref{lem:contain} for a continuously updated estimator.
-
-\paragraph{Is the factor $\Kmax^{1/3}$ necessary?}
-It arises from H\"older over the at most $\Kmax$ epochs (Step~8), exactly as
-the $\sqrt{\Kmax}$ of \Cref{thm:main} arises from Cauchy--Schwarz (Step~9 of
-\Cref{sec:proof}). \Cref{thm:blocklb} lower bounds only the additive term, and
-\Cref{prop:sqrtT} lower bounds only the $T$-dependence. A
-lower bound of the form $\Omega(\Kmax^{c}T^{2/3})$ for some $c>0$, matching
-the multiplicative price of not knowing $K$, is open in both the
-full-information and the partial-information settings. The obvious attempt
---- running $\Kmax/2$ disjoint copies of the two-type construction of
-\Cref{prop:sqrtT}, one per epoch --- does not work, and the reason is
-instructive. Per-epoch lower bounds do not add, because the benchmark
-\Cref{eq:pstar} is a \emph{single} fixed coverage vector: in $G_3$ with all
-the intervals disjoint, \Cref{lem:hit} says that no $\pvec$ hits more than
-one type at all, so the global benchmark is far weaker than the sum of the
-per-epoch benchmarks and the global regret is correspondingly smaller. A
-matching lower bound will have to make the epochs share a good comparator,
-as the nested family of \Cref{thm:blocklb} does, while still forcing fresh
-learning in each of them.
-
-The complementary attack is on the upper bound: avoid the restart, and both
-factors disappear with it, since with no epochs there is neither a
-Cauchy--Schwarz nor a H\"older step. Algorithms that track a \emph{growing}
-expert set \citep{mourtada2017} do exactly that, and \Cref{sec:related}
-already notes them as a drop-in replacement for the Polynomial-Weights
-sub-routine of \Cref{alg:gc}. What the proofs above show is that replacing
-the sub-routine is not by itself enough: Steps~4 and 5 of \Cref{sec:proof}
-also use the epoch structure, to pass from the epoch-local optimum to the
-global $\pvec^{*}$. Under partial information the difficulty is sharper
-still. The estimator of \Cref{lem:lift}(ii) is defined relative to a fixed
-catalogue --- its spanner $\Lambda$ and the ambient set $\mathcal{W}$ both
-change when $C$ grows --- so the estimates produced before and after a
-discovery block are not estimates of comparable quantities, and cannot be
-handed to a single continuously running learner without a new argument.
-
-\paragraph{Confounded search: $\Kmax\ge 2$ on a finite universe.}
-\Cref{thm:bits} pins the optimal regret on a resolution-$M$ universe
-to $\min\{T,\log_2 M-b\}\pm 3$ when $\Kmax=1$, because a miss then identifies
-a half of the version space unambiguously. For $\Kmax\ge 2$ the defender
-does not know which of its opponents produced the observation, so the same
-search is corrupted. \Cref{prop:sqrtT} settles one half of the question ---
-the answer must contain an $\Omega(\sqrt{T})$ term, already at $M=2$ --- and
-\Cref{rem:phase} records the two upper bounds we can write down,
-$O(\sqrt{T\Kmax(n^2+\Kmax\log n)})$ under full information and
-$O(T^{2/3}nM\log^{1/3}(nM))$ under partial information. Neither has any
-$\log M$ in it, and the lower bound has no $M$ in it either, so the joint
-dependence on $M$ and $\Kmax$ is entirely open. Note that
-\Cref{thm:impossible} does not settle it: it shows the $M\to\infty$ limit is
-$\Theta(T)$ for every $\Kmax\ge 1$, but says nothing about the finite-$M$
-dependence for $\Kmax\ge 2$.
-
-\paragraph{One theorem for volume and latency together.}
-\Cref{thm:bits} charges an oracle for its bits and ignores their timing;
-\Cref{thm:blocklb} charges for the timing and lets the bits be free. Neither
-subsumes the other, and a defender buying threat intelligence pays for both
-at once. The missing statement is a lower bound in terms of a pair
-$(b,\lambda)$ --- total budget and worst-case delay between a type's first
-attack and the first message that names it --- which should degrade to
-\Cref{thm:bits} at $\lambda=0$ and to \Cref{thm:blocklb} at $b=\infty$. We
-expect the right form to be
-$\Omega\bigl(\min\{T,\log_2 M-b\}+\Kmax\lambda\bigr)$, but the two arguments
-resist being run simultaneously: \Cref{lem:count} conditions on a transcript
-that the latency argument needs to keep random. A related gap is the oracle
-whose messages are unbounded in length but weak in content --- one that
-reports the utilities of a uniformly random element of $D_\nu$, say. Such an
-oracle is not covered by \Cref{thm:bits}, whose budget is a bound on message
-\emph{length}, and the version-space construction of \Cref{thm:bits}(ii) does
-not apply to it either.
-
-\paragraph{Self-timed reports in a general game.}
-\Cref{prop:adaptive} shows that in $G_3$ a defender that chooses its own
-report times pays $\Kmax$ rather than $\Kmax B$, because there a missed round
-is a certificate that the catalogue is stale. \Cref{rem:adaptive} explains
-why the certificate is special to that gadget. Whether some other trigger ---
-a statistical test on the estimator of \Cref{lem:lift}(ii), say --- recovers
-a comparable saving in a general repeated SSG, and whether the $\Theta(\Kmax
-T/N)$ of \Cref{cor:B} is the truth for self-timed queries, we leave open.
-This is the question with the most direct operational content: it asks
-whether it is better to subscribe to a periodic feed or to keep a budget of
-on-demand lookups.
-
-
-\bibliography{refs}
-
-
 
 
 \end{document}

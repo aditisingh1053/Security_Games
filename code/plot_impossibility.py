@@ -11,15 +11,15 @@ averaging over all M candidates rather than by sampling.
 Produces `figures/impossibility.{pdf,png}`:
 
   (a) regret versus T when the universe has resolution M = 2^T (the infinite
-      universe of Theorem 13): regret is T - 2, i.e. linear;
-  (b) Theorem 16, the bit price: with a side-information oracle of budget b
+      universe of Theorem 12): regret is T - 2, i.e. linear;
+  (b) Theorem 15, the bit price: with a side-information oracle of budget b
       the regret saturates at log2(M) - b - 2, and curves with the same value
       of log2(M) - b coincide;
-  (c) Proposition 21: with two attacker types on a two-element universe the
+  (c) Proposition 16: with two attacker types on a two-element universe the
       regret is Theta(sqrt(T)), against the flat curve for one type;
-  (d) Theorem 32: on the nested-interval instance, regret grows as K(B - 2)
+  (d) Theorem 24: on the nested-interval instance, regret grows as K(B - 2)
       in the revelation length B, so batching really does cost Theta(K B);
-  (e) Proposition 34: the same K reports cost K(B - 2) when their times are
+  (e) Proposition 26: the same K reports cost K(B - 2) when their times are
       fixed in advance and at most K when the defender chooses them.
 
 Run from `code/`:  python plot_impossibility.py
@@ -44,7 +44,7 @@ U_D = np.array([-1.0, 0.0, -1.0])
 
 
 def attacker_utils(r1: float, r2: float):
-    """Type alpha_{r1,r2} of Lemma 10: U(1,p) = r1 - p1, U(2,p) = 0,
+    """Type alpha_{r1,r2} of Section 9.2: U(1,p) = r1 - p1, U(2,p) = 0,
     U(3,p) = (1 - r2) - p3.  All utilities lie in [-1, 1]."""
     u_c = np.array([r1 - 1.0, 0.0, -r2])
     u_u = np.array([r1, 0.0, 1.0 - r2])
@@ -91,12 +91,12 @@ def closed_form(M: int, T: int) -> float:
 
 
 def run_budget_defender(M: int, b: int, T: int, j_true: int) -> int:
-    """Misses under the budget-b scheme of Theorem 16(ii).
+    """Misses under the budget-b scheme of Theorem 15(ii).
 
     The oracle names the block of ceil(M / 2^b) consecutive indices that
     contains the true index -- one message from an alphabet of size 2^b, so
     exactly b bits -- and the defender then runs the midpoint version-space
-    search of Remark 14 inside that block.  Everything else is the real game:
+    search of Remark 13 inside that block.  Everything else is the real game:
     the played coverage vector is (k/M, 0, 1 - k/M) and the observation is the
     true type's best response to it.
     """
@@ -125,11 +125,11 @@ def expected_regret_budget(M: int, b: int, T: int) -> float:
 
 
 def observe_exact(p1_num: int, r1_num: int, r2_num: int) -> int:
-    """The observation of Lemma 11, in exact integer arithmetic.
+    """The observation of Lemma 10, in exact integer arithmetic.
 
-    With p = (p1, 0, 1 - p1) and the type alpha_{r1,r2}, Lemma 11 gives
+    With p = (p1, 0, 1 - p1) and the type alpha_{r1,r2}, Lemma 10 gives
     b(p) = 2 iff p1 > r1 and 1 - p1 >= 1 - r2, i.e. iff r1 < p1 <= r2, and
-    Lemma 10 gives b(p) = 1 for p1 <= r1 and b(p) = 3 for p1 > r2.  All three
+    Section 9.2 gives b(p) = 1 for p1 <= r1 and b(p) = 3 for p1 > r2.  All three
     quantities are multiples of a common power of two here, so the comparisons
     are done on integer numerators and the nesting can be iterated to any
     depth without floating-point error.  `_check_observe_exact` verifies the
@@ -156,7 +156,7 @@ def _check_observe_exact(depth: int = 20, trials: int = 4000) -> float:
 
 
 def run_nested(K: int, B: int, T: int, rng) -> int:
-    """Theorem 32's instance: K nested types, one per revelation block.
+    """Theorem 24's instance: K nested types, one per revelation block.
 
     I_1 = (0,1]; given I_{j-1}, the interval I_j is a uniformly random dyadic
     sub-interval of I_{j-1} at depth B.  Block j is attacked by alpha^{(j)},
@@ -197,24 +197,24 @@ def _walk_abs_mean(T: int) -> float:
 
 
 def sqrt_floor(T: int) -> float:
-    """The bound of Proposition 21: (1/2) sqrt(floor(T/2))."""
+    """The bound of Proposition 16: (1/2) sqrt(floor(T/2))."""
     return 0.5 * math.sqrt(T // 2)
 
 
 def sqrt_exact(T: int) -> float:
     """(1/2) E|N_1 - N_2|: the smallest expected regret any algorithm can have
-    on the two-type instance of Proposition 21, since no algorithm hits with
+    on the two-type instance of Proposition 16, since no algorithm hits with
     probability more than 1/2 on any round."""
     return 0.5 * _walk_abs_mean(T)
 
 
 def run_two_type(T: int, rng, reps: int) -> float:
-    """Measured regret of follow-the-leader on the instance of Proposition 21.
+    """Measured regret of follow-the-leader on the instance of Proposition 16.
 
     The two types are alpha_{0,1/2} and alpha_{1/2,1}; the defender plays the
     midpoint of the interval of whichever type it has seen more often so far,
     which is the best it can do given the past.  Regret = max(N1, N2) - hits,
-    because a fixed strategy hits at most one of the two types (Lemma 11).
+    because a fixed strategy hits at most one of the two types (Lemma 10).
     """
     tot = 0.0
     for _ in range(reps):
@@ -223,7 +223,7 @@ def run_two_type(T: int, rng, reps: int) -> float:
         hits = 0
         for a in seq:
             guess = 0 if n[0] >= n[1] else 1
-            # midpoint of I_guess; by Lemma 11 it hits iff the attacker is that type
+            # midpoint of I_guess; by Lemma 10 it hits iff the attacker is that type
             hits += int(guess == a)
             n[a] += 1
         tot += max(n) - hits
@@ -231,7 +231,7 @@ def run_two_type(T: int, rng, reps: int) -> float:
 
 
 def run_nested_adaptive(K: int, B: int, rng) -> tuple:
-    """Proposition 34 on the same instance that run_nested plays.
+    """Proposition 26 on the same instance that run_nested plays.
 
     The defender may spend a query at the end of any round instead of being
     handed a report every B rounds.  It plays the midpoint of the smallest
@@ -285,7 +285,7 @@ def main() -> None:
         print(f"    b={b}:  regret(T=14) = {budget[b][-1]:7.4f}   "
               f"log2(M)-b-2 = {np.log2(M_b) - b - 2:5.2f}")
 
-    # ---- (c), (d) the block-revelation lower bound and Proposition 34 ----
+    # ---- (c), (d) the block-revelation lower bound and Proposition 26 ----
     Bs = [4, 8, 16, 32]
     Ks = [1, 2, 3, 4]
     print(f"    exact-observation check against the utility-based best response: "
@@ -299,7 +299,7 @@ def main() -> None:
     ad_q = [float(np.mean([run_nested_adaptive(K_ad, B, rng)[1] for _ in range(400)]))
             for B in Bs]
 
-    # ---- the sqrt(T) floor at Kmax = 2 (Proposition 21) -----------------
+    # ---- the sqrt(T) floor at Kmax = 2 (Proposition 16) -----------------
     Ts_c = [16, 32, 64, 128, 256, 512, 1024, 2048, 4096]
     ftl = [run_two_type(T, rng, 20000) for T in Ts_c]
     exact_c = [sqrt_exact(T) for T in Ts_c]
@@ -316,7 +316,7 @@ def main() -> None:
     ax.plot(Ts, reg_inf, "o-", color="tab:red", lw=1.7, ms=4,
             label="optimal defender, $M=2^{T}$")
     ax.plot(Ts, [T - 2 for T in Ts], color="black", ls="--", lw=1.0,
-            label=r"$T-2$ (Theorem 13)")
+            label=r"$T-2$ (Theorem 12)")
     ax.plot(Ts, Ts, color="0.6", ls=":", lw=1.0, label=r"$T$ (all rounds lost)")
     ax.set_title(r"(a) infinite universe: $\mathbb{E}[\mathrm{Regret}] = T-2+o(1)$",
                  fontsize=9)
@@ -344,7 +344,7 @@ def main() -> None:
     ax.plot(Ts_c, exact_c, "-", color="tab:red", lw=1.4,
             label=r"$\frac{1}{2}\mathbb{E}|N_1-N_2|$ (optimal)")
     ax.plot(Ts_c, floor_c, "--", color="black", lw=1.2,
-            label=r"$\frac{1}{2}\sqrt{\lfloor T/2\rfloor}$ (Prop. 21)")
+            label=r"$\frac{1}{2}\sqrt{\lfloor T/2\rfloor}$ (Prop. 16)")
     ax.plot(Ts_c, one_type, ":", color="tab:blue", lw=1.6,
             label=r"$|K|=1$ on the same universe")
     ax.set_xscale("log"); ax.set_yscale("log")
@@ -361,7 +361,7 @@ def main() -> None:
                 zorder=1, label=r"$|K|(B-2)$" if K == Ks[0] else None)
         ax.plot(Bs_arr, nested[K], "o", color=c, ms=5, zorder=3,
                 label=rf"measured, $|K|={K}$")
-    ax.set_title(r"(d) scheduled revelation: regret $\geq |K|(B-2)$ (Thm. 32)",
+    ax.set_title(r"(d) scheduled revelation: regret $\geq |K|(B-2)$ (Thm. 24)",
                  fontsize=9)
     ax.set_xlabel("revelation length $B$", fontsize=8)
     ax.set_ylabel("expected regret", fontsize=8)
@@ -371,9 +371,9 @@ def main() -> None:
     ax.plot(Bs_arr, K_ad * (Bs_arr - 2), color="0.35", ls="--", lw=1.4,
             label=rf"$|K|(B-2)$, $|K|={K_ad}$")
     ax.plot(Bs_arr, nested[K_ad], "s-", color="tab:red", lw=1.5, ms=5,
-            label="scheduled (Theorem 32)")
+            label="scheduled (Theorem 24)")
     ax.plot(Bs_arr, adaptive, "o-", color="tab:blue", lw=1.5, ms=5,
-            label="defender-chosen (Proposition 34)")
+            label="defender-chosen (Proposition 26)")
     ax.axhline(K_ad, color="tab:blue", ls=":", lw=1.0, label=rf"$|K|={K_ad}$")
     ax.set_yscale("log")
     ax.set_title(r"(e) same $N=|K|$ reports: chosen times vs. fixed times",

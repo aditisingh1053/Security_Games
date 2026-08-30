@@ -1,9 +1,9 @@
 """Numerical checks of the non-asymptotic claims in Sections 9-11.
 
 Covered: every claim of Sections 9 and 10 that is not purely asymptotic, and
-the oracle and estimator claims of Section 11.1.  NOT covered, because they
+the oracle and estimator claims of Appendix C.  NOT covered, because they
 are measurements rather than claims about the algebra: the fitted exponents,
-envelope constants and timings of Sections 11.2-11.5, which are printed by
+envelope constants and timings of Section 11 and Appendices C-D, printed by
 `bench_oracle.py`, `plot_tractable_regret.py`, `plot_block_revelation.py` and
 `plot_impossibility.py` when those are rerun.
 
@@ -55,7 +55,7 @@ def report(name, ok, detail=""):
 
 # ---------------------------------------------------------------------------
 def check_lemma10(trials=20000, seed=0):
-    """Lemma 10: utilities in [-1,1] and the 1/2/3 pattern on the segment."""
+    """Section 9.2: utilities in [-1,1] and the 1/2/3 pattern on the segment."""
     rng = np.random.default_rng(seed)
     bad_range = bad_pattern = 0
     for _ in range(trials):
@@ -68,13 +68,13 @@ def check_lemma10(trials=20000, seed=0):
         want = 0 if p1 <= r1 else (1 if p1 <= r2 else 2)
         if best_response(p, r1, r2) != want:
             bad_pattern += 1
-    report("Lemma 10 (realizable threshold types)",
+    report("Section 9.2 (realizable threshold types)",
            bad_range == 0 and bad_pattern == 0,
            f"range violations {bad_range}, pattern mismatches {bad_pattern}")
 
 
 def check_lemma11(trials=50000, seed=1):
-    """Lemma 11: hit iff p1 > r1 and p3 >= 1-r2, and at most one hit."""
+    """Lemma 10: hit iff p1 > r1 and p3 >= 1-r2, and at most one hit."""
     rng = np.random.default_rng(seed)
     bad_iff = 0
     worst_hits = 0
@@ -89,15 +89,15 @@ def check_lemma11(trials=50000, seed=1):
             p = rng.dirichlet(np.ones(4))[:3]
             hits = sum(best_response(p, (j - 1) / M, j / M) == 1 for j in range(1, M + 1))
             worst_hits = max(worst_hits, hits)
-    report("Lemma 11 (hit condition, at most one hit)",
+    report("Lemma 10 (hit condition, at most one hit)",
            bad_iff == 0 and worst_hits <= 1,
            f"iff mismatches {bad_iff}, max simultaneous hits {worst_hits}")
 
 
 def check_benchmarks_tie_free(M=64, seed=7):
-    """The benchmarks of Theorems 13 and 32 must hit under ANY tie rule.
+    """The benchmarks of Theorems 12 and 24 must hit under ANY tie rule.
 
-    Theorem 13 uses the midpoint of I_j and Theorem 32 the midpoint of the
+    Theorem 12 uses the midpoint of I_j and Theorem 24 the midpoint of the
     innermost nested interval; at both, target 2 is the strict maximizer, so
     the value of the benchmark does not depend on how ties are broken.  The
     endpoint of I_j, which sits exactly on the tie U(3, p) = U(2, p) = 0,
@@ -117,7 +117,7 @@ def check_benchmarks_tie_free(M=64, seed=7):
         for rule in ("low", "high"):
             mid_ok &= br(pm, r1, r2, rule) == 1
             end_ok &= br(pe, r1, r2, rule) == 1
-    # Theorem 32: midpoint of the innermost of a nested chain hits every type
+    # Theorem 24: midpoint of the innermost of a nested chain hits every type
     rng = np.random.default_rng(seed)
     nested_ok = True
     for _ in range(2000):
@@ -132,14 +132,14 @@ def check_benchmarks_tie_free(M=64, seed=7):
         for (r1, r2) in chain:
             for rule in ("low", "high"):
                 nested_ok &= br(p, r1, r2, rule) == 1
-    report("Theorems 13, 32 (benchmark hits under any tie rule)",
+    report("Theorems 12, 24 (benchmark hits under any tie rule)",
            mid_ok and nested_ok and not end_ok,
            f"midpoint {mid_ok}, nested midpoint {nested_ok}, "
            f"endpoint tie-free {end_ok} (expected False)")
 
 
 def check_lemma12_and_thm13(Tmax=10):
-    """Lemma 12 / Theorem 13: the counting bound is exactly the optimum.
+    """Lemma 11 / Theorem 12: the counting bound is exactly the optimum.
 
     F(m, s) is the largest total number of hits, summed over all m candidates,
     that any deterministic strategy can force in s rounds when the consistent
@@ -156,15 +156,15 @@ def check_lemma12_and_thm13(Tmax=10):
         M = 2 ** T
         dp = T - F(M, T) / M
         worst = max(worst, abs(dp - closed_form(M, T)))
-    report("Lemma 12 / Theorem 13 (counting bound is exactly attained)",
+    report("Lemma 11 / Theorem 12 (counting bound is exactly attained)",
            worst < 1e-12, f"max |DP optimum - (T - (2^(T+1)-T-2)/M)| = {worst:.2e}")
 
 
 def check_simulation(Tmax=14):
-    """Theorem 13 in the actual game: simulated regret equals T-2+(T+2)/2^T."""
+    """Theorem 12 in the actual game: simulated regret equals T-2+(T+2)/2^T."""
     worst = max(abs(expected_regret(2 ** T, T) - closed_form(2 ** T, T))
                 for T in range(1, Tmax + 1))
-    report("Theorem 13 (simulated game matches the bound)",
+    report("Theorem 12 (simulated game matches the bound)",
            worst < 1e-12, f"max discrepancy {worst:.2e}")
 
 
@@ -186,11 +186,11 @@ def check_observe_exact(depth=24, trials=20000, seed=2):
 
 
 def check_holder(trials=200000, seed=3):
-    """Step 8 of Theorem 28, as the proof actually uses it.
+    """The Holder step of Theorem 20, as the proof actually uses it.
 
     Holder alone gives sum L_j^{2/3} <= m^{1/3} (sum L_j)^{2/3}, which is a
     theorem and cannot fail.  The step the proof takes is the chain that
-    follows from it *together with* the two facts Lemma 26 supplies,
+    follows from it *together with* the two facts Lemma 19 supplies,
     m <= K' and sum_j L_j <= T, namely
 
         sum_j L_j^{2/3} <= K'^{1/3} T^{2/3},
@@ -222,14 +222,14 @@ def check_holder(trials=200000, seed=3):
             bad_equal += 1
         if rhs > 0:
             worst_slack = min(worst_slack, (rhs - lhs) / rhs)
-    report("Theorem 28 Step 8 (Holder, under Lemma 26's constraints)",
+    report("Theorem 20 (the Holder step, under Lemma 19's constraints)",
            bad == 0 and bad_equal == 0,
            f"violations {bad}, equality-case mismatches {bad_equal}, "
            f"tightest relative slack {worst_slack:.2e}")
 
 
 def check_Bstar(trials=100000, seed=4):
-    """Corollary 30: B* is where batching stops being free, and the call count
+    """Corollary 22: B* is where batching stops being free, and the call count
     it licenses is optimal.
 
     Asserting 2*K*B* == lead would be a tautology, since B* is *defined* as
@@ -265,7 +265,7 @@ def check_Bstar(trials=100000, seed=4):
         worst_ratio = max(worst_ratio, ratio)
         if abs(ratio - 2 * (1 + 2 * K / lead)) > 1e-9 * ratio or not (2.0 - 1e-9 <= ratio <= 3.0):
             bad_lb += 1
-    report("Corollary 30 (B* is the crossover; call count optimal)",
+    report("Corollary 22 (B* is the crossover; call count optimal)",
            bad_dom == 0 and bad_calls == 0 and bad_lb == 0,
            f"dominance flips {bad_dom}, call-count form {bad_calls}, "
            f"sufficient/necessary call ratio = 2(1+2K/lead) <= {worst_ratio:.4f} "
@@ -273,15 +273,15 @@ def check_Bstar(trials=100000, seed=4):
 
 
 def check_bits(M=2 ** 10, T=14):
-    """Theorem 16: the optimal regret on U_M with a b-bit oracle.
+    """Theorem 15: the optimal regret on U_M with a b-bit oracle.
 
     Three things are checked at once.  (a) The measured regret of the
-    budget-b scheme of Theorem 16(ii), played in the real game, lies between
+    budget-b scheme of Theorem 15(ii), played in the real game, lies between
     the lower bound min{T, floor(log2 M) - b} - 2 and the upper bound
     min{T, max(0, ceil(log2 M) - b)}.  (b) It depends on M and b only through
     log2(M) - b, i.e. a budget-b run on U_M equals a budget-0 run on
     U_{M/2^b}.  (c) The tail bound Pr[tau <= u] <= 2^b (2^u - 1) / M of
-    Lemma 12 implies E[min{tau-1,T}] >= min{T, floor(log2 M) - b} - 2, which
+    Lemma 11 implies E[min{tau-1,T}] >= min{T, floor(log2 M) - b} - 2, which
     is the step from Equation (30) to Equation (31).
     """
     m = int(math.log2(M))
@@ -312,7 +312,7 @@ def check_bits(M=2 ** 10, T=14):
                     algebra_ok = False
     # and the real-b step of the proof: 2 - f >= 2^(1-f) on [0, 1)
     frac_ok = all(2 - f / 1000 >= 2 ** (1 - f / 1000) - 1e-12 for f in range(0, 1000))
-    report("Theorem 16 (bit price: value, collapse, and Eq. (31))",
+    report("Theorem 15 (bit price: value, collapse, and Eq. (31))",
            in_band and worst_gap < 1e-12 and algebra_ok and frac_ok,
            f"inside [lb, ub] {in_band}, max |budget-b on M - budget-0 on M/2^b| "
            f"= {worst_gap:.2e}, Eq. (31) all cases {algebra_ok}, "
@@ -320,7 +320,7 @@ def check_bits(M=2 ** 10, T=14):
 
 
 def check_sqrtT(seed=12):
-    """Proposition 21: two types on a two-element universe cost Theta(sqrt T).
+    """Proposition 16: two types on a two-element universe cost Theta(sqrt T).
 
     (a) The floor (1/2) sqrt(floor(T/2)) is below the exact optimal expected
     regret (1/2) E|N_1 - N_2| for every T in a wide range -- this is the
@@ -338,14 +338,14 @@ def check_sqrtT(seed=12):
     for T in (16, 64, 256, 1024):
         got = run_two_type(T, rng, 20000)
         worst = max(worst, abs(got - sqrt_exact(T)) / sqrt_exact(T))
-    report("Proposition 21 (two types cost sqrt(T), and the floor is valid)",
+    report("Proposition 16 (two types cost sqrt(T), and the floor is valid)",
            floor_ok and binom_ok and worst < 0.05,
            f"floor <= optimum {floor_ok}, binomial bound {binom_ok}, "
            f"max relative gap of follow-the-leader to the optimum {worst:.3f}")
 
 
 def check_adaptive(reps=400, seed=11):
-    """Proposition 34: chosen report times cost at most K', scheduled ones K'(B-2).
+    """Proposition 26: chosen report times cost at most K', scheduled ones K'(B-2).
 
     Both schemes are run on the same nested-interval instance and at the same
     report budget N = K, so the comparison is like for like.
@@ -362,13 +362,13 @@ def check_adaptive(reps=400, seed=11):
             ok &= miss <= K + 1e-9 and q <= K
             if (K, B) == (4, 32):
                 detail = [miss, q, sched, K * (B - 2)]
-    report("Proposition 34 (chosen times cost <= |K|, scheduled cost |K|(B-2))",
+    report("Proposition 26 (chosen times cost <= |K|, scheduled cost |K|(B-2))",
            ok, f"at |K|=4, B=32: adaptive {detail[0]:.2f} (<= 4) with "
                f"{detail[1]} queries, scheduled {detail[2]:.1f} vs |K|(B-2)={detail[3]}")
 
 
 def check_oracle(trials=60, seed=5):
-    """Section 11.1: MILP == profile enumeration == brute force over E(C;eps)."""
+    """Appendix C: MILP == profile enumeration == brute force over E(C;eps)."""
     rng = np.random.default_rng(seed)
     worst = 0.0
     for _ in range(trials):
@@ -386,12 +386,12 @@ def check_oracle(trials=60, seed=5):
                  for p in compute_extreme_points(game, types))
         worst = max(worst, abs(ve - vm), abs(ve - inst.lifted_value(pe, a, b)),
                     abs(vm - inst.lifted_value(pm, a, b)), vE - ve)
-    report("Section 11.1 (oracle back-ends agree with brute force)", worst < 1e-5,
+    report("Appendix C (oracle back-ends agree with brute force)", worst < 1e-5,
            f"worst discrepancy {worst:.2e}")
 
 
 def check_estimator(reps=40000, seed=6):
-    """Lemma 36(ii): |B_tau| g_tau is unbiased for the block's type counts."""
+    """Lemma 29(ii): |B_tau| g_tau is unbiased for the block's type counts."""
     rng = np.random.default_rng(seed)
     n, K, L = 6, 3, 40
     game = SSGame(n=n, u_d_c=rng.uniform(0.1, 1, n), u_d_u=rng.uniform(-1, -0.1, n))
@@ -413,7 +413,7 @@ def check_estimator(reps=40000, seed=6):
     err = float(np.abs(est - m).max())
     # three standard errors of the mean of a Bernoulli-driven estimate
     tol = 3 * L * math.sqrt(K) / math.sqrt(reps) + 0.05
-    report("Lemma 36(ii) (frequency estimator is unbiased)", err < tol,
+    report("Lemma 29(ii) (frequency estimator is unbiased)", err < tol,
            f"max |estimate - truth| = {err:.3f} on counts {m} (tolerance {tol:.3f})")
 
 
@@ -435,7 +435,7 @@ def main():
     check_holder(20000 if q else 200000)
     check_Bstar(10000 if q else 100000)
     check_adaptive(reps=60 if q else 400)
-    print("Section 11 (the implementation)")
+    print("Appendix C (the implementation)")
     check_oracle(10 if q else 60)
     check_estimator(4000 if q else 40000)
     print()

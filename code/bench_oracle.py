@@ -1,6 +1,6 @@
 """Runtime of the best-response oracle versus exhaustive vertex enumeration.
 
-Produces the scaling table quoted in Section 11 of the report: for each
+Produces the scaling table quoted in Appendix C of the report: for each
 (n, K) we time
 
   * `algorithm.compute_extreme_points` -- the exhaustive enumeration of
