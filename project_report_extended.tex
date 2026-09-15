@@ -254,11 +254,9 @@ Our contributions are the following.
     adversarial sequence of length $T$ under full-information feedback.
     The rate matches Theorem~5.1 of \citet{balcan2015} with $k$ replaced
     by $\Kmax$; for constant $\Kmax$ it is $\tilde O(n\sqrt T)$.
-  \item \textbf{Regime analysis (\Cref{cor:regime,cor:adaptive}).}
-    We characterize the parameter regime in which the bound is meaningful
-    ($n^2\Kmax^2\log(n\Kmax)=o(T)$), and we prove an
-    instance-adaptive refinement in which the leading factor depends on
-    the number $K'$ of types \emph{actually} observed rather than on
+  \item \textbf{Instance-adaptive refinement (\Cref{cor:adaptive}).}
+    We prove a refinement of the bound in which the leading factor depends
+    on the number $K'$ of types \emph{actually} observed rather than on
     $\Kmax$.
   \item \textbf{An impossibility result under partial information
     (\Cref{sec:partial}).}
@@ -569,10 +567,9 @@ matching the known-$K$ bound of \citet[Theorem 5.1]{balcan2015} up to
 logarithmic factors.
 \end{theorem}
 
-We prove \Cref{thm:main} in detail in \Cref{sec:proof}. Two useful
-corollaries of the proof (the regime of applicability and an
-instance-adaptive refinement) are stated after the proof in
-\Cref{sec:consequences}.
+We prove \Cref{thm:main} in detail in \Cref{sec:proof}. An
+instance-adaptive refinement that follows from the proof is stated after it
+in \Cref{sec:consequences}.
 
 % ==========================================================================
 \section{Proof of \Cref{thm:main}}
@@ -767,32 +764,8 @@ completes the proof.
 \subsection{Consequences of the proof}
 \label{sec:consequences}
 
-Two corollaries follow directly from the proof of \Cref{thm:main} above.
-The first characterizes the regime in which the bound is non-trivial,
-the second gives an instance-adaptive refinement.
-
-\begin{corollary}[Regime of applicability]
-\label{cor:regime}
-The bound of \Cref{thm:main} is sublinear in $T$ if and only if
-\[
-n^2\Kmax^2\log(n\Kmax)\;=\;o(T).
-\]
-In particular it is sublinear whenever
-$\Kmax=O\!\bigl(\sqrt T/(n\log T)\bigr)$, and for $\Kmax=O(1)$ the rate is
-$\tilde O(n\sqrt T)$.
-\end{corollary}
-
-\begin{proof}
-Dividing \Cref{eq:main} by $T$, the bound is $o(T)$ exactly when
-$n\Kmax\sqrt{\log(n\Kmax)}=o(\sqrt T)$, which, both sides being
-non-negative, is equivalent to $n^2\Kmax^2\log(n\Kmax)=o(T)$. If
-$n\Kmax\le c\sqrt T/\log T$ for all large $T$, then $n\Kmax\le\sqrt T$ once
-$\log T\ge c$, so $\log(n\Kmax)\le\tfrac12\log T$ and
-\[
-n^2\Kmax^2\log(n\Kmax)\;\le\;\frac{c^2T}{\log^2 T}\cdot\frac{\log T}{2}
-\;=\;\frac{c^2T}{2\log T}\;=\;o(T).
-\]
-\end{proof}
+The following refinement follows directly from the proof of
+\Cref{thm:main} above.
 
 \begin{corollary}[Instance-adaptive bound]
 \label{cor:adaptive}
