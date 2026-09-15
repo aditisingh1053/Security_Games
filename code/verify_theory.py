@@ -1,9 +1,10 @@
-"""Numerical checks of the non-asymptotic claims in Sections 9-11.
+"""Numerical checks of the non-asymptotic claims in Sections 6-9.
 
-Covered: every claim of Sections 9 and 10 that is not purely asymptotic, and
-the oracle and estimator claims of Appendix C.  NOT covered, because they
+Covered: Step 7 of Section 6, every claim of Sections 7 and 8 that is not
+purely asymptotic, and
+the oracle and estimator claims of Appendix B.  NOT covered, because they
 are measurements rather than claims about the algebra: the fitted exponents,
-envelope constants and timings of Section 11 and Appendices C-D, printed by
+envelope constants and timings of Section 9 and Appendices B-C, printed by
 `bench_oracle.py`, `plot_tractable_regret.py`, `plot_block_revelation.py` and
 `plot_impossibility.py` when those are rerun.
 
@@ -36,7 +37,6 @@ from plot_impossibility import (
     expected_regret,
     observe_exact,
     run_nested,
-    run_nested_adaptive,
     run_two_type,
     sqrt_exact,
     sqrt_floor,
@@ -54,7 +54,7 @@ def report(name, ok, detail=""):
 
 # ---------------------------------------------------------------------------
 def check_lemma10(trials=20000, seed=0):
-    """Section 9.2: utilities in [-1,1] and the 1/2/3 pattern on the segment."""
+    """Section 7.2: utilities in [-1,1] and the 1/2/3 pattern on the segment."""
     rng = np.random.default_rng(seed)
     bad_range = bad_pattern = 0
     for _ in range(trials):
@@ -67,7 +67,7 @@ def check_lemma10(trials=20000, seed=0):
         want = 0 if p1 <= r1 else (1 if p1 <= r2 else 2)
         if best_response(p, r1, r2) != want:
             bad_pattern += 1
-    report("Section 9.2 (realizable threshold types)",
+    report("Section 7.2 (realizable threshold types)",
            bad_range == 0 and bad_pattern == 0,
            f"range violations {bad_range}, pattern mismatches {bad_pattern}")
 
@@ -296,31 +296,8 @@ def check_sqrtT(seed=12):
            f"max relative gap of follow-the-leader to the optimum {worst:.3f}")
 
 
-def check_adaptive(reps=400, seed=11):
-    """Proposition 24: chosen report times cost at most K', scheduled ones K'(B-2).
-
-    Both schemes are run on the same nested-interval instance and at the same
-    report budget N = K, so the comparison is like for like.
-    """
-    rng = np.random.default_rng(seed)
-    ok = True
-    detail = []
-    for K in (1, 2, 3, 4):
-        for B in (4, 8, 16, 32):
-            res = [run_nested_adaptive(K, B, rng) for _ in range(reps)]
-            miss = float(np.mean([r[0] for r in res]))
-            q = max(r[1] for r in res)
-            sched = float(np.mean([run_nested(K, B, K * B, rng) for _ in range(reps)]))
-            ok &= miss <= K + 1e-9 and q <= K
-            if (K, B) == (4, 32):
-                detail = [miss, q, sched, K * (B - 2)]
-    report("Proposition 24 (chosen times cost <= |K|, scheduled cost |K|(B-2))",
-           ok, f"at |K|=4, B=32: adaptive {detail[0]:.2f} (<= 4) with "
-               f"{detail[1]} queries, scheduled {detail[2]:.1f} vs |K|(B-2)={detail[3]}")
-
-
 def check_oracle(trials=60, seed=5):
-    """Appendix C: MILP == profile enumeration == brute force over E(C;eps)."""
+    """Appendix B: MILP == profile enumeration == brute force over E(C;eps)."""
     rng = np.random.default_rng(seed)
     worst = 0.0
     for _ in range(trials):
@@ -338,12 +315,12 @@ def check_oracle(trials=60, seed=5):
                  for p in compute_extreme_points(game, types))
         worst = max(worst, abs(ve - vm), abs(ve - inst.lifted_value(pe, a, b)),
                     abs(vm - inst.lifted_value(pm, a, b)), vE - ve)
-    report("Appendix C (oracle back-ends agree with brute force)", worst < 1e-5,
+    report("Appendix B (oracle back-ends agree with brute force)", worst < 1e-5,
            f"worst discrepancy {worst:.2e}")
 
 
 def check_estimator(reps=40000, seed=6):
-    """Lemma 27(ii): |B_tau| g_tau is unbiased for the block's type counts."""
+    """Lemma 24(ii): |B_tau| g_tau is unbiased for the block's type counts."""
     rng = np.random.default_rng(seed)
     n, K, L = 6, 3, 40
     game = SSGame(n=n, u_d_c=rng.uniform(0.1, 1, n), u_d_u=rng.uniform(-1, -0.1, n))
@@ -365,8 +342,56 @@ def check_estimator(reps=40000, seed=6):
     err = float(np.abs(est - m).max())
     # three standard errors of the mean of a Bernoulli-driven estimate
     tol = 3 * L * math.sqrt(K) / math.sqrt(reps) + 0.05
-    report("Lemma 27(ii) (frequency estimator is unbiased)", err < tol,
+    report("Lemma 24(ii) (frequency estimator is unbiased)", err < tol,
            f"max |estimate - truth| = {err:.3f} on counts {m} (tolerance {tol:.3f})")
+
+
+def check_step7():
+    """Section 6, Step 7: log Nmax = O(n^2 K log(nK)), and Step 10's substitution.
+
+    Guards the whole chain, including the trap that sank the first draft: the
+    sqrt(K) of the Cauchy-Schwarz step (Step 9) makes the regret scale with K,
+    not sqrt(K), so Balcan's Theorem 5.1 form with k -> Kmax is NOT an upper
+    bound on ours.
+    """
+    lg = lambda z: math.log(z, 2)
+    grid = [(n, K) for n in range(2, 41)
+                   for K in (1, 2, 3, 5, 10, 100, 10**3, 10**6)]
+
+    # (i) each inequality of the displayed chain, term by term
+    line1 = lambda n, K: n * lg(2**n + K * n * n) + K * lg(n)
+    line2 = lambda n, K: n * (n + 1 + lg(K * n * n)) + K * lg(n)
+    line3 = lambda n, K: n * n + n * lg(n * K) + K * lg(n)
+    line4 = lambda n, K: n * n * K * lg(n * K)
+    bad12 = [(n, K) for n, K in grid if line1(n, K) > line2(n, K) + 1e-9]
+    # lines 2 -> 3 -> 4 hold up to absolute constants; record the constants
+    c23 = max(line2(n, K) / line3(n, K) for n, K in grid)
+    c34 = max(line3(n, K) / line4(n, K) for n, K in grid)
+    c14 = max(line1(n, K) / line4(n, K) for n, K in grid)
+    report("Section 6, Step 7 (log Nmax chain)",
+           not bad12 and c23 <= 3 and c34 <= 3,
+           f"exact<=line2 violations {len(bad12)}, "
+           f"line2/line3 <= {c23:.3f}, line3/line4 <= {c34:.3f}, "
+           f"exact/final <= {c14:.3f}")
+
+    # (ii) Step 10: sqrt(K * T * logNmax) must reproduce n*K*sqrt(T log nK)
+    T = 10**6
+    worst = max(abs(math.sqrt(K * T * line4(n, K)) - n * K * math.sqrt(T * lg(n * K)))
+                / (n * K * math.sqrt(T * lg(n * K))) for n, K in grid)
+    report("Section 6, Step 10 (substitution gives n*K*sqrt(T log nK))",
+           worst < 1e-12, f"max relative error {worst:.2e}")
+
+    # (iii) the guard: K to the FIRST power understates our bound by exactly K.
+    # (our regret)^2 = K * T * logNmax; Balcan Thm 5.1 with k -> K is T n^2 K log(nK).
+    ours = lambda n, K: K * T * line4(n, K)
+    balcan_k1 = lambda n, K: T * n * n * K * lg(n * K)
+    rel = max(abs(ours(n, K) / balcan_k1(n, K) - K) / K for n, K in grid)
+    viol = [(n, K) for n, K in grid if ours(n, K) > balcan_k1(n, K) * (1 + 1e-9)]
+    kge2 = sum(1 for _, K in grid if K >= 2)
+    report("Section 6 (Cauchy-Schwarz sqrt(K) is real: the k^1 form is not an upper bound)",
+           rel < 1e-12 and len(viol) == kge2,
+           f"(ours / k^1 form) = Kmax exactly, max relative dev {rel:.2e}; "
+           f"strict on {len(viol)}/{kge2} points with Kmax >= 2, equality at Kmax = 1")
 
 
 def main():
@@ -374,7 +399,9 @@ def main():
     ap.add_argument("--quick", action="store_true")
     args = ap.parse_args()
     q = args.quick
-    print("Section 9 (the gadget and the lower bounds)")
+    print("Section 6 (the expert-set bound)")
+    check_step7()
+    print("Section 7 (the gadget and the lower bounds)")
     check_lemma10(2000 if q else 20000)
     check_lemma11(5000 if q else 50000)
     check_benchmarks_tie_free()
@@ -382,11 +409,10 @@ def main():
     check_simulation(8 if q else 14)
     check_observe_exact(trials=2000 if q else 20000)
     check_sqrtT()
-    print("Section 10 (the block-revelation bound)")
+    print("Section 8 (the block-revelation bound)")
     check_holder(20000 if q else 200000)
     check_Bstar(10000 if q else 100000)
-    check_adaptive(reps=60 if q else 400)
-    print("Appendix C (the implementation)")
+    print("Appendix B (the implementation)")
     check_oracle(10 if q else 60)
     check_estimator(4000 if q else 40000)
     print()

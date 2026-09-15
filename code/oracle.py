@@ -57,7 +57,7 @@ class OracleInstance:
 
     Attacker and defender utilities are passed explicitly so that the same
     object serves both the full-information algorithm of Section 5 and the
-    block-revelation algorithm of Section 10.
+    block-revelation algorithm of Section 8.
     """
 
     n: int

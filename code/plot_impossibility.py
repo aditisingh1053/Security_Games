@@ -1,6 +1,6 @@
-"""The lower bounds of Sections 9 and 10, in simulation.
+"""The lower bounds of Sections 7 and 8, in simulation.
 
-Plays the three-target gadget game G_3 of Section 9.2 for real -- attacker
+Plays the three-target gadget game G_3 of Section 7.2 for real -- attacker
 types are built from their utility vectors, best responses are computed from
 those utilities, and the defender's payoff is read off the attacked target --
 against the *optimal* defender for that game, namely the one that keeps the
@@ -15,9 +15,7 @@ Produces `figures/impossibility.{pdf,png}`:
   (b) Proposition 14: with two attacker types on a two-element universe the
       regret is Theta(sqrt(T)), against the flat curve for one type;
   (c) Theorem 22: on the nested-interval instance, regret grows as K(B - 2)
-      in the revelation length B, so batching really does cost Theta(K B);
-  (d) Proposition 24: the same K reports cost K(B - 2) when their times are
-      fixed in advance and at most K when the defender chooses them.
+      in the revelation length B, so batching really does cost Theta(K B).
 
 Run from `code/`:  python plot_impossibility.py
 """
@@ -41,7 +39,7 @@ U_D = np.array([-1.0, 0.0, -1.0])
 
 
 def attacker_utils(r1: float, r2: float):
-    """Type alpha_{r1,r2} of Section 9.2: U(1,p) = r1 - p1, U(2,p) = 0,
+    """Type alpha_{r1,r2} of Section 7.2: U(1,p) = r1 - p1, U(2,p) = 0,
     U(3,p) = (1 - r2) - p3.  All utilities lie in [-1, 1]."""
     u_c = np.array([r1 - 1.0, 0.0, -r2])
     u_u = np.array([r1, 0.0, 1.0 - r2])
@@ -92,7 +90,7 @@ def observe_exact(p1_num: int, r1_num: int, r2_num: int) -> int:
 
     With p = (p1, 0, 1 - p1) and the type alpha_{r1,r2}, Lemma 10 gives
     b(p) = 2 iff p1 > r1 and 1 - p1 >= 1 - r2, i.e. iff r1 < p1 <= r2, and
-    Section 9.2 gives b(p) = 1 for p1 <= r1 and b(p) = 3 for p1 > r2.  All three
+    Section 7.2 gives b(p) = 1 for p1 <= r1 and b(p) = 3 for p1 > r2.  All three
     quantities are multiples of a common power of two here, so the comparisons
     are done on integer numerators and the nesting can be iterated to any
     depth without floating-point error.  `_check_observe_exact` verifies the
@@ -193,40 +191,6 @@ def run_two_type(T: int, rng, reps: int) -> float:
     return tot / reps
 
 
-def run_nested_adaptive(K: int, B: int, rng) -> tuple:
-    """Proposition 24 on the same instance that run_nested plays.
-
-    The defender may spend a query at the end of any round instead of being
-    handed a report every B rounds.  It plays the midpoint of the smallest
-    revealed interval and queries exactly when it missed; the query returns
-    the type that has just attacked, hence that type's interval.  Returns
-    (misses, queries).  The instance is the one of run_nested -- K nested
-    types, type j active for the B rounds of block j -- so the two schemes are
-    compared at the same report budget N = K.
-
-    Endpoints are integer numerators over 2^(K*B+1); the extra bit keeps every
-    interval of width at least two, so the midpoint of an interval is always
-    an interior point of it and a correctly located defender never misses.
-    """
-    den_bits = K * B + 1
-    true_lo, true_hi = 0, 1 << den_bits            # J_0 = (0, 1]
-    known = None                                   # smallest revealed interval
-    misses = queries = 0
-    for _ in range(1, K + 1):
-        width = (true_hi - true_lo) >> B
-        k_true = 1 + int(rng.integers(0, 1 << B))
-        r1, r2 = true_lo + (k_true - 1) * width, true_lo + k_true * width
-        for _ in range(B):
-            p1 = (1 << (den_bits - 1)) if known is None else (known[0] + known[1]) // 2
-            if observe_exact(p1, r1, r2) == 1:     # target 2 attacked: a hit
-                continue
-            misses += 1
-            queries += 1                           # the miss triggers a query
-            known = (r1, r2)                       # ... which names the type
-        true_lo, true_hi = r1, r2                  # the next type nests inside
-    return misses, queries
-
-
 def main() -> None:
     os.makedirs(OUT_DIR, exist_ok=True)
 
@@ -237,7 +201,7 @@ def main() -> None:
     err = max(abs(a - b) for a, b in zip(reg_inf, pred_inf))
     print(f"(a) max |simulated - T + (2^(T+1)-T-2)/2^T| = {err:.2e}")
 
-    # ---- (c), (d) the block-revelation lower bound and Proposition 24 ----
+    # ---- (c) the block-revelation lower bound -------------------------
     Bs = [4, 8, 16, 32]
     Ks = [1, 2, 3, 4]
     print(f"    exact-observation check against the utility-based best response: "
@@ -245,12 +209,6 @@ def main() -> None:
     rng = np.random.default_rng(0)
     nested = {K: [float(np.mean([run_nested(K, B, K * B, rng) for _ in range(400)]))
                   for B in Bs] for K in Ks}
-    K_ad = 4
-    adaptive = [float(np.mean([run_nested_adaptive(K_ad, B, rng)[0] for _ in range(400)]))
-                for B in Bs]
-    ad_q = [float(np.mean([run_nested_adaptive(K_ad, B, rng)[1] for _ in range(400)]))
-            for B in Bs]
-
     # ---- the sqrt(T) floor at Kmax = 2 (Proposition 14) -----------------
     Ts_c = [16, 32, 64, 128, 256, 512, 1024, 2048, 4096]
     ftl = [run_two_type(T, rng, 20000) for T in Ts_c]
@@ -261,10 +219,10 @@ def main() -> None:
     for T, a, b_, c_, d_ in zip(Ts_c, ftl, exact_c, floor_c, one_type):
         print(f"{T:>5} {a:>15.3f} {b_:>13.3f} {c_:>7.3f} {d_:>8.3f}")
 
-    fig, axes = plt.subplots(2, 2, figsize=(9.2, 6.4))
+    fig, axes = plt.subplots(1, 3, figsize=(13.2, 3.5))
     cols = ["tab:blue", "tab:green", "tab:orange", "tab:purple"]
 
-    ax = axes[0, 0]
+    ax = axes[0]
     ax.plot(Ts, reg_inf, "o-", color="tab:red", lw=1.7, ms=4,
             label="optimal defender, $M=2^{T}$")
     ax.plot(Ts, [T - 2 for T in Ts], color="black", ls="--", lw=1.0,
@@ -276,7 +234,7 @@ def main() -> None:
     ax.set_ylabel("expected regret", fontsize=8)
     ax.tick_params(labelsize=7); ax.legend(fontsize=6.5, loc="upper left"); ax.grid(alpha=0.25)
 
-    ax = axes[0, 1]
+    ax = axes[1]
     ax.plot(Ts_c, ftl, "o", color="tab:red", ms=5,
             label=r"$|K|=2$: measured (follow the leader)")
     ax.plot(Ts_c, exact_c, "-", color="tab:red", lw=1.4,
@@ -292,7 +250,7 @@ def main() -> None:
     ax.set_ylabel("expected regret", fontsize=8)
     ax.tick_params(labelsize=7); ax.legend(fontsize=6.5, loc="upper left"); ax.grid(alpha=0.25)
 
-    ax = axes[1, 0]
+    ax = axes[2]
     Bs_arr = np.array(Bs, dtype=float)
     for K, c in zip(Ks, cols):
         ax.plot(Bs_arr, K * (Bs_arr - 2), color="0.35", ls="--", lw=1.6,
@@ -303,21 +261,6 @@ def main() -> None:
                  fontsize=9)
     ax.set_xlabel("revelation length $B$", fontsize=8)
     ax.set_ylabel("expected regret", fontsize=8)
-    ax.tick_params(labelsize=7); ax.legend(fontsize=6.5, loc="upper left"); ax.grid(alpha=0.25)
-
-    ax = axes[1, 1]
-    ax.plot(Bs_arr, K_ad * (Bs_arr - 2), color="0.35", ls="--", lw=1.4,
-            label=rf"$|K|(B-2)$, $|K|={K_ad}$")
-    ax.plot(Bs_arr, nested[K_ad], "s-", color="tab:red", lw=1.5, ms=5,
-            label="scheduled (Theorem 22)")
-    ax.plot(Bs_arr, adaptive, "o-", color="tab:blue", lw=1.5, ms=5,
-            label="defender-chosen (Proposition 24)")
-    ax.axhline(K_ad, color="tab:blue", ls=":", lw=1.0, label=rf"$|K|={K_ad}$")
-    ax.set_yscale("log")
-    ax.set_title(r"(d) same $N=|K|$ reports: chosen times vs. fixed times",
-                 fontsize=9)
-    ax.set_xlabel("revelation length $B$ (horizon $T=|K|B$)", fontsize=8)
-    ax.set_ylabel("expected regret (log scale)", fontsize=8)
     ax.tick_params(labelsize=7); ax.legend(fontsize=6.5, loc="upper left"); ax.grid(alpha=0.25)
 
     fig.tight_layout()
@@ -332,9 +275,6 @@ def main() -> None:
     for K in Ks:
         for B, v in zip(Bs, nested[K]):
             print(f"{K:>5} {B:>4} {v:>11.3f} {K*(B-2):>8}")
-    print("\n    B   adaptive   queries   |K|")
-    for B, v, q in zip(Bs, adaptive, ad_q):
-        print(f"{B:>5} {v:>10.3f} {q:>9.3f} {K_ad:>5}")
 
 
 if __name__ == "__main__":

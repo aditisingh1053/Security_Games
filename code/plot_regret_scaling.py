@@ -1,4 +1,4 @@
-"""Generate Figure 2 of the report: cumulative Regret(T) vs T, with the
+"""Generate Figure 3 of the report: cumulative Regret(T) vs T, with the
 C * sqrt(T) upper envelope implied by the main theorem.
 
 Saves to figures/regret_vs_T_scaling.{pdf,png}.

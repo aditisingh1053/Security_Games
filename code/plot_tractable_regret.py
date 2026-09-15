@@ -1,4 +1,4 @@
-"""Reproduce the Section 7 experiments at n = 10 and n = 20.
+"""Reproduce the Section 9 experiments at n = 10 and n = 20.
 
 Figures 1 and 2 of the report were run at n = 3 because the expert set
 E(C; eps) was built by exhaustive vertex enumeration.  This script reruns the
@@ -9,13 +9,13 @@ Produces `figures/tractable_regret.{pdf,png}`:
 
   (a) rolling-window per-round regret at n = 10 under the staggered-uniform
       adversary, showing the epoch structure of the proof of Theorem 6 (one
-      spike per discovery round) -- this is Figure 1 at n = 10;
+      spike per discovery round) -- this is Figure 2 at n = 10;
   (b) the same at n = 20;
   (c) cumulative regret at n = 10 under the uniform-random adversary, with the
-      C sqrt(t) envelope -- this is Figure 2 at n = 10;
+      C sqrt(t) envelope -- this is Figure 3 at n = 10;
   (d) the same at n = 20.
 
-Panels (a), (b) and panels (c), (d) use the two adversaries of Section 7 for
+Panels (a), (b) and panels (c), (d) use the two adversaries of Section 9 for
 the same reason Figures 1 and 2 do.  The staggered-uniform adversary spreads
 the discovery rounds across the horizon and so exhibits the epoch structure,
 but it is non-stationary, so the best *fixed* strategy in hindsight is a weak
@@ -59,7 +59,7 @@ def make_types(n, K, rng):
 
 
 def staggered_uniform(T, types, rng):
-    """The staggered-uniform adversary of Section 7.1: phase i draws uniformly
+    """The staggered-uniform adversary of Section 9.1: phase i draws uniformly
     from the first i types, so discovery rounds fall at t = 0, T/K, 2T/K, ..."""
     K = len(types)
     L = T // K
@@ -71,7 +71,7 @@ def staggered_uniform(T, types, rng):
 
 
 def uniform_random(T, types, rng):
-    """The uniform-random adversary of Section 7.2: a_t is drawn uniformly
+    """The uniform-random adversary of Section 9.2: a_t is drawn uniformly
     from all K types, independently across rounds."""
     K = len(types)
     return [types[int(rng.integers(0, K))] for _ in range(T)]

@@ -14,8 +14,8 @@ The algorithm and regret bound are described in `gt_report.pdf`.
   revelation length and a separation between scheduled and defender-chosen
   report times;
 * a sqrt(T) lower bound as soon as there are two attacker types;
-* experiments: the lower bounds in simulation (Section 11), and tractable
-  runs at n = 10 and n = 20 (Appendix D).
+* experiments: the lower bounds in simulation (Section 9.4), and tractable
+  runs at n = 10 and n = 20 (Appendix C).
 
 This repository reproduces every figure in both reports.
 
@@ -24,29 +24,29 @@ This repository reproduces every figure in both reports.
     gt_report.pdf               compiled report (Sections 1-8)
     project_report.tex          report source
     project_report_extended.tex source of the extended report (Sections 1-12
-                                plus Appendices A-D)
+                                plus Appendices A-C)
     project_report_extended.pdf compiled extended report
     refs.bib                    bibliography
 
     code/
       algorithm.py              core data structures and GROW-CATALOGUE
-      plot_per_round_regret.py  Figure 1 (rolling per-round regret, n = 3)
-      plot_regret_scaling.py    Figure 2 (Regret vs T scaling, n = 3)
+      plot_per_round_regret.py  Figure 2 (rolling per-round regret, n = 3)
+      plot_regret_scaling.py    Figure 3 (Regret vs T scaling, n = 3)
 
-      oracle.py                 the best-response oracle of Appendix C:
+      oracle.py                 the best-response oracle of Appendix B:
                                 linear optimisation over the lifted set,
                                 by profile enumeration (n^|C| LPs) or by one
                                 MILP; replaces the explicit set E(C; eps)
       tractable.py              Oracle-Grow-Catalogue (Algorithm 1) and
                                 Block-Grow-Catalogue (Algorithm 2), each one
                                 oracle call per round
-      bench_oracle.py           Table 3 (enumeration vs oracle runtimes; App. C)
-      plot_tractable_regret.py  Figure 4 (Algorithm 1 at n = 10, 20; App. D)
-      plot_block_revelation.py  Figure 5 (Algorithm 2 at n = 10, 20; App. D)
-      plot_impossibility.py     Figure 3 (Theorems 12, 22 and
-                                Propositions 14, 24 in simulation)
+      bench_oracle.py           Table 3 (enumeration vs oracle runtimes; App. B)
+      plot_tractable_regret.py  Figure 5 (Algorithm 1 at n = 10, 20; App. C)
+      plot_block_revelation.py  Figure 6 (Algorithm 2 at n = 10, 20; App. C)
+      plot_impossibility.py     Figure 4 (Theorems 12, 22 and
+                                Proposition 14 in simulation)
       verify_theory.py          re-runs the non-asymptotic claims of
-                                Sections 9-10 and Appendix C; prints PASS/FAIL
+                                Sections 7-8 and Appendix B; prints PASS/FAIL
 
     figures/                    figures included in the report
     presentation/               slide deck and its own figures
@@ -64,11 +64,11 @@ From the `code/` directory:
 
     cd code
 
-    # Sections 1-8
+    # Full information (Sections 3-6, 9.1-9.2)
     python plot_per_round_regret.py     # -> ../figures/avg_regret_per_iter.{pdf,png}
     python plot_regret_scaling.py       # -> ../figures/regret_vs_T_scaling.{pdf,png}
 
-    # Sections 9-12
+    # Partial information and block revelation (Sections 7-10)
     python verify_theory.py             # -> PASS/FAIL for every claim
     python bench_oracle.py              # -> Table 3, printed
     python plot_impossibility.py        # -> ../figures/impossibility.{pdf,png}
@@ -96,9 +96,11 @@ curves in `figures/*_curves.npz` without rerunning the simulations.
     pdflatex project_report_extended.tex
     pdflatex project_report_extended.tex
 
-Sections 1-8 of `project_report_extended.tex` are byte-identical to
-`project_report.tex`; Sections 9-12 are appended before the bibliography and
-Appendices A-D after it.
+`project_report_extended.tex` presents the full-information result of
+`project_report.tex` (Sections 3-6) and then the partial-information
+impossibility and its block-revelation repair (Sections 7-8), with the
+experiments consolidated in Section 9, the discussion in Section 10 and
+Appendices A-C after the bibliography.
 
 Requires a TeX Live installation with `texlive-latex-recommended`,
 `texlive-latex-extra`, and `texlive-science` (the last supplies

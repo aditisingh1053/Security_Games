@@ -868,10 +868,9 @@ recovers \citet[Section 6]{balcan2015}.
 Every lower bound below is proved in one fixed game $G_3$: the game of
 \citet[Theorem 7.1]{balcan2015}, with $n=3$ targets, one resource, and
 schedules $\mathcal{D}=\{\emptyset,\{1\},\{2\},\{3\}\}$, so that
-$\cP=\{\pvec\in[0,1]^3:p_1+p_2+p_3\le 1\}$. Letting the resource idle only
-enlarges the defender's action set and so only strengthens the lower bounds;
-every coverage vector we exhibit has $\sum_i p_i=1$, so each argument also
-runs verbatim on the simplex. The defender's payoffs are
+$\cP=\{\pvec\in[0,1]^3:p_1+p_2+p_3\le 1\}$. Every coverage vector we exhibit
+has $\sum_i p_i=1$, so the arguments run verbatim on the simplex as well.
+The defender's payoffs are
 \begin{equation}
 u_d^c(i)=u_d^u(i)=-1\ \ (i\in\{1,3\}),\qquad u_d^c(2)=u_d^u(2)=0,
 \label{eq:g3-def}
@@ -884,10 +883,10 @@ U_d(1,\pvec)=U_d(3,\pvec)=-1,\qquad U_d(2,\pvec)=0
 for every $\pvec\in\cP$. The defender's payoff therefore depends on $\pvec_t$
 only through which target the attacker picks: a round is worth $0$ if
 target~$2$ is attacked and $-1$ otherwise. We say the defender \emph{hits} at
-round $t$ if $b_{a_t}(\pvec_t)=2$ and \emph{misses} otherwise. Types break
-ties towards the lowest-indexed target, as in \citet[Section 7]{balcan2015};
-at every benchmark we exhibit, target~$2$ is the \emph{strict} maximizer, so
-the benchmark's value does not depend on the rule.
+round $t$ if $b_{a_t}(\pvec_t)=2$ and \emph{misses} otherwise. Ties go to the
+lowest-indexed target, as in \citet[Section 7]{balcan2015}, though target~$2$
+is the \emph{strict} maximizer at every benchmark we exhibit, so no bound
+below depends on the rule.
 
 \paragraph{Threshold types.}
 For $0\le r_1\le r_2\le 1$ let $\alpha_{r_1,r_2}$ be the attacker with
@@ -915,9 +914,9 @@ b_{\alpha_{r_1,r_2}}\bigl((p,0,1-p)\bigr)=
 \end{cases}
 \label{eq:type-line}
 \end{equation}
-This is \citet[Lemma 7.2]{balcan2015}; we record the utility vectors
-explicitly because the arguments below need the best response at every
-$\pvec\in\cP$, not only on that segment. A type is thus named by an interval
+This is \citet[Lemma 7.2]{balcan2015}, with the utility vectors recorded
+explicitly because later arguments need the best response on all of $\cP$,
+not only on this segment. A type is thus named by an interval
 $(r_1,r_2]$, and the defender's task is to locate it.
 
 The next lemma is the structural fact driving every lower bound: a hit is
@@ -963,9 +962,9 @@ index $j$: each play is a query, each observation an answer in $\{1,2,3\}$,
 and by \Cref{lem:hit} the answer ``$2$'' is consistent with at most one
 candidate. The following lemma bounds how fast \emph{any} such search can
 succeed. It sharpens the classical $\Omega(\log_2 M)$ comparison-search bound
-in the two ways we need: it charges every unsuccessful query, not just the
-number of queries until termination, and it bounds the whole tail of the
-success time rather than only its worst case.
+in the two ways we need: it charges every failed query rather than counting
+queries to termination, and it bounds the whole tail of the success time
+rather than its worst case alone.
 
 \begin{lemma}[comparison trees identify slowly]
 \label{lem:count}
@@ -990,19 +989,44 @@ for every $u\ge 1$ and every $T\ge 1$,
 \end{equation}
 \end{lemma}
 
-\begin{proof}
-The idea is a counting one: a searcher that has not yet hit has learned only
-which of $2^{t-1}$ answer histories it is in, and each such history can be the
-prefix of a hit for at most one index.
+It is worth saying \Cref{eq:one-hit} in words, since the whole bound rests
+on it: whatever the searcher asks, at most one of the $M$ candidates would
+answer $2$. So the answer $2$ names the hidden index outright, and it is the
+only answer that does; $1$ and $3$ merely say ``too low'' or ``too high'' and
+narrow the field. This is the only property of the game the lemma uses, and
+\Cref{lem:hit} is what supplies it, which is why the same lemma serves again
+in \Cref{thm:blocklb}.
 
-Formally, let $H_t$ be the set of histories $(o_1,\dots,o_{t-1})$ of the first
-$t-1$ rounds containing no answer $2$; each $o_s\in\{1,3\}$, so
-$|H_t|\le 2^{t-1}$. If $\tau(j)=t$ then $j$ produces some $h\in H_t$; the
-strategy being deterministic, the round-$t$ query is the fixed $q_t(h)$, and
-$\mathcal{O}(q_t(h),j)=2$. By \Cref{eq:one-hit} at most one index answers $2$
-to $q_t(h)$, so each $h$ accounts for at most one such $j$, giving
-$|\{j:\tau(j)=t\}|\le 2^{t-1}$. Summing over $t\le u$ and dividing by $M$
-gives \Cref{eq:tau-tail}.
+\begin{proof}
+Everything follows from counting, for each round $t$, how many of the $M$
+indices can be found for the first time at that round. Fix $t$ and consider
+the indices with $\tau(j)=t$. Three facts combine.
+
+\emph{(i) There are at most $2^{t-1}$ histories the searcher can be in.}
+Its only record of rounds $1,\dots,t-1$ is the answers $o_1,\dots,o_{t-1}$,
+and none of them is $2$, since $\tau(j)=t$ means it has not hit yet. So each
+is $1$ or $3$, and the set $H_t$ of such histories has $|H_t|\le 2^{t-1}$.
+
+\emph{(ii) The history determines the round-$t$ query.} The strategy is
+deterministic, so that query is a fixed function $q_t(h)$ of the history $h$
+alone, with no other input.
+
+\emph{(iii) A query is answered $2$ by at most one index.} This is
+\Cref{eq:one-hit}.
+
+Now take any $j$ with $\tau(j)=t$. It produces some history $h\in H_t$, by
+(ii) the searcher then plays $q_t(h)$, and by definition of $\tau$ the answer
+is $2$; by (iii) at most one index does that. So each history accounts for at
+most one such $j$, and
+\begin{equation*}
+|\{j:\tau(j)=t\}|\;\le\;|H_t|\;\le\;2^{t-1}.
+\end{equation*}
+Summing over the first $u$ rounds,
+\begin{equation*}
+|\{j:\tau(j)\le u\}|\;\le\;\sum_{t=1}^{u}2^{t-1}\;=\;2^{u}-1,
+\end{equation*}
+and dividing by $M$, since $j$ is uniform on $[M]$, gives
+\Cref{eq:tau-tail}.
 
 For \Cref{eq:count-final}, put $X=\min\{\tau-1,T\}$. Since $X>s$ iff
 $\tau>s+1$,
@@ -1012,6 +1036,17 @@ $\tau>s+1$,
 \end{align*}
 which is \Cref{eq:count-final} because $\sum_{u\le T}2^u=2^{T+1}-2$.
 \end{proof}
+
+It is worth seeing why \Cref{eq:count-final} is so close to $T$, since that is
+what makes \Cref{thm:impossible} below cost all but a constant number of
+rounds. The census $|\{j:\tau(j)=t\}|\le 2^{t-1}$ leaves no slack: summed to
+$t=T$ it is $2^{T}-1$, so at $M=2^{T}$ the budget is exactly spent, and the
+best a search can do is to find $2^{T-1}$ of the indices at round $T$,
+$2^{T-2}$ at round $T-1$, and so on. Half the candidates are therefore pinned
+down only by the very last comparison, a quarter by the one before it. Binary
+search has this shape in general: its average depth is its worst-case depth
+minus a constant, not a fraction of it. That constant is the $2$ in
+\Cref{eq:impossible}.
 
 \subsection{The impossibility theorem}
 \label{sec:impossibility}
@@ -1028,8 +1063,7 @@ construction, suffers, on some instance with $|K|=1$,
 \EE[\Regret(T)]\;\ge\;T-2+\frac{T+2}{2^{T}}\;>\;T-2 .
 \label{eq:impossible}
 \end{equation}
-The game does not depend on $T$; only the adversary's choice of $K$ inside
-the fixed universe does.
+The game is fixed; only the adversary's choice of $K$ within it depends on $T$.
 \end{theorem}
 
 \begin{proof}
@@ -1051,12 +1085,11 @@ does better, so $\pvec^{*}$ is a maximizer in \Cref{eq:pstar} and
 \Regret(T)=\EE\bigl[\#\{t\le T:\text{miss at }t\}\bigr].
 \label{eq:regret-is-misses}
 \end{equation}
-Regret counts missed rounds exactly.
 
-\emph{The interaction is a comparison search.} A deterministic algorithm is a
-family of maps $\pvec_t=\pvec_t(o_1,\dots,o_{t-1})$, the observations being
-its only feedback. Take $q_t=\pvec_t$ and
-$\mathcal{O}(\pvec,j')=b_{\alpha^{(j')}}(\pvec)$. The $I_j$ are disjoint, so
+\emph{The interaction is a comparison search.} Observations are the algorithm's
+only feedback, so a deterministic one is a family of maps
+$\pvec_t=\pvec_t(o_1,\dots,o_{t-1})$. Take $q_t=\pvec_t$ and
+$\mathcal{O}(\pvec,j')=b_{\alpha^{(j')}}(\pvec)$; the $I_j$ are disjoint, so
 \Cref{lem:hit} gives exactly \Cref{eq:one-hit}.
 
 \emph{Counting.} Every round before the first hit $\tau$ is a miss, so by
@@ -1091,16 +1124,15 @@ $1/M=2^{-T}$.
 \subsection{A $\sqrt{T}$ floor as soon as $\Kmax\ge 2$}
 \label{sec:floor}
 
-For $\Kmax=1$ the problem is entirely a naming problem. On a fixed finite
-universe $\Univ_M$ the version-space search of \Cref{rem:tight-lb} finishes
-after at most $\lceil\log_2 M\rceil$ misses and hits in every round
-thereafter, so the regret stops growing: it does not grow with $T$ at all,
-and the linear bound of \Cref{thm:impossible} is driven purely by
-$|\Univ|=\infty$. That is special to one type. With
-two types the regret is $\Omega(\sqrt T)$ on the \emph{smallest possible}
-universe, under \emph{full} information, and even if the defender is told $K$
-in advance, because it must now track which of two known opponents is
-currently more frequent, and no naming settles that.
+Is a name all the defender ever lacks? For $\Kmax=1$, yes: on a fixed finite
+universe $\Univ_M$ the version-space search of \Cref{rem:tight-lb} stops
+missing after $\lceil\log_2 M\rceil$ rounds, so the regret does not grow with
+$T$ at all, and the linear bound of \Cref{thm:impossible} is driven purely by
+$|\Univ|=\infty$. Two types break this, which is why the following result,
+though it concerns \emph{full} information with $K$ \emph{known}, belongs
+here: it marks the limit of the naming account. The defender must now track
+which of two known opponents is currently more frequent, and no name settles
+that.
 
 \begin{proposition}[two types already cost $\sqrt{T}$]
 \label{prop:sqrtT}
@@ -1126,13 +1158,13 @@ $N_i=|\{t:a_t=\alpha^{(i)}\}|$, so $N_1+N_2=T$.
 so it earns at least $-\min\{N_1,N_2\}$, and this is attained:
 $\pvec=(\tfrac14,0,\tfrac34)$ hits $\alpha^{(1)}$ in all $N_1$ of its rounds
 by \Cref{eq:hit-iff}, and $(\tfrac34,0,\tfrac14)$ hits $\alpha^{(2)}$ in all
-$N_2$ of its rounds. Hence the benchmark earns $-\min\{N_1,N_2\}$.
+$N_2$ of its.
 
-\emph{Algorithm.} Fix $t$ and condition on the history, which depends only on
-$a_1,\dots,a_{t-1}$ and the algorithm's randomness, hence is independent of
-$a_t$. The played $\pvec_t$ hits at most one type, and $a_t$ is that type
-with probability $\tfrac12$, so $\Pr[\text{hit at }t]\le\tfrac12$ and the
-algorithm earns at most $-T/2$ in expectation.
+\emph{Algorithm.} Condition on the history at round $t$; it depends only on
+$a_1,\dots,a_{t-1}$ and the algorithm's coins, so it is independent of $a_t$.
+The played $\pvec_t$ hits at most one type and $a_t$ is that type with
+probability $\tfrac12$, so $\Pr[\text{hit at }t]\le\tfrac12$ and the algorithm
+earns at most $-T/2$ in expectation.
 
 \emph{Combining.} As $\min\{N_1,N_2\}=\tfrac12(T-|N_1-N_2|)$,
 \[
@@ -1140,25 +1172,20 @@ algorithm earns at most $-T/2$ in expectation.
 \;=\;\tfrac{1}{2}\EE\bigl[|N_1-N_2|\bigr],
 \]
 and $N_1-N_2$ is a simple random walk $S_T$, for which
-$\EE|S_T|\ge\sqrt{\lfloor T/2\rfloor}$ (\Cref{app:walk}). Nothing here refers
-to the feedback model or to knowledge of $K$: only that $\pvec_t$ cannot hit
-both types and that $a_t$ is independent of the past.
+$\EE|S_T|\ge\sqrt{\lfloor T/2\rfloor}$ (\Cref{app:walk}).
 \end{proof}
 
-The bound is tight on this instance in a strong sense: $\Pr[\text{hit}]\le
-\tfrac12$ is an \emph{equality} for any algorithm that plays inside one of
-the two intervals, so every such algorithm, follow-the-leader included,
-and one simply told $K$ included, has expected regret exactly
-$\tfrac12\EE|N_1-N_2|=\sqrt{T/(2\pi)}(1+o(1))$. The remaining freedom buys
-nothing; \Cref{fig:impossible}(b) shows the measured curve sitting on that
-value.
+The bound is tight in a strong sense: $\Pr[\text{hit}]\le\tfrac12$ is an
+\emph{equality} for any algorithm playing inside one of the two intervals, so
+all of them, follow-the-leader and one simply told $K$ alike, have expected
+regret exactly $\tfrac12\EE|N_1-N_2|=\sqrt{T/(2\pi)}(1+o(1))$, the value
+\Cref{fig:impossible}(b) measures.
 
-So the transition at $\Kmax=2$ is not about how hard a type is to identify
-but about whether identification is the whole problem. On the upper
-side, \citet[Theorem 6.1]{balcan2015} with $k=M$, legitimate, since a
-finite universe \emph{is} a known type set, gives regret
-$O(\min\{T,T^{2/3}nM\log^{1/3}(nM)\})$ under partial information, while
-\Cref{thm:main} gives $O(n\Kmax\sqrt{T\log(n\Kmax)})$ under full
+So the transition at $\Kmax=2$ is not about how hard a type is to identify,
+but about whether identification is the whole problem. The best upper bounds
+we can pair with it are $O(\min\{T,T^{2/3}nM\log^{1/3}(nM)\})$, from
+\citet[Theorem 6.1]{balcan2015} with $k=M$, a finite universe being a known
+type set, and $O(n\Kmax\sqrt{T\log(n\Kmax)})$ from \Cref{thm:main} under full
 information. Closing the gap to $\Omega(\sqrt T)$ is the finite-$M$ question
 of \Cref{sec:conc2}.
 
@@ -1487,9 +1514,9 @@ choice of block count: there is an absolute constant $c_0$ such that a
 run tuned to $H$ satisfies
 \begin{equation}
 \text{regret at prefix }L\;\le\;c_0\,H^{2/3}\,n|C|\log^{1/3}(n|C|)
-\quad\text{for every }L\le H.
 \label{eq:prefix-bound}
 \end{equation}
+for every $L\le H$.
 The right-hand side depends on $H$, not $L$: at short prefixes we are
 still paying for the horizon we tuned to.
 
