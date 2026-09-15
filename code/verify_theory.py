@@ -2,9 +2,9 @@
 
 Covered: Step 7 of Section 6, every claim of Sections 7 and 8 that is not
 purely asymptotic, and
-the oracle and estimator claims of Appendix C.  NOT covered, because they
+the oracle and estimator claims of Appendix B.  NOT covered, because they
 are measurements rather than claims about the algebra: the fitted exponents,
-envelope constants and timings of Section 9 and Appendices C-D, printed by
+envelope constants and timings of Section 9 and Appendices B-C, printed by
 `bench_oracle.py`, `plot_tractable_regret.py`, `plot_block_revelation.py` and
 `plot_impossibility.py` when those are rerun.
 
@@ -37,7 +37,6 @@ from plot_impossibility import (
     expected_regret,
     observe_exact,
     run_nested,
-    run_nested_adaptive,
     run_two_type,
     sqrt_exact,
     sqrt_floor,
@@ -297,31 +296,8 @@ def check_sqrtT(seed=12):
            f"max relative gap of follow-the-leader to the optimum {worst:.3f}")
 
 
-def check_adaptive(reps=400, seed=11):
-    """Proposition 24: chosen report times cost at most K', scheduled ones K'(B-2).
-
-    Both schemes are run on the same nested-interval instance and at the same
-    report budget N = K, so the comparison is like for like.
-    """
-    rng = np.random.default_rng(seed)
-    ok = True
-    detail = []
-    for K in (1, 2, 3, 4):
-        for B in (4, 8, 16, 32):
-            res = [run_nested_adaptive(K, B, rng) for _ in range(reps)]
-            miss = float(np.mean([r[0] for r in res]))
-            q = max(r[1] for r in res)
-            sched = float(np.mean([run_nested(K, B, K * B, rng) for _ in range(reps)]))
-            ok &= miss <= K + 1e-9 and q <= K
-            if (K, B) == (4, 32):
-                detail = [miss, q, sched, K * (B - 2)]
-    report("Proposition 24 (chosen times cost <= |K|, scheduled cost |K|(B-2))",
-           ok, f"at |K|=4, B=32: adaptive {detail[0]:.2f} (<= 4) with "
-               f"{detail[1]} queries, scheduled {detail[2]:.1f} vs |K|(B-2)={detail[3]}")
-
-
 def check_oracle(trials=60, seed=5):
-    """Appendix C: MILP == profile enumeration == brute force over E(C;eps)."""
+    """Appendix B: MILP == profile enumeration == brute force over E(C;eps)."""
     rng = np.random.default_rng(seed)
     worst = 0.0
     for _ in range(trials):
@@ -339,12 +315,12 @@ def check_oracle(trials=60, seed=5):
                  for p in compute_extreme_points(game, types))
         worst = max(worst, abs(ve - vm), abs(ve - inst.lifted_value(pe, a, b)),
                     abs(vm - inst.lifted_value(pm, a, b)), vE - ve)
-    report("Appendix C (oracle back-ends agree with brute force)", worst < 1e-5,
+    report("Appendix B (oracle back-ends agree with brute force)", worst < 1e-5,
            f"worst discrepancy {worst:.2e}")
 
 
 def check_estimator(reps=40000, seed=6):
-    """Lemma 27(ii): |B_tau| g_tau is unbiased for the block's type counts."""
+    """Lemma 24(ii): |B_tau| g_tau is unbiased for the block's type counts."""
     rng = np.random.default_rng(seed)
     n, K, L = 6, 3, 40
     game = SSGame(n=n, u_d_c=rng.uniform(0.1, 1, n), u_d_u=rng.uniform(-1, -0.1, n))
@@ -366,7 +342,7 @@ def check_estimator(reps=40000, seed=6):
     err = float(np.abs(est - m).max())
     # three standard errors of the mean of a Bernoulli-driven estimate
     tol = 3 * L * math.sqrt(K) / math.sqrt(reps) + 0.05
-    report("Lemma 27(ii) (frequency estimator is unbiased)", err < tol,
+    report("Lemma 24(ii) (frequency estimator is unbiased)", err < tol,
            f"max |estimate - truth| = {err:.3f} on counts {m} (tolerance {tol:.3f})")
 
 
@@ -436,8 +412,7 @@ def main():
     print("Section 8 (the block-revelation bound)")
     check_holder(20000 if q else 200000)
     check_Bstar(10000 if q else 100000)
-    check_adaptive(reps=60 if q else 400)
-    print("Appendix C (the implementation)")
+    print("Appendix B (the implementation)")
     check_oracle(10 if q else 60)
     check_estimator(4000 if q else 40000)
     print()

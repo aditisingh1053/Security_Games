@@ -1,4 +1,4 @@
-"""Generate Figure 1 of the report: rolling-window per-round regret vs
+"""Generate Figure 2 of the report: rolling-window per-round regret vs
 iteration for GROW-CATALOGUE under the staggered-uniform adversary.
 
 Saves to figures/avg_regret_per_iter.{pdf,png}.

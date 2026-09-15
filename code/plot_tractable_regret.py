@@ -9,10 +9,10 @@ Produces `figures/tractable_regret.{pdf,png}`:
 
   (a) rolling-window per-round regret at n = 10 under the staggered-uniform
       adversary, showing the epoch structure of the proof of Theorem 6 (one
-      spike per discovery round) -- this is Figure 1 at n = 10;
+      spike per discovery round) -- this is Figure 2 at n = 10;
   (b) the same at n = 20;
   (c) cumulative regret at n = 10 under the uniform-random adversary, with the
-      C sqrt(t) envelope -- this is Figure 2 at n = 10;
+      C sqrt(t) envelope -- this is Figure 3 at n = 10;
   (d) the same at n = 20.
 
 Panels (a), (b) and panels (c), (d) use the two adversaries of Section 9 for
