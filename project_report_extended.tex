@@ -511,29 +511,23 @@ namely a known constant $\Kmax$.
 
 \subsection{The \textsc{Grow-Catalogue} algorithm}
 
-We describe \textsc{Grow-Catalogue} at a high level and then give the
-pseudocode in \Cref{alg:gc}. At any round $t$ the defender holds a
-catalogue $C_t\subseteq K$ of all types seen so far. Conceptually, the
-defender runs a small instance of the \emph{known-$K$} algorithm of
-\citet[Sec.~5]{balcan2015} on the catalogue $C_t$, pretending that $C_t$
-\emph{is} the full attacker set. Concretely:
-\begin{itemize}[leftmargin=1.1em,itemsep=0.05em,topsep=0.2em]
-  \item The algorithm maintains the $\epsilon$-approximate extreme-point
-  set $\cE_t=\cE(C_t;\epsilon)$ of \Cref{lem:43}. We set
-  $\epsilon=1/\sqrt T$; this balances the $2\epsilon T$ approximation term
-  in \Cref{lem:43} against the $\sqrt{T\log\Nmax}$ regret term of
-  \Cref{prop:hedge}.
-  \item An anytime Polynomial-Weights sub-routine of
-  \Cref{prop:hedge} runs over $\cE_t$, updating via a time-varying
-  learning rate $\eta_{t_{\text{loc}}}=\sqrt{\log|\cE_t|/t_{\text{loc}}}$
-  where $t_{\text{loc}}$ is a local counter reset at every catalogue
-  change. This is the standard anytime schedule; see \citet[Sec.~2]{cesa2006}.
-  \item When a new attacker type $\alpha$ appears, the catalogue grows to
-  $C_t\cup\{\alpha\}$, the approximate extreme-point set is recomputed,
-  and the sub-routine is restarted on the enlarged expert set. The single
-  round of first contact with $\alpha$ contributes a bounded additive
-  amount to the regret that we will absorb.
-\end{itemize}
+The defender maintains a \emph{catalogue} $C_t\subseteq K$ of the attacker
+types seen so far and treats it as if it were the full attacker set. The
+rounds at which a type appears for the first time cut the horizon into
+\emph{epochs}. Within an epoch the catalogue does not change and every
+attacker that appears belongs to it, so the defender is facing an ordinary
+known-$K$ game on $C_t$ and simply runs the algorithm of
+\citet[Sec.~5]{balcan2015} for that game. When a new type appears, the
+catalogue grows, that algorithm is restarted on the enlarged catalogue, and
+the next epoch begins.
+
+We use the known-$K$ algorithm as a black box $\mathcal{A}(C)$: it takes a
+type set $C$, prescribes a coverage vector each round, and receives the
+attacking type as feedback. The only property of it the analysis needs is
+its regret guarantee, \citet[Theorem 5.1]{balcan2015}, which Step~3 of
+\Cref{sec:proof} invokes once per epoch. The round of first contact with a
+new type falls outside that guarantee and is charged separately, in Step~6.
+\Cref{alg:gc} gives the pseudocode.
 
 \begin{algorithm}[t]
 \caption{\textsc{Grow-Catalogue} (full information).}
@@ -541,21 +535,17 @@ defender runs a small instance of the \emph{known-$K$} algorithm of
 \begin{algorithmic}[1]
 \small
 \Require horizon $T$, bound $\Kmax$, game primitives, default $\pvec_{\text{def}}\in\cP$
-\State $C\gets\emptyset$;~$\cE\gets\emptyset$;~$\epsilon\gets 1/\sqrt T$;~$t_{\text{loc}}\gets 0$
+\State $C\gets\emptyset$;~$\mathcal{A}\gets\textsc{null}$
+   \Comment{empty catalogue, no inner learner yet}
 \For{$t=1,\dots,T$}
-  \If{$\cE=\emptyset$} \State play $\pvec_t\gets\pvec_{\text{def}}$
-  \Else \State sample $\pvec_t\sim q_t$, where $q_t$ is the current PW distribution over $\cE$
-  \EndIf
-  \State observe $a_t$
+  \State \textbf{Play} $\pvec_t\gets\pvec_{\text{def}}$ if $C=\emptyset$, else the strategy $\mathcal{A}$ prescribes for round $t$
+  \State \textbf{Observe} the attacking type $a_t$
   \If{$a_t\notin C$} \Comment{discovery round: new attacker type}
     \State $C\gets C\cup\{a_t\}$; record $(u_{a_t}^c,u_{a_t}^u)$
-    \State $\cE\gets\cE(C;\epsilon)$ \Comment{recompute extreme points}
-    \State reset PW on $\cE$; $t_{\text{loc}}\gets 0$
+    \State $\mathcal{A}\gets\mathcal{A}(C)$
+       \Comment{restart the known-$K$ learner on the enlarged catalogue}
   \Else \Comment{routine round}
-    \State $t_{\text{loc}}\gets t_{\text{loc}}+1$
-    \State compute $\ell_t(\pvec)\!=\!-U_d(b_{a_t}(\pvec),\pvec)$ for $\pvec\in\cE$
-    \State $\eta\gets\sqrt{\log|\cE|/t_{\text{loc}}}$
-    \State $w_\pvec\gets w_\pvec\cdot e^{-\eta\,\ell_t(\pvec)}$ for all $\pvec\in\cE$
+    \State pass $a_t$ to $\mathcal{A}$ as its round-$t$ feedback
   \EndIf
 \EndFor
 \end{algorithmic}
@@ -592,6 +582,11 @@ The proof closely tracks the structure of the known-$K$ proof of \citet[Sec.~5]{
 but has two non-trivial deviations: (i) the expert set is no longer static
 but grows over time, and (ii) the discovery rounds introduce an extra
 bounded additive term. We account for both the deviations in our proof.
+The known-$K$ analysis itself is used as a black box: the approximate
+extreme-point set $\cE(C;\epsilon)$, its cardinality and the
+multiplicative-weights regret over it enter only through the known-$K$
+bound of \citet[Theorem 5.1]{balcan2015}, which Step~3 invokes once per
+epoch and never unpacks.
 
 \begin{proof}[Proof:- ]
 Fix an oblivious adversarial sequence $\avec=a_1,\dots,a_T\in K^T$ with
@@ -634,86 +629,62 @@ $\tau_{i+1}$, no new type appears in $\mathrm{Ep}_i$, so
 a_t\in C_i\quad\text{for every }t\in\mathrm{Ep}_i.
 \label{eq:epoch-types}
 \end{equation}
-Denote by $\cE_i\coloneqq\cE(C_i;\epsilon)$ the extreme-point set
-used by the PW sub-routine during $\mathrm{Ep}_i$; \Cref{eq:epoch-types}
-is exactly the hypothesis needed to apply \Cref{lem:43} to $C_i$ and the
-sub-sequence inside $\mathrm{Ep}_i$.
 
 \paragraph{Step 3 (Within-epoch regret).}
-During $\mathrm{Ep}_i$ the algorithm runs a fresh instance of the anytime
-Polynomial-Weights sub-routine on the fixed expert set $\cE_i$ for $L_i$
-rounds. The losses are $\ell_t(\pvec)=-U_d(b_{a_t}(\pvec),\pvec)\in[-1,1]$,
-so the range parameter is $\kappa=1$. \Cref{prop:hedge} therefore
-yields an absolute constant $c_1>0$ such that
+Fix $i$. Throughout $\mathrm{Ep}_i$ the catalogue is the fixed set $C_i$,
+every attacker that appears lies in $C_i$ by \Cref{eq:epoch-types}, and the
+sub-routine active on the epoch is a single instance of the known-$K$
+algorithm of \citet[Sec.~5]{balcan2015}, started on $C_i$ and running
+uninterrupted for $L_i$ rounds. The epoch is therefore itself a known-$K$
+instance, with type set $C_i$ and horizon $L_i$, so we may use
+\citet[Theorem 5.1]{balcan2015} on it directly: for an absolute constant
+$c_1$,
 \begin{align}
-&\max_{\pvec\in\cE_i}\sum_{t\in\mathrm{Ep}_i}\!U_d(b_{a_t}(\pvec),\pvec)\notag\\
-&\quad-\EE\!\left[\sum_{t\in\mathrm{Ep}_i}\!U_d(b_{a_t}(\pvec_t),\pvec_t)\right]\;\le\;c_1\sqrt{L_i\log|\cE_i|}.
-\label{eq:hedge-epoch}
+&\underbrace{\max_{\pvec\in\cP}\!\sum_{t\in\mathrm{Ep}_i}\!U_d(b_{a_t}(\pvec),\pvec)}_{\eqqcolon\;\mathrm{OPT}_i}
+ -\EE\!\Bigl[\sum_{t\in\mathrm{Ep}_i}\!U_d(b_{a_t}(\pvec_t),\pvec_t)\Bigr]\notag\\
+&\hspace{4em}\le\;c_1\,n\sqrt{|C_i|\,L_i\,\log\bigl(n|C_i|\bigr)}.
+\label{eq:balcan51-epoch}
 \end{align}
+The one thing to check is that the sub-routine never needs to know $L_i$ in
+advance, which it does not: it is anytime, so its guarantee holds at
+whatever round the epoch happens to end.
 
-\paragraph{Step 4 (Within-epoch approximation via \Cref{lem:43}).}
-We now wish to compare the max over $\cE_i$ during $\mathrm{Ep}_i$ with
-the \emph{global} benchmark $\pvec^{*}$ (the best fixed strategy over the
-full horizon $[1,T]$). \Cref{lem:43}, however, is a statement of the form
-``$\max_{\pvec\in\cE(C;\epsilon)}(\cdot)\ge\max_{\pvec\in\cP}(\cdot)-2\epsilon T'$''
-and, strictly speaking, does \emph{not} directly involve $\pvec^{*}$: it
-compares the max over the finite set $\cE(C;\epsilon)$ against the
-unrestricted max over $\cP$, both on the \emph{same} attacker sequence.
-We therefore proceed in two sub-steps and make the passage to $\pvec^{*}$
-explicit.
-
-\emph{Sub-step 4a (apply \Cref{lem:43} to the epoch sub-sequence).}
-By \Cref{eq:epoch-types}, the sub-sequence $(a_t)_{t\in\mathrm{Ep}_i}$
-has length $L_i$ and uses only types in $C_i$, which is exactly the
-hypothesis of \Cref{lem:43}. Applying the lemma with catalogue $C_i$ and
-sequence length $T'=L_i$ gives
-\begin{align}
-&\max_{\pvec\in\cE_i}\!\sum_{t\in\mathrm{Ep}_i}\!U_d(b_{a_t}(\pvec),\pvec)\notag\\
-&\quad\ge\;\underbrace{\max_{\pvec\in\cP}\!\sum_{t\in\mathrm{Ep}_i}\!U_d(b_{a_t}(\pvec),\pvec)}_{\eqqcolon\;\mathrm{OPT}_i}-2\epsilon L_i.
-\label{eq:lem43-epoch}
-\end{align}
-Here $\mathrm{OPT}_i$ is the best cumulative utility achievable on
-$\mathrm{Ep}_i$ by \emph{any} coverage vector in $\cP$; crucially, this
-is the epoch-$i$ optimum, which in general \emph{differs} from the value
-of $\pvec^{*}$. This is the subtle point that distinguishes
-our setting from the known-$K$ proof of \citet[Sec.~5]{balcan2015}: in their
-analysis, \Cref{lem:43} is applied once on the full horizon, so
-$\mathrm{OPT}=\sum_{t=1}^T U_d(b_{a_t}(\pvec^{*}),\pvec^{*})$ by
-definition of $\pvec^{*}$ and no separate passage is needed. In our
-per-epoch application, $\mathrm{OPT}_i$ is an epoch-local quantity,
-potentially larger than $\pvec^{*}$'s value on the epoch.
-
-\emph{Sub-step 4b (pass from $\mathrm{OPT}_i$ to $\pvec^{*}$).}
-Since $\pvec^{*}\in\cP$, the coverage vector $\pvec^{*}$ is a \emph{feasible}
-competitor in the maximization defining $\mathrm{OPT}_i$. Therefore
+\paragraph{Step 4 (Comparing against $\pvec^{*}$).}
+\Cref{eq:balcan51-epoch} measures the algorithm against $\mathrm{OPT}_i$,
+the best coverage vector for the epoch $\mathrm{Ep}_i$ on its own, while the
+regret we have to bound measures it against $\pvec^{*}$, the best coverage
+vector for the whole horizon. The two need not be the same, since a strategy
+tailored to the types that happen to be active during $\mathrm{Ep}_i$ can do
+better on that epoch than $\pvec^{*}$ does. But $\pvec^{*}$ is itself a
+coverage vector, $\pvec^{*}\in\cP$, so it is one of the candidates over
+which the maximum defining $\mathrm{OPT}_i$ is taken, and therefore
 \begin{equation}
 \mathrm{OPT}_i\;\ge\;\sum_{t\in\mathrm{Ep}_i}\!U_d(b_{a_t}(\pvec^{*}),\pvec^{*}).
 \label{eq:opt-vs-pstar}
 \end{equation}
-Inequality \Cref{eq:opt-vs-pstar} is \emph{not} a consequence of
-\Cref{lem:43} but of the trivial fact that the global benchmark
-$\pvec^{*}$ is an element of the set over which the epoch-local optimum
-is taken. Chaining \Cref{eq:lem43-epoch} with \Cref{eq:opt-vs-pstar},
+We may thus replace $\mathrm{OPT}_i$ in \Cref{eq:balcan51-epoch} by the
+utility that $\pvec^{*}$ collects on the epoch: doing so only lowers the
+left-hand side, so the inequality survives. Chaining
+\Cref{eq:balcan51-epoch,eq:opt-vs-pstar} in this way gives, for every epoch
+$i\in\{1,\dots,K'\}$,
 \begin{align}
-&\max_{\pvec\in\cE_i}\!\sum_{t\in\mathrm{Ep}_i}\!U_d(b_{a_t}(\pvec),\pvec)\notag\\
-&\quad\ge\;\sum_{t\in\mathrm{Ep}_i}\!U_d(b_{a_t}(\pvec^{*}),\pvec^{*})-2\epsilon L_i.
-\label{eq:lem43-pstar}
+&\sum_{t\in\mathrm{Ep}_i}\!U_d(b_{a_t}(\pvec^{*}),\pvec^{*})
+ -\EE\!\left[\sum_{t\in\mathrm{Ep}_i}\!U_d(b_{a_t}(\pvec_t),\pvec_t)\right]\notag\\
+&\hspace{4em}\le\;c_1\,n\sqrt{|C_i|\,L_i\,\log\bigl(n|C_i|\bigr)},
+\label{eq:combined-epoch}
 \end{align}
+which is the per-epoch regret bound against the global benchmark.
 
-
-\paragraph{Step 5 (Per-epoch combined bound).}
-Chaining \Cref{eq:hedge-epoch,eq:lem43-pstar}, for every epoch
-$i\in\{1,\dots,K'\}$ we obtain
+\paragraph{Step 5 (Adding up the epochs).}
+Summing \Cref{eq:combined-epoch} over $i=1,\dots,K'$ bounds the regret
+incurred on all the non-discovery rounds at once:
 \begin{align}
-&\EE\!\left[\sum_{t\in\mathrm{Ep}_i}\!U_d(b_{a_t}(\pvec_t),\pvec_t)\right]\notag\\
-&\;\ge\;\sum_{t\in\mathrm{Ep}_i}\!U_d(b_{a_t}(\pvec^{*}),\pvec^{*})-2\epsilon L_i-c_1\sqrt{L_i\log|\cE_i|}.\label{eq:combined-epoch}
+&\sum_{i=1}^{K'}\left(\sum_{t\in\mathrm{Ep}_i}\!U_d(b_{a_t}(\pvec^{*}),\pvec^{*})
+ -\EE\!\left[\sum_{t\in\mathrm{Ep}_i}\!U_d(b_{a_t}(\pvec_t),\pvec_t)\right]\right)\notag\\
+&\hspace{4em}\le\;c_1\,n\sum_{i=1}^{K'}\sqrt{|C_i|\,L_i\,\log\bigl(n|C_i|\bigr)}.
+\label{eq:epoch-sum}
 \end{align}
-\Cref{eq:combined-epoch} is the per-epoch regret bound
-\emph{against the global benchmark} $\pvec^{*}$, and it is the building
-block for the rest of the proof. Note that despite the fact that
-$\pvec^{*}$ is the benchmark over all $T$ rounds (not just epoch $i$),
-we are able to bound our per-epoch regret against $\pvec^{*}$ because
-$\pvec^{*}\in\cP$ and we applied \Cref{lem:43} on the sub-sequence.
+The rounds of $\mathcal{D}$ are all that is left, and Step~6 handles them.
 
 \paragraph{Step 6 (Discovery rounds).}
 For each discovery round $t\in\mathcal{D}$, the algorithm either plays
@@ -737,38 +708,24 @@ This is the only source of additive dependence on $\Kmax$ that does not
 come from the main $\sqrt{T\Kmax}$ term. It is the ``price of not knowing
 $K$'' at a discovery round.
 
-\paragraph{Step 7 (Uniform bound on $|\cE_i|$).}
-By \Cref{lem:44} applied with $|C_i|\le\Kmax$,
-\[
-|\cE_i|\;\le\;c_2\,(2^n+\Kmax n^2)^n\cdot n^{\Kmax}\;\eqqcolon\;\Nmax,
-\]
-for an absolute constant $c_2$. Taking logarithms,
-\begin{align}
-\log\Nmax &= n\log\!\bigl(2^n+\Kmax n^2\bigr)+\Kmax\log n+O(1)\notag\\
-&\le n\bigl(n+1+\log(\Kmax n^2)\bigr)+\Kmax\log n+O(1)\notag\\
-&= O\bigl(n^2+n\log(n\Kmax)+\Kmax\log n\bigr)\notag\\
-&= O\bigl(n^2\,\Kmax\log(n\Kmax)\bigr).
-\label{eq:logN}
-\end{align}
-Both summands of $2^n+\Kmax n^2$ are at least $1$, so their sum is at most
-$2\cdot 2^n\cdot\Kmax n^2$, which gives the second line; the last step absorbs
-each of the three terms into the product, every factor of which is at least
-$1$ once $n\ge 2$. The third line is sharper and could be carried through; we
-quote the fourth because it is the form \citet[Lemma 4.4]{balcan2015} take
-into their Theorem 5.1, which lets \Cref{thm:main} be read off against that
-theorem exactly. Crucially, \Cref{eq:logN} is uniform in
-$i$: $\log|\cE_i|\le\log\Nmax$ for every epoch. This lets us pull the
-$\log|\cE_i|$ factor in Step~5 outside the sum over epochs.
+\paragraph{Step 7 (Uniform bound on the catalogue size).}
+The catalogue only grows and contains only types already observed, so
+$|C_i|\le K'\le\Kmax$ for every epoch $i$. Hence
+\begin{equation}
+\sqrt{|C_i|\log\bigl(n|C_i|\bigr)}\;\le\;\sqrt{\Kmax\log (n\Kmax)}
+\qquad\text{uniformly in }i,
+\label{eq:uniform-Ci}
+\end{equation}
+which lets the catalogue-dependent factor be pulled out of the sum over
+epochs in the next step.
 
-\paragraph{Step 8 (Summing across epochs).}
-Sum \Cref{eq:combined-epoch} over $i=1,\dots,K'$ and add
-\Cref{eq:disc-sum}. The algorithm's total expected utility is then at
-least the benchmark's total utility, minus the discovery term $2\Kmax$,
-minus $2\epsilon T$ from the telescoping Lemma-4.3 approximation errors
-(using $\sum_i L_i\le T$), minus the sum of the per-epoch PW regret
-terms. Rearranging,
+\paragraph{Step 8 (Putting the pieces together).}
+Bound every summand on the right of \Cref{eq:epoch-sum} using
+\Cref{eq:uniform-Ci}, and add the discovery term \Cref{eq:disc-sum}. Since
+$[1,T]=\mathcal{D}\sqcup\bigcup_i\mathrm{Ep}_i$ by Step~1, the two pieces
+account for every round, and rearranging gives
 \begin{align}
-\EE[\Regret(T)]\;\le\;2\Kmax+2\epsilon T+c_1\sqrt{\log\Nmax}\!\sum_{i=1}^{K'}\!\sqrt{L_i}.
+\EE[\Regret(T)]\;\le\;2\Kmax+c_1\,n\sqrt{\Kmax\log (n\Kmax)}\!\sum_{i=1}^{K'}\!\sqrt{L_i}.
 \label{eq:after-sum}
 \end{align}
 
@@ -784,29 +741,27 @@ The first inequality is tight when all epochs have equal length, a
 scenario that corresponds to an adversary who reveals types evenly across
 the horizon. This is where the leading multiplicative $\sqrt{\Kmax}$
 factor in the bound is generated. An instance-adaptive version uses $K'$
-in place of $\Kmax$, which is what \Cref{cor:adaptive} records.
+in place of $\Kmax$, which is what Corollary~\ref{cor:adaptive} records.
 
 \paragraph{Step 10 (Final substitution).}
-Plugging \Cref{eq:logN,eq:CS} into \Cref{eq:after-sum} and choosing
-$\epsilon=1/\sqrt T$ gives
-\begin{align*}
-\EE[\Regret(T)]&\le 2\Kmax+2\sqrt T+c_1\sqrt{\Kmax T\,\log\Nmax}\\
-&\le 2\Kmax+2\sqrt T\\
-&\quad+c_3\,n\Kmax\sqrt{T\log (n\Kmax)}
-\end{align*}
-for an absolute constant $c_3$, the last line by substituting
-\Cref{eq:logN} for $\log\Nmax$ and taking the square root of the product,
-which collects the two factors of $\Kmax$ into one. Whenever $T\ge\Kmax$
-(the only regime in which \Cref{thm:main} is non-trivial) the leading term
-dominates the additive $2\Kmax+2\sqrt T$, so
+Substituting \Cref{eq:CS} into \Cref{eq:after-sum} gives
+\[
+\EE[\Regret(T)]\;\le\;2\Kmax+c_1\,n\Kmax\sqrt{T\log (n\Kmax)},
+\]
+the two factors of $\sqrt{\Kmax}$, one from Step~7 and one from Step~9,
+collecting into a single $\Kmax$. Whenever $T\ge\Kmax$ (the only regime in
+which \Cref{thm:main} is non-trivial) the leading term dominates the
+additive $2\Kmax$, so
 \[
 \EE[\Regret(T)]\;=\;O\!\Bigl(n\Kmax\sqrt{T\log(n\Kmax)}\Bigr),
 \]
 which is the bound of \Cref{thm:main}. Written in the equivalent form
 $O(\sqrt{T\,n^2\Kmax^2\log(n\Kmax)})$, it is the bound of
-\citet[Theorem 5.1]{balcan2015} with $k$ replaced by $\Kmax$ and inflated by
-the $\sqrt{\Kmax}$ of the Cauchy--Schwarz step, so Step~9 is where the price
-of the unknown catalogue is paid. This completes the proof.
+\citet[Theorem 5.1]{balcan2015} with $k$ replaced by $\Kmax$, run once on
+the whole horizon and inflated by the $\sqrt{\Kmax}$ of the Cauchy--Schwarz
+step, so Step~9 is where the price of the unknown catalogue is paid and
+Step~6 is the additive remainder. This
+completes the proof.
 \end{proof}
 
 \subsection{Consequences of the proof}
@@ -819,17 +774,24 @@ the second gives an instance-adaptive refinement.
 \begin{corollary}[Regime of applicability]
 \label{cor:regime}
 The bound of \Cref{thm:main} is sublinear in $T$ if and only if
-$n^2\Kmax^2\log(n\Kmax)=o(T)$; equivalently,
-$\Kmax=o\!\bigl(\sqrt T/(n\sqrt{\log (n\Kmax)})\bigr)$, which up to the
-logarithmic factor is $\Kmax=\tilde o(\sqrt T/n)$.
-In particular, for $\Kmax=O(1)$ the rate is $\tilde O(n\sqrt T)$.
+\[
+n^2\Kmax^2\log(n\Kmax)\;=\;o(T).
+\]
+In particular it is sublinear whenever
+$\Kmax=O\!\bigl(\sqrt T/(n\log T)\bigr)$, and for $\Kmax=O(1)$ the rate is
+$\tilde O(n\sqrt T)$.
 \end{corollary}
 
 \begin{proof}
-Set the right-hand side of \Cref{eq:main} equal to $T$ and solve for
-$\Kmax$. Squaring, $n\Kmax\sqrt{T\log(n\Kmax)}=o(T)$ holds exactly when
-$n^2\Kmax^2\log(n\Kmax)=o(T)$, which is the stated condition; dividing by
-$n^2\log(n\Kmax)$ and taking square roots gives the equivalent form.
+Dividing \Cref{eq:main} by $T$, the bound is $o(T)$ exactly when
+$n\Kmax\sqrt{\log(n\Kmax)}=o(\sqrt T)$, which, both sides being
+non-negative, is equivalent to $n^2\Kmax^2\log(n\Kmax)=o(T)$. If
+$n\Kmax\le c\sqrt T/\log T$ for all large $T$, then $n\Kmax\le\sqrt T$ once
+$\log T\ge c$, so $\log(n\Kmax)\le\tfrac12\log T$ and
+\[
+n^2\Kmax^2\log(n\Kmax)\;\le\;\frac{c^2T}{\log^2 T}\cdot\frac{\log T}{2}
+\;=\;\frac{c^2T}{2\log T}\;=\;o(T).
+\]
 \end{proof}
 
 \begin{corollary}[Instance-adaptive bound]
@@ -846,8 +808,8 @@ attacker types actually observed in the realized sequence. Then
 $K'$ replaces $\Kmax$ at both places the proof uses it: the Cauchy--Schwarz
 step \Cref{eq:CS} gives $\sum_{i=1}^{K'}\sqrt{L_i}\le\sqrt{K'T}$, and the
 catalogue never holds more than the types observed, so $|C_i|\le K'$ and
-Step~7 gives $\log\Nmax=O(n^2K'\log(nK'))$. Redoing Step~10 with both
-gives the bound.\end{proof}
+Step~7 gives the uniform factor $\sqrt{K'\log(nK')}$. Redoing Step~10 with
+both gives the bound.\end{proof}
 
 
 
