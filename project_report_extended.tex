@@ -26,6 +26,24 @@
 \usepackage[capitalise,noabbrev]{cleveref}
 \usepackage[square,sort&compress,numbers]{natbib}
 \bibliographystyle{abbrvnat}
+\setlength{\bibsep}{2pt plus 0.6pt}
+
+% Float placement: top-align float-only pages (LaTeX centres them by
+% default, which leaves a large gap), and let a float page be fuller.
+\makeatletter
+\setlength{\@fptop}{0pt}
+\setlength{\@dblfptop}{0pt}
+\setlength{\@dblfpsep}{8pt plus 1fil}
+\setlength{\@dblfpbot}{0pt plus 1fil}
+\setlength{\@fpsep}{8pt plus 1fil}
+\setlength{\@fpbot}{0pt plus 1fil}
+\makeatother
+\renewcommand{\topfraction}{0.9}
+\renewcommand{\bottomfraction}{0.7}
+\renewcommand{\textfraction}{0.1}
+\renewcommand{\floatpagefraction}{0.75}
+\renewcommand{\dbltopfraction}{0.9}
+\renewcommand{\dblfloatpagefraction}{0.75}
 
 % ---- Balcan et al. notation (Balcan, Blum, Haghtalab, Procaccia 2015) ----
 \newcommand{\pvec}{\mathbf{p}}
@@ -41,6 +59,9 @@
 \newcommand{\RR}{\mathbb{R}}
 \newcommand{\Kmax}{K_{\max}}
 \newcommand{\Nmax}{N_{\max}}
+\newcommand{\Univ}{\mathfrak{U}}
+\newcommand{\cB}{\mathcal{B}}
+\newcommand{\Ep}{\mathrm{Ep}}
 \newcommand{\argmax}{\operatorname*{arg\,max}}
 \newcommand{\argmin}{\operatorname*{arg\,min}}
 \newcommand{\Regret}{\mathrm{Regret}}
@@ -118,20 +139,34 @@ defender resources against attackers whose preferences are often uncertain.
 drawn from a finite, \emph{known} set $K$, and proved a matching linear-regret
 lower bound when $K$ is unbounded. A natural real-world middle ground is
 left open: the defender does not know $K$ a priori, but has a bound $\Kmax$
-on its size. We study this setting in the full-information feedback model.
+on its size. We first study this setting in the full-information
+feedback model.
 We propose \textsc{Grow-Catalogue}, an algorithm that incrementally learns
 new attacker types as they arrive, re-partitions the coverage polytope, and
 runs an anytime multiplicative-weights sub-routine on the resulting
 extreme-point set. Our central technical contribution is a full proof that
 \textsc{Grow-Catalogue} achieves expected regret
 \[
-O\!\left(\sqrt{T\cdot\Kmax\cdot(n^2+\Kmax\log n)}\right)
+O\!\left(n\Kmax\sqrt{T\log (n\Kmax)}\right)
 \]
-against any oblivious adversarial sequence of length $T$. The rate matches
-that of \citet{balcan2015} with $k$ replaced by $\Kmax$ and is sublinear
-whenever $\Kmax\cdot(n^2+\Kmax\log n)=o(T)$. Experiments on synthetic SSG
+against any oblivious adversarial sequence of length $T$. This is the rate of
+\citet{balcan2015} with $k$ replaced by $\Kmax$, inflated by the $\sqrt{\Kmax}$
+that the unknown catalogue costs, and it is sublinear whenever
+$n^2\Kmax^2\log(n\Kmax)=o(T)$. Experiments on synthetic SSG
 instances confirm the predicted $\sqrt{T}$ scaling, and the empirical regret
-stays comfortably below the analytic $C\sqrt{T}$ envelope. Our implementation and all experiment scripts are at
+stays comfortably below the analytic $C\sqrt{T}$ envelope.
+We then ask whether the same relaxation is affordable when the defender
+observes only the attacked target, and show that it is not: under
+partial-information feedback with an unknown type set no algorithm achieves
+sublinear regret, even when one fixed type attacks in every round, because
+the defender can never learn \emph{which} type it faces. What is missing is
+a name, so we identify the weakest supplement that supplies one --- a
+periodic report naming the set of types seen so far --- and prove that it
+restores regret
+$O(n\Kmax^{4/3}T^{2/3}\log^{1/3}(n\Kmax)+\Kmax B)$ for a report period
+$B$, the additive batching term being tight. Simulations of the lower-bound
+constructions match the theory to machine precision.
+Our implementation and all experiment scripts are at
 \textcolor{blue}{\href{https://github.com/aditisingh1053/Security_Games}{github.com/aditisingh1053/Security\_Games}}.
 
 \section{Introduction}
@@ -179,6 +214,19 @@ This question lies squarely in the gap left open between the
 \citet{balcan2015}. It is not answered by any of the existing work, and
 resolving it is the main goal of the present report.
 
+The answer turns out to depend sharply on what the defender is allowed to
+observe, and this report is organized around that dependence.
+\Cref{sec:model,sec:unknownK} set up the model and the unknown-$K$ problem,
+and \Cref{sec:alg,sec:proof} give \textsc{Grow-Catalogue} together with its
+guarantee under full-information feedback. \Cref{sec:partial} then withdraws
+that feedback, leaving the defender only the attacked target, and shows that
+the question now has a negative answer: no algorithm is sublinear, even
+against a single fixed type. \Cref{sec:block} identifies the weakest
+supplement that repairs this --- a periodic report naming the types met so
+far --- and recovers a sublinear rate, with matching lower bounds on what
+the batching costs. \Cref{sec:exp} reports the experiments and
+\Cref{sec:conc2} the open problems.
+
 \subsection{Contributions}
 \label{sec:contrib}
 
@@ -201,21 +249,49 @@ Our contributions are the following.
     (\Cref{sec:mainresult,sec:proof}).}
     The technical core of this report is a self-contained proof that
     \textsc{Grow-Catalogue} achieves expected regret at most
-    $O(\sqrt{T\cdot\Kmax\cdot(n^2+\Kmax\log n)})$ against any oblivious
+    $O(n\Kmax\sqrt{T\log (n\Kmax)})$ against any oblivious
     adversarial sequence of length $T$ under full-information feedback.
     The rate matches Theorem~5.1 of \citet{balcan2015} with $k$ replaced
     by $\Kmax$; for constant $\Kmax$ it is $\tilde O(n\sqrt T)$.
   \item \textbf{Regime analysis (\Cref{cor:regime,cor:adaptive}).}
     We characterize the parameter regime in which the bound is meaningful
-    ($\Kmax\cdot(n^2+\Kmax\log n)=o(T)$), and we prove an
+    ($n^2\Kmax^2\log(n\Kmax)=o(T)$), and we prove an
     instance-adaptive refinement in which the leading factor depends on
     the number $K'$ of types \emph{actually} observed rather than on
     $\Kmax$.
+  \item \textbf{An impossibility result under partial information
+    (\Cref{sec:partial}).}
+    We show that the two relaxations do not compose: if the defender
+    observes only the attacked target and does not know $K$, then
+    \Cref{thm:impossible} gives expected regret at least $T-2$ --- attained
+    exactly, by \Cref{rem:tight-lb} --- and this holds already at
+    $\Kmax=1$, so the obstruction is not the number of types but the
+    defender's inability to \emph{name} the one it faces. A separate
+    phenomenon, \Cref{prop:sqrtT}, gives a $\Theta(\sqrt T)$ floor as soon
+    as $\Kmax\ge 2$, on a universe of only two types and under full
+    information.
+  \item \textbf{Block revelation (\Cref{sec:block}).}
+    We formalize in \Cref{prob:block} the weakest supplement that repairs
+    the impossibility --- every $B$ rounds an oracle reports the \emph{set}
+    of types seen so far, and nothing about when or how often they attacked
+    --- give \Cref{alg:bgc} for it, and prove in \Cref{thm:block} a regret
+    bound of $O(n\Kmax^{4/3}T^{2/3}\log^{1/3}(n\Kmax)+\Kmax B)$. By
+    \Cref{cor:B} the report need arrive only $\tilde O(T^{1/3})$ times over
+    the horizon, and not fewer.
+  \item \textbf{Matching lower bounds for the relaxation
+    (\Cref{thm:blocklb,prop:adaptive}).}
+    The additive $\Theta(\Kmax B)$ above cannot be removed, and it is a
+    statement about the report \emph{schedule} rather than the number of
+    reports: letting the defender choose when the same reports arrive
+    collapses the cost from $\Kmax B$ to $\Kmax$.
   \item \textbf{Experiments (\Cref{sec:exp}).}
-    We implement \textsc{Grow-Catalogue} and two reference baselines, and
-    evaluate them on synthetic SSG instances. The empirical regret scales
+    We implement \textsc{Grow-Catalogue} and two reference baselines and
+    evaluate them on synthetic SSG instances; the empirical regret scales
     as predicted by the theorem, staying comfortably below the analytic
-    $C\sqrt{T}$ envelope.
+    $C\sqrt{T}$ envelope. An oracle reformulation (\Cref{app:oracle})
+    removes the extreme-point enumeration and carries both algorithms to
+    $n=10$ and $n=20$, and we simulate each lower-bound construction
+    exactly, confirming that its constant is attained.
 \end{itemize}
 
 \subsection{Related Work}
@@ -494,7 +570,7 @@ Let the defender play \Cref{alg:gc} in the unknown-$K$ full-information
 setting of \Cref{prob:unknownK}. For any oblivious adversarial sequence
 $\avec\in K^T$ with $|K|\le\Kmax$, the expected regret satisfies
 \begin{equation}
-\EE[\Regret(T)]\;\le\;O\!\Bigl(\sqrt{T\cdot\Kmax\cdot(n^2+\Kmax\log n)}\Bigr).
+\EE[\Regret(T)]\;\le\;O\!\Bigl(n\Kmax\sqrt{T\log (n\Kmax)}\Bigr).
 \label{eq:main}
 \end{equation}
 In particular, if $\Kmax=O(1)$ then $\EE[\Regret(T)]=\tilde O(n\sqrt T)$,
@@ -631,7 +707,7 @@ $i\in\{1,\dots,K'\}$ we obtain
 &\EE\!\left[\sum_{t\in\mathrm{Ep}_i}\!U_d(b_{a_t}(\pvec_t),\pvec_t)\right]\notag\\
 &\;\ge\;\sum_{t\in\mathrm{Ep}_i}\!U_d(b_{a_t}(\pvec^{*}),\pvec^{*})-2\epsilon L_i-c_1\sqrt{L_i\log|\cE_i|}.\label{eq:combined-epoch}
 \end{align}
-Equation \Cref{eq:combined-epoch} is the per-epoch regret bound
+\Cref{eq:combined-epoch} is the per-epoch regret bound
 \emph{against the global benchmark} $\pvec^{*}$, and it is the building
 block for the rest of the proof. Note that despite the fact that
 $\pvec^{*}$ is the benchmark over all $T$ rounds (not just epoch $i$),
@@ -668,12 +744,18 @@ By \Cref{lem:44} applied with $|C_i|\le\Kmax$,
 for an absolute constant $c_2$. Taking logarithms,
 \begin{align}
 \log\Nmax &= n\log\!\bigl(2^n+\Kmax n^2\bigr)+\Kmax\log n+O(1)\notag\\
-&\le n^2+n\log\!\bigl(1+\tfrac{\Kmax n^2}{2^{n-1}}\bigr)+\Kmax\log n\notag\\
-&= O\bigl(n^2+\Kmax\log n\bigr),
+&\le n\bigl(n+1+\log(\Kmax n^2)\bigr)+\Kmax\log n+O(1)\notag\\
+&= O\bigl(n^2+n\log(n\Kmax)+\Kmax\log n\bigr)\notag\\
+&= O\bigl(n^2\,\Kmax\log(n\Kmax)\bigr).
 \label{eq:logN}
 \end{align}
-where the middle step uses $\log(2^n+\Kmax n^2)\le n+\log(1+\Kmax n^2/2^{n-1})$
-and $\log(1+x)\le x$ for $x>0$. Crucially, \Cref{eq:logN} is uniform in
+Both summands of $2^n+\Kmax n^2$ are at least $1$, so their sum is at most
+$2\cdot 2^n\cdot\Kmax n^2$, which gives the second line; the last step absorbs
+each of the three terms into the product, every factor of which is at least
+$1$ once $n\ge 2$. The third line is sharper and could be carried through; we
+quote the fourth because it is the form \citet[Lemma 4.4]{balcan2015} take
+into their Theorem 5.1, which lets \Cref{thm:main} be read off against that
+theorem exactly. Crucially, \Cref{eq:logN} is uniform in
 $i$: $\log|\cE_i|\le\log\Nmax$ for every epoch. This lets us pull the
 $\log|\cE_i|$ factor in Step~5 outside the sum over epochs.
 
@@ -709,16 +791,21 @@ $\epsilon=1/\sqrt T$ gives
 \begin{align*}
 \EE[\Regret(T)]&\le 2\Kmax+2\sqrt T+c_1\sqrt{\Kmax T\,\log\Nmax}\\
 &\le 2\Kmax+2\sqrt T\\
-&\quad+c_3\sqrt{T\Kmax(n^2+\Kmax\log n)}
+&\quad+c_3\,n\Kmax\sqrt{T\log (n\Kmax)}
 \end{align*}
-for an absolute constant $c_3$. Whenever $T\ge\Kmax$ (the only regime in
-which the statement of \Cref{thm:main} is non-trivial) the leading
-$\sqrt{T\Kmax(n^2+\Kmax\log n)}$ term dominates the additive
-$2\Kmax+2\sqrt T$, so
+for an absolute constant $c_3$, the last line by substituting
+\Cref{eq:logN} for $\log\Nmax$ and taking the square root of the product,
+which collects the two factors of $\Kmax$ into one. Whenever $T\ge\Kmax$
+(the only regime in which \Cref{thm:main} is non-trivial) the leading term
+dominates the additive $2\Kmax+2\sqrt T$, so
 \[
-\EE[\Regret(T)]\;=\;O\!\Bigl(\sqrt{T\cdot\Kmax\cdot(n^2+\Kmax\log n)}\Bigr),
+\EE[\Regret(T)]\;=\;O\!\Bigl(n\Kmax\sqrt{T\log(n\Kmax)}\Bigr),
 \]
-which is exactly the bound of \Cref{thm:main}. This completes the proof.
+which is the bound of \Cref{thm:main}. Written in the equivalent form
+$O(\sqrt{T\,n^2\Kmax^2\log(n\Kmax)})$, it is the bound of
+\citet[Theorem 5.1]{balcan2015} with $k$ replaced by $\Kmax$ and inflated by
+the $\sqrt{\Kmax}$ of the Cauchy--Schwarz step, so Step~9 is where the price
+of the unknown catalogue is paid. This completes the proof.
 \end{proof}
 
 \subsection{Consequences of the proof}
@@ -731,17 +818,17 @@ the second gives an instance-adaptive refinement.
 \begin{corollary}[Regime of applicability]
 \label{cor:regime}
 The bound of \Cref{thm:main} is sublinear in $T$ if and only if
-$\Kmax\cdot(n^2+\Kmax\log n)=o(T)$; equivalently,
-$\Kmax=o\!\bigl(\min\{T/n^2,\sqrt{T/\log n}\}\bigr)$.
+$n^2\Kmax^2\log(n\Kmax)=o(T)$; equivalently,
+$\Kmax=o\!\bigl(\sqrt T/(n\sqrt{\log (n\Kmax)})\bigr)$, which up to the
+logarithmic factor is $\Kmax=\tilde o(\sqrt T/n)$.
 In particular, for $\Kmax=O(1)$ the rate is $\tilde O(n\sqrt T)$.
 \end{corollary}
 
 \begin{proof}
 Set the right-hand side of \Cref{eq:main} equal to $T$ and solve for
-$\Kmax$. The condition $\Kmax\cdot(n^2+\Kmax\log n)=o(T)$ is exactly
-when the bound of \Cref{thm:main} is $o(T)$; the equivalent form follows
-by separately bounding $\Kmax\cdot n^2\le T/\omega(1)$ and
-$\Kmax^2\log n\le T/\omega(1)$.
+$\Kmax$. Squaring, $n\Kmax\sqrt{T\log(n\Kmax)}=o(T)$ holds exactly when
+$n^2\Kmax^2\log(n\Kmax)=o(T)$, which is the stated condition; dividing by
+$n^2\log(n\Kmax)$ and taking square roots gives the equivalent form.
 \end{proof}
 
 \begin{corollary}[Instance-adaptive bound]
@@ -750,148 +837,27 @@ Let $K'=|\{a_1,\dots,a_T\}|\le\Kmax$ be the number of \emph{distinct}
 attacker types actually observed in the realized sequence. Then
 \Cref{alg:gc} achieves
 \[
-\EE[\Regret(T)]\;\le\;O\!\Bigl(\sqrt{T\cdot K'\cdot(n^2+K'\log n)}\Bigr).
+\EE[\Regret(T)]\;\le\;O\!\Bigl(nK'\sqrt{T\log (nK')}\Bigr).
 \]
 \end{corollary}
 
 \begin{proof}
-The Cauchy--Schwarz step \Cref{eq:CS} of the proof of \Cref{thm:main}
-gives $\sum_{i=1}^{K'}\sqrt{L_i}\le\sqrt{K'\cdot T}$; plugging this
-sharper bound into \Cref{eq:after-sum} and redoing Step~10 with $K'$ in
-place of $\Kmax$ gives the stated bound.\end{proof}
-
-
-% ==========================================================================
-\section{Experiments}
-\label{sec:exp}
-
-\subsection{Setup}
-
-We implement \Cref{alg:gc} in Python 
-, along
-with two reference algorithms: the known-$K$ oracle of
-\citet[Sec.~5]{balcan2015}, which receives the full set $K$ at $t=1$; and a
-\emph{uniform} baseline that plays $\pvec_{\text{def}}=(R/n,\dots,R/n)$
-every round. Unless stated otherwise, we use $n=3$ targets, $R=1$
-resource, and attacker utilities drawn i.i.d.\ from $\mathrm{Unif}[-1,1]$
-with $u_\alpha^u(i)>0>u_\alpha^c(i)$ to ensure covering is costly for the
-attacker. The extreme-point set $\cE(C;\epsilon)$ is computed by direct
-enumeration of intersections of $(n-1)$-subsets of the defining
-hyperplanes, which is tractable at $n=3$.
-
-We use a \emph{staggered-uniform} adversary: the horizon $[0,T)$ is
-partitioned into $\Kmax$ phases of length $T/\Kmax$ each, and in phase
-$i$ the attacker is drawn uniformly at random from the first $i$ types
-$\{\alpha_1,\dots,\alpha_i\}$. Thus $\alpha_1$ is present in every
-phase, $\alpha_2$ from phase 2 onward, and so on. This design produces a
-clean sequence of discovery rounds at $t=0,T/\Kmax,\dots,(\Kmax-1)T/\Kmax$,
-while still mixing old and new types after each reveal so that the
-benchmark $\pvec^{*}$ is a genuine compromise rather than a specialist
-strategy.
-
-\subsection{Results}
-
-\begin{figure}[t]
-\centering
-\includegraphics[width=0.98\linewidth]{figures/avg_regret_per_iter.pdf}
-\vspace{-0.5em}
-\caption{Rolling-window per-round regret of \textsc{Grow-Catalogue} under
-the staggered-uniform adversary ($n=3$, $\Kmax=4$, $T=4000$, average over
-$40$ seeds, window $=75$). Red dashed lines mark the discovery rounds
-$0,1000,2000,3000$. Each reveal causes a visible transient spike,
-followed by PW re-convergence inside the new epoch.}
-\label{fig:per-round}
-\end{figure}
-
-\begin{figure}[t]
-\centering
-\includegraphics[width=0.98\linewidth]{figures/regret_vs_T_scaling.pdf}
-\vspace{-0.5em}
-\caption{Cumulative regret versus horizon $T$ for \textsc{Grow-Catalogue}
-($n=3$, $\Kmax=3$, uniform random adversary, 80 seeds). The green curve
-stays strictly below the $C\sqrt T$ upper envelope implied by
-\Cref{thm:main}, which is in turn well below the linear-regret regime
-that would result without learning.}
-\label{fig:scaling}
-\end{figure}
-
-\Cref{fig:per-round} shows that the algorithm's per-round regret tracks
-the epoch structure of the proof: each discovery round produces a bounded
-transient, and the PW sub-routine re-converges within the new epoch. The
-spikes shrink with $i$ because, by epoch $i$, the algorithm already has a
-good PW distribution on most of the new (refined) extreme points.
-
-\Cref{fig:scaling} plots cumulative $\Regret(T)$ versus $T$ with the
-$C\sqrt T$ envelope from \Cref{thm:main} overlaid. The empirical regret
-stays visibly below the envelope for all $T$ tested, and the ratio
-$\Regret(T)/\sqrt T$ remains bounded (in fact, it decreases, indicating
-that the stochastic staggered-uniform adversary is far from the worst
-case). This is entirely consistent with \Cref{thm:main}, which is our upper bound
-
-\Cref{tab:comparison} compares the four algorithms at $T=4000$. The regret
-of \textsc{Grow-Catalogue} is
-within roughly $15\%$--$40\%$ of the known-$K$ oracle and an order of
-magnitude better than the uniform baseline. The two \textsc{Grow-Catalogue}
-variants produce regret that differs only by Monte-Carlo noise, as
-predicted by the observational equivalence of the two recomputation
-schemes.
-
-\begin{table}[h]
-\centering
-\footnotesize
-\renewcommand{\arraystretch}{1.15}
-\begin{tabular}{lcc}
-\toprule
-Algorithm & $\EE[\Regret(T)]$ & Ratio\\
-\midrule
-Known-$K$ oracle of \citet{balcan2015} & $14.51\pm 5.00$  & $1.00$\\
-\textsc{Grow-Cat.} (total)     & $16.57\pm 5.40$  & $1.14$\\
-Uniform baseline               & $292.77\pm 350.28$ & $20.18$\\
-\bottomrule
-\end{tabular}
-\caption{Cumulative regret at $T=4000$, $n=3$, $\Kmax=3$, uniform-random
-adversary, mean $\pm$ std over 15 seeds. The known-$K$ oracle receives
-$K$ in advance; \textsc{Grow-Catalogue} attains comparable regret
-\emph{without} this information.}
-\label{tab:comparison}
-\end{table}
-
-% ==========================================================================
-\section{Conclusions}
-\label{sec:conc}
-
-We studied the repeated Stackelberg security game in a new, open regime
-in which the set of attacker types is unknown to the defender a priori
-but known to have bounded cardinality. We presented \textsc{Grow-Catalogue},
-a simple online algorithm that incrementally discovers attacker types and
-re-partitions the coverage polytope accordingly, and we gave a full proof
-that its expected regret under full-information feedback is at most
-$O\!\bigl(\sqrt{T\cdot\Kmax\cdot(n^2+\Kmax\log n)}\bigr)$. This is the
-same functional form as the known-$K$ bound of \citet[Theorem 5.1]{balcan2015},
-with the known cardinality $k$ replaced by our known upper bound $\Kmax$.
-The bound is sublinear whenever $\Kmax\cdot(n^2+\Kmax\log n)=o(T)$, and
-the matching $\Omega(T)$ lower bound of \citet[Theorem 7.1]{balcan2015}
-rules out further improvements on the unbounded side. Our experiments
-confirm the analytical scaling: the empirical regret stays below the
-$C\sqrt T$ envelope and tracks the epoch structure of the proof.
+$K'$ replaces $\Kmax$ at both places the proof uses it: the Cauchy--Schwarz
+step \Cref{eq:CS} gives $\sum_{i=1}^{K'}\sqrt{L_i}\le\sqrt{K'T}$, and the
+catalogue never holds more than the types observed, so $|C_i|\le K'$ and
+Step~7 gives $\log\Nmax=O(n^2K'\log(nK'))$. Redoing Step~10 with both
+gives the bound.\end{proof}
 
 
 
 % ==========================================================================
-% ===================  EXTENSION: SECTIONS 9-12  ===========================
-% ==========================================================================
-
-% Additional notation used only in the sections below.
-\newcommand{\Univ}{\mathfrak{U}}
-\newcommand{\cB}{\mathcal{B}}
-\newcommand{\Ep}{\mathrm{Ep}}
-
 \section{Partial-Information Feedback with an Unknown Type Set}
 \label{sec:partial}
 
 \Cref{thm:main} shows that not knowing $K$ is affordable: under
-full-information feedback it costs a factor $\sqrt{\Kmax}$ over the known-$K$
-rate of \citet[Theorem 5.1]{balcan2015}. Not observing $a_t$ is affordable
+full-information feedback it costs exactly a factor $\sqrt{\Kmax}$ over the
+known-$K$ rate of \citet[Theorem 5.1]{balcan2015}, as Step~10 of
+\Cref{sec:proof} records. Not observing $a_t$ is affordable
 too: with $K$ known and only the attacked target observed,
 \citet[Theorem 6.1]{balcan2015} achieve $O(T^{2/3}nk\log^{1/3}(nk))$. One
 expects the two relaxations to compose. They do not.
@@ -1227,9 +1193,9 @@ value.
 So the transition at $\Kmax=2$ is not about how hard a type is to identify
 but about whether identification is the whole problem. On the upper
 side, \citet[Theorem 6.1]{balcan2015} with $k=M$ --- legitimate, since a
-finite universe \emph{is} a known type set --- gives
-$O(\min\{T,T^{2/3}nM\log^{1/3}(nM)\})$ under partial information, and
-\Cref{thm:main} gives $O(\sqrt{T\Kmax(n^2+\Kmax\log n)})$ under full
+finite universe \emph{is} a known type set --- gives regret
+$O(\min\{T,T^{2/3}nM\log^{1/3}(nM)\})$ under partial information, while
+\Cref{thm:main} gives $O(n\Kmax\sqrt{T\log(n\Kmax)})$ under full
 information. Closing the gap to $\Omega(\sqrt T)$ is the finite-$M$ question
 of \Cref{sec:conc2}.
 
@@ -1558,7 +1524,7 @@ At $B=1$ every round is its own block, so the decomposition of
 \Cref{sec:proof}: a discovery block is a discovery round, and the epochs are
 the same sets. The additive terms agree too --- \Cref{eq:disc-block-sum} reads
 $2K'$, which is \Cref{eq:disc-sum}. Yet the leading terms do not:
-\Cref{thm:main} gives $\sqrt{T\Kmax(n^2+\Kmax\log n)}$ and
+\Cref{thm:main} gives $n\Kmax\sqrt{T\log (n\Kmax)}$ and
 \Cref{eq:block-main} gives $n\Kmax^{4/3}T^{2/3}\log^{1/3}(n\Kmax)$.
 
 The reason is that $B=1$ does not restore full information.
@@ -1786,9 +1752,129 @@ schedules, not about report counts.
 
 % ==========================================================================
 \section{Experiments}
+\label{sec:exp}
 \label{sec:exp2}
 
-The experiments of \Cref{sec:exp} ran at $n=3$ targets, limited not by the
+We report three groups of experiments.
+\Cref{sec:exp-n3,sec:exp-scale} test \Cref{alg:gc} and \Cref{alg:bgc}
+against the envelopes of \Cref{thm:main,thm:block}, first at $n=3$ and
+then, with the oracle implementation of \Cref{app:oracle}, at $n=10$ and
+$n=20$. \Cref{sec:exp-imp} instead plays the gadget $G_3$ of
+\Cref{sec:gadget} exactly, checking that the lower bounds of
+\Cref{thm:impossible,prop:sqrtT,thm:blocklb,prop:adaptive} are attained
+rather than artefacts of the analysis.
+
+\subsection{Setup}
+
+We implement \Cref{alg:gc} in Python 
+, along
+with two reference algorithms: the known-$K$ oracle of
+\citet[Sec.~5]{balcan2015}, which receives the full set $K$ at $t=1$; and a
+\emph{uniform} baseline that plays $\pvec_{\text{def}}=(R/n,\dots,R/n)$
+every round. Unless stated otherwise, we use $n=3$ targets, $R=1$
+resource, and attacker utilities drawn i.i.d.\ from $\mathrm{Unif}[-1,1]$
+with $u_\alpha^u(i)>0>u_\alpha^c(i)$ to ensure covering is costly for the
+attacker. The extreme-point set $\cE(C;\epsilon)$ is computed by direct
+enumeration of intersections of $(n-1)$-subsets of the defining
+hyperplanes, which is tractable at $n=3$.
+
+We use a \emph{staggered-uniform} adversary: the horizon $[0,T)$ is
+partitioned into $\Kmax$ phases of length $T/\Kmax$ each, and in phase
+$i$ the attacker is drawn uniformly at random from the first $i$ types
+$\{\alpha_1,\dots,\alpha_i\}$. Thus $\alpha_1$ is present in every
+phase, $\alpha_2$ from phase 2 onward, and so on. This design produces a
+clean sequence of discovery rounds at $t=0,T/\Kmax,\dots,(\Kmax-1)T/\Kmax$,
+while still mixing old and new types after each reveal so that the
+benchmark $\pvec^{*}$ is a genuine compromise rather than a specialist
+strategy.
+
+\subsection{Full information at $n=3$}
+\label{sec:exp-n3}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.98\linewidth]{figures/avg_regret_per_iter.pdf}
+\vspace{-0.5em}
+\caption{Rolling-window per-round regret of \textsc{Grow-Catalogue} under
+the staggered-uniform adversary ($n=3$, $\Kmax=4$, $T=4000$, average over
+$40$ seeds, window $=75$). Red dashed lines mark the discovery rounds
+$0,1000,2000,3000$. Each reveal causes a visible transient spike,
+followed by PW re-convergence inside the new epoch.}
+\label{fig:per-round}
+\end{figure}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.98\linewidth]{figures/regret_vs_T_scaling.pdf}
+\vspace{-0.5em}
+\caption{Cumulative regret versus horizon $T$ for \textsc{Grow-Catalogue}
+($n=3$, $\Kmax=3$, uniform random adversary, 80 seeds). The green curve
+stays strictly below the $C\sqrt T$ upper envelope implied by
+\Cref{thm:main}, which is in turn well below the linear-regret regime
+that would result without learning.}
+\label{fig:scaling}
+\end{figure}
+
+\Cref{fig:per-round} shows that the algorithm's per-round regret tracks
+the epoch structure of the proof: each discovery round produces a bounded
+transient, and the PW sub-routine re-converges within the new epoch. The
+spikes shrink with $i$ because, by epoch $i$, the algorithm already has a
+good PW distribution on most of the new (refined) extreme points.
+
+\Cref{fig:scaling} plots cumulative $\Regret(T)$ versus $T$ with the
+$C\sqrt T$ envelope from \Cref{thm:main} overlaid. The empirical regret
+stays visibly below the envelope for all $T$ tested, and the ratio
+$\Regret(T)/\sqrt T$ remains bounded (in fact, it decreases, indicating
+that the stochastic staggered-uniform adversary is far from the worst
+case). This is entirely consistent with \Cref{thm:main}, which is our upper bound
+
+\Cref{tab:comparison} compares the four algorithms at $T=4000$. The regret
+of \textsc{Grow-Catalogue} is
+within roughly $15\%$--$40\%$ of the known-$K$ oracle and an order of
+magnitude better than the uniform baseline. The two \textsc{Grow-Catalogue}
+variants produce regret that differs only by Monte-Carlo noise, as
+predicted by the observational equivalence of the two recomputation
+schemes.
+
+\begin{table}[h]
+\centering
+\footnotesize
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{lcc}
+\toprule
+Algorithm & $\EE[\Regret(T)]$ & Ratio\\
+\midrule
+Known-$K$ oracle of \citet{balcan2015} & $14.51\pm 5.00$  & $1.00$\\
+\textsc{Grow-Cat.} (total)     & $16.57\pm 5.40$  & $1.14$\\
+Uniform baseline               & $292.77\pm 350.28$ & $20.18$\\
+\bottomrule
+\end{tabular}
+\caption{Cumulative regret at $T=4000$, $n=3$, $\Kmax=3$, uniform-random
+adversary, mean $\pm$ std over 15 seeds. The known-$K$ oracle receives
+$K$ in advance; \textsc{Grow-Catalogue} attains comparable regret
+\emph{without} this information.}
+\label{tab:comparison}
+\end{table}
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=0.96\textwidth]{figures/impossibility.pdf}
+\vspace{-0.5em}
+\caption{The gadget $G_3$ in simulation, against the optimal defender.
+(a) \Cref{thm:impossible}: with $|\Univ_M|=2^{T}$ the regret is $T-2+o(1)$.
+(b) \Cref{prop:sqrtT}: two types on a two-element universe cost
+$\Theta(\sqrt T)$, one type costs $0.5$ at every horizon.
+(c) \Cref{thm:blocklb}: on the nested instance the regret matches $|K|(B-2)$
+(dashed lines). (d) \Cref{prop:adaptive}: the same $N=|K|$ reports cost
+$|K|(B-2)$ on a fixed schedule and $|K|$ when the defender picks their times.
+Panels (b) and (d) have logarithmic vertical axes.}
+\label{fig:impossible}
+\end{figure*}
+
+\subsection{Scaling to $n=10$ and $n=20$}
+\label{sec:exp-scale}
+
+The runs of \Cref{sec:exp-n3} were at $n=3$ targets, limited not by the
 online algorithm but by the expert set: \Cref{alg:gc} needs
 $\cE(C;\epsilon)$ explicitly, and building it by enumerating $(n-1)$-subsets
 of the defining hyperplanes costs $7.3\times10^{14}$ linear solves at $n=10$.
@@ -1849,26 +1935,29 @@ defender does not even exceed its budget. The measured adaptive regret is
 $3.72$, $3.98$, $4.00$, $4.00$ for $B=4,8,16,32$ --- it is below $|K|$ only
 because a lucky initial play occasionally hits the first type outright.
 
-\begin{figure*}[t]
-\centering
-\includegraphics[width=0.96\textwidth]{figures/impossibility.pdf}
-\vspace{-0.5em}
-\caption{The gadget $G_3$ in simulation, against the optimal defender.
-(a) \Cref{thm:impossible}: with $|\Univ_M|=2^{T}$ the regret is $T-2+o(1)$.
-(b) \Cref{prop:sqrtT}: two types on a two-element universe cost
-$\Theta(\sqrt T)$, one type costs $0.5$ at every horizon.
-(c) \Cref{thm:blocklb}: on the nested instance the regret matches $|K|(B-2)$
-(dashed lines). (d) \Cref{prop:adaptive}: the same $N=|K|$ reports cost
-$|K|(B-2)$ on a fixed schedule and $|K|$ when the defender picks their times.
-Panels (b) and (d) have logarithmic vertical axes.}
-\label{fig:impossible}
-\end{figure*}
-
 % ==========================================================================
 \section{Discussion and Open Problems}
 \label{sec:conc2}
+\label{sec:conc}
 
-\Cref{sec:partial,sec:block} locate the boundary of learnability for the
+We studied the repeated Stackelberg security game in a new, open regime
+in which the set of attacker types is unknown to the defender a priori
+but known to have bounded cardinality. We presented \textsc{Grow-Catalogue},
+a simple online algorithm that incrementally discovers attacker types and
+re-partitions the coverage polytope accordingly, and we gave a full proof
+that its expected regret under full-information feedback is at most
+$O\!\bigl(n\Kmax\sqrt{T\log (n\Kmax)}\bigr)$. This is exactly the known-$K$
+bound of \citet[Theorem 5.1]{balcan2015} with the known cardinality $k$
+replaced by our known upper bound $\Kmax$, inflated by the $\sqrt{\Kmax}$ that
+the epoch decomposition costs.
+The bound is sublinear whenever $n^2\Kmax^2\log(n\Kmax)=o(T)$, and
+the matching $\Omega(T)$ lower bound of \citet[Theorem 7.1]{balcan2015}
+rules out further improvements on the unbounded side. Our experiments
+confirm the analytical scaling: the empirical regret stays below the
+$C\sqrt T$ envelope and tracks the epoch structure of the proof.
+
+Beyond that full-information picture, \Cref{sec:partial,sec:block} locate
+the boundary of learnability for the
 unknown-$K$ repeated security game. On one side, \Cref{thm:main}: an unknown
 attacker set of bounded size costs only $\sqrt{\Kmax}$, provided the defender
 is told after each round which type attacked. On the other,
@@ -1888,14 +1977,14 @@ Feedback & Set $K$ & Regret\\
 full    & known, $|K|=k$        & $O(\sqrt{Tn^2k\log nk})$\\
 partial & known, $|K|=k$        & $O(T^{2/3}nk\log^{1/3}\!nk)$\\
 full    & known, $|K|=2^{T+1}{-}2$ & $\Omega(T)$\\
-full    & unknown, $\le\Kmax$   & $O(\sqrt{T\Kmax\Lambda_n})$\\
+full    & unknown, $\le\Kmax$   & $O(n\Kmax\sqrt{T\log n\Kmax})$\\
 partial & unknown, $\le\Kmax$   & $\Omega(T)$, even $\Kmax{=}1$\\
 full    & known, $|K|{=}|\Univ|{=}2$ & $\Theta(\sqrt T)$\\
 partial & unknown, $\le\Kmax$,  & \\
         & \ \ block revelation  & $\tilde O(n\Kmax^{4/3}T^{2/3}{+}\Kmax B)$\\
 \bottomrule
 \end{tabular}
-\caption{The landscape, with $\Lambda_n=n^2+\Kmax\log n$. Rows 1--3 are
+\caption{The landscape. Rows 1--3 are
 Theorems 5.1, 6.1 and 7.1 of \citet{balcan2015}; row 4 is \Cref{thm:main};
 row 5 is \Cref{thm:impossible}; row 6 is \Cref{prop:sqrtT} with
 \Cref{thm:main} at $k=2$; row 7 is \Cref{thm:block}.
@@ -1976,7 +2065,7 @@ optimum of $\Theta(\min\{T,\log_2 M\})$. For $\Kmax\ge 2$ the defender does
 not know which opponent produced the observation, so the same search is
 corrupted. \Cref{prop:sqrtT} settles one half --- the answer must contain
 $\Omega(\sqrt T)$, already at $M=2$ --- and the two upper bounds we can write
-down, $O(\sqrt{T\Kmax(n^2+\Kmax\log n)})$ and $O(T^{2/3}nM\log^{1/3}(nM))$,
+down, $O(n\Kmax\sqrt{T\log (n\Kmax)})$ and $O(T^{2/3}nM\log^{1/3}(nM))$,
 contain no $\log M$ while the lower bound contains no $M$ at all. The joint
 dependence is open.
 
@@ -1991,12 +2080,14 @@ the truth for self-timed queries, we leave open. This is the question with
 the most direct operational content: it asks whether to subscribe to a
 periodic feed or to keep a budget of on-demand lookups.
 
+
 \bibliography{refs}
 
 
 
 
 
+\clearpage
 \appendix
 \section{The random-walk bound of \Cref{prop:sqrtT}}
 \label{app:walk}
@@ -2335,6 +2426,19 @@ is an exact branch-and-bound solve, not a fixed amount of work.}
 \section{Experiments at $n=10$ and $n=20$}
 \label{app:bign}
 
+\begin{figure*}[t]
+\centering
+\includegraphics[width=0.96\textwidth]{figures/tractable_regret.pdf}
+\vspace{-0.5em}
+\caption{\Cref{alg:gc} with the oracle implementation of \Cref{app:oracle},
+$\Kmax=4$, $T=1500$, mean over $4$ seeds. (a), (b) per-round regret under the
+staggered-uniform adversary, rolling window $101$; red dashed lines mark the
+phase boundaries, at which a new type becomes available. (c), (d) cumulative regret under the uniform-random
+adversary, against the $C\sqrt t$ envelope of \Cref{thm:main} and the uniform
+baseline.}
+\label{fig:tractable}
+\end{figure*}
+
 \subsection{Full information at $n=10$ and $n=20$}
 \label{sec:exp-full}
 
@@ -2366,17 +2470,21 @@ benchmark $\pvec^{*}$ is itself computed with one oracle call, so even
 \emph{evaluating} the regret at $n=20$ was out of reach before
 \Cref{app:oracle}.
 
+
 \begin{figure*}[t]
 \centering
-\includegraphics[width=0.96\textwidth]{figures/tractable_regret.pdf}
+\includegraphics[width=0.96\textwidth]{figures/block_revelation.pdf}
 \vspace{-0.5em}
-\caption{\Cref{alg:gc} with the oracle implementation of \Cref{app:oracle},
-$\Kmax=4$, $T=1500$, mean over $4$ seeds. (a), (b) per-round regret under the
-staggered-uniform adversary, rolling window $101$; red dashed lines mark the
-phase boundaries, at which a new type becomes available. (c), (d) cumulative regret under the uniform-random
-adversary, against the $C\sqrt t$ envelope of \Cref{thm:main} and the uniform
-baseline.}
-\label{fig:tractable}
+\caption{\Cref{alg:bgc} under partial-information feedback with block
+revelation, $\Kmax=4$, $T=2000$, mean over $4$ seeds. (a)--(c)
+staggered-uniform adversary; (d) uniform-random adversary. (a), (b)
+cumulative regret against the $Ct^{2/3}$ envelope of \Cref{thm:block}.
+(c) final regret as a function of the revelation length $B$, against a
+least-squares fit and against the worst-case slope $2K'$ of
+\Cref{thm:block}. (d) full information (\Cref{thm:main}) against block
+revelation (\Cref{thm:block}) as $T$ grows; fitted exponents $0.317$ and
+$0.664$.}
+\label{fig:block}
 \end{figure*}
 
 \subsection{Block revelation at $n=10$ and $n=20$}
@@ -2401,7 +2509,7 @@ predict --- a least-squares fit over $B\in[4,256]$ has slope $0.47$ --- but
 that slope is far below the worst-case $2K'=8$, and the panel draws both.
 The gap is expected rather than a discrepancy: the worst case is attained
 only by the nested adversary of \Cref{thm:blocklb}, which
-\Cref{fig:impossible}(d) exhibits separately, and on a random instance most
+\Cref{fig:impossible}(c) exhibits separately, and on a random instance most
 of the rounds of a discovery block are not in fact wasted, because a strategy
 tuned to the types already in the catalogue is usually not terrible against a
 new one.
@@ -2432,21 +2540,6 @@ reason the measured regret in panels (a) and (b) is an order of magnitude
 above the full-information regret of \Cref{fig:tractable} at the same
 horizon, and it is a constant-factor effect, not a change of exponent.
 
-\begin{figure*}[t]
-\centering
-\includegraphics[width=0.96\textwidth]{figures/block_revelation.pdf}
-\vspace{-0.5em}
-\caption{\Cref{alg:bgc} under partial-information feedback with block
-revelation, $\Kmax=4$, $T=2000$, mean over $4$ seeds. (a)--(c)
-staggered-uniform adversary; (d) uniform-random adversary. (a), (b)
-cumulative regret against the $Ct^{2/3}$ envelope of \Cref{thm:block}.
-(c) final regret as a function of the revelation length $B$, against a
-least-squares fit and against the worst-case slope $2K'$ of
-\Cref{thm:block}. (d) full information (\Cref{thm:main}) against block
-revelation (\Cref{thm:block}) as $T$ grows; fitted exponents $0.317$ and
-$0.664$.}
-\label{fig:block}
-\end{figure*}
 
 
 \end{document}

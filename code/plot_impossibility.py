@@ -1,6 +1,6 @@
-"""The lower bounds of Sections 9 and 10, in simulation.
+"""The lower bounds of Sections 7 and 8, in simulation.
 
-Plays the three-target gadget game G_3 of Section 9.2 for real -- attacker
+Plays the three-target gadget game G_3 of Section 7.2 for real -- attacker
 types are built from their utility vectors, best responses are computed from
 those utilities, and the defender's payoff is read off the attacked target --
 against the *optimal* defender for that game, namely the one that keeps the
@@ -41,7 +41,7 @@ U_D = np.array([-1.0, 0.0, -1.0])
 
 
 def attacker_utils(r1: float, r2: float):
-    """Type alpha_{r1,r2} of Section 9.2: U(1,p) = r1 - p1, U(2,p) = 0,
+    """Type alpha_{r1,r2} of Section 7.2: U(1,p) = r1 - p1, U(2,p) = 0,
     U(3,p) = (1 - r2) - p3.  All utilities lie in [-1, 1]."""
     u_c = np.array([r1 - 1.0, 0.0, -r2])
     u_u = np.array([r1, 0.0, 1.0 - r2])
@@ -92,7 +92,7 @@ def observe_exact(p1_num: int, r1_num: int, r2_num: int) -> int:
 
     With p = (p1, 0, 1 - p1) and the type alpha_{r1,r2}, Lemma 10 gives
     b(p) = 2 iff p1 > r1 and 1 - p1 >= 1 - r2, i.e. iff r1 < p1 <= r2, and
-    Section 9.2 gives b(p) = 1 for p1 <= r1 and b(p) = 3 for p1 > r2.  All three
+    Section 7.2 gives b(p) = 1 for p1 <= r1 and b(p) = 3 for p1 > r2.  All three
     quantities are multiples of a common power of two here, so the comparisons
     are done on integer numerators and the nesting can be iterated to any
     depth without floating-point error.  `_check_observe_exact` verifies the

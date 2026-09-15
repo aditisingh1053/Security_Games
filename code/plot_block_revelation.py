@@ -1,4 +1,4 @@
-"""Experiments for BLOCK-GROW-CATALOGUE (Section 10).
+"""Experiments for BLOCK-GROW-CATALOGUE (Section 8).
 
 Produces `figures/block_revelation.{pdf,png}`:
 
@@ -9,7 +9,7 @@ Produces `figures/block_revelation.{pdf,png}`:
   (d) full information (Theorem 6) against block revelation (Theorem 18) as
       T grows, on a log-log scale.
 
-Panels (a)-(c) use the staggered-uniform adversary of Section 7, which
+Panels (a)-(c) use the staggered-uniform adversary of Section 9, which
 spreads the discovery blocks across the horizon and so exercises the epoch
 decomposition of Definition 16.  Panel (d) uses the stationary uniform-random
 adversary, because it compares two algorithms against the best *fixed*
